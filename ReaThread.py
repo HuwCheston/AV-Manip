@@ -5,17 +5,24 @@ import threading
 
 class ReaThread:
     def __init__(self, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
-        self.project = reapy.Project()
+        # Initialisation
+        self.project = reapy.Project()  # Initialise the Reaper project in Python
         reaper_thread = threading.Thread(target=self.main_loop, args=(stop_event, params))
 
+        # Wait for other threads to complete initialisation
         print(f"Reaper manager currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
         global_barrier.wait()
+
+        # Main loop
         reaper_thread.start()
 
     def main_loop(self, stop_event, params):
-        self.project.record()
-        while not stop_event.is_set():
-            time.sleep(0.1)
-            if params['flipped']:
-                pass    # Placeholder for when I get round to building keypress functionality into ReaThread
-        self.project.stop()
+        self.project.record()   # Start recording in Reaper
+
+        # Main loop
+        while not stop_event.is_set():  # stop_event is trigerred by KeyThread
+            time.sleep(0.1)     # Improves performance in main_loop
+            if params['flipped']:   # Placeholder for triggering modifications in Reaper when set by KeyThread
+                pass
+
+        self.project.stop()     # Stops recording in Reaper
