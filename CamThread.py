@@ -12,30 +12,31 @@ class CamThread:
 
         self.camera_queue = queue.Queue(maxsize=5)
         self.edit_camera_queue = queue.Queue(maxsize=5)
+        local_barrier = threading.Barrier(4)
 
         self.camera_reader = threading.Thread(target=camera_reader,
                                               args=(source,
                                                     self.camera_queue,
                                                     self.edit_camera_queue,
-                                                    # self.barrier,
+                                                    local_barrier,
                                                     stop_event,
                                                     global_barrier))
         self.camera_display = threading.Thread(target=camera_display,
                                                args=(source,
                                                      self.camera_queue,
-                                                     # self.barrier,
+                                                     local_barrier,
                                                      stop_event,
                                                      global_barrier))
         self.edit_camera_display = threading.Thread(target=edit_camera_display,
                                                     args=(source,
                                                           self.edit_camera_queue,
-                                                          # self.barrier,
+                                                          local_barrier,
                                                           params,
                                                           stop_event,
                                                           global_barrier))
         self.camera_recorder = threading.Thread(target=write_video,
                                                 args=(source,
-                                                      # self.barrier,
+                                                      local_barrier,
                                                       stop_event,
                                                       global_barrier))
 
@@ -45,12 +46,13 @@ class CamThread:
         self.camera_recorder.start()
 
 
-def camera_reader(source, camera_queue, edit_camera_queue, stop_event, global_barrier):
-    cam = cv2.VideoCapture(source)
+def camera_reader(source, camera_queue, edit_camera_queue, local_barrier, stop_event, global_barrier):
+    cam = cv2.VideoCapture(source, cv2.CAP_DSHOW)
     _, frame = cam.read()
     camera_queue.put(frame)
     edit_camera_queue.put(frame)
     print(f"Cam {source + 1} reader currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
+    local_barrier.wait()
     global_barrier.wait()
 
     while not stop_event.is_set():
@@ -60,7 +62,7 @@ def camera_reader(source, camera_queue, edit_camera_queue, stop_event, global_ba
     cam.release()
 
 
-def camera_display(source, camera_queue, stop_event, global_barrier):
+def camera_display(source, camera_queue, local_barrier, stop_event, global_barrier):
     name = f"Cam {source + 1} Rec"
     while True:
         try:
@@ -70,6 +72,8 @@ def camera_display(source, camera_queue, stop_event, global_barrier):
         else:
             cv2.imshow(name, frame)
             break
+    local_barrier.wait()
+
     print(f"Cam {source + 1} display currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
     global_barrier.wait()
 
@@ -77,10 +81,11 @@ def camera_display(source, camera_queue, stop_event, global_barrier):
         frame = camera_queue.get()
         cv2.imshow(name, frame)
         cv2.waitKey(1)
+    time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
     cv2.destroyWindow(name)
 
 
-def edit_camera_display(source, edit_camera_queue, edit_params: dict, stop_event, global_barrier):
+def edit_camera_display(source, edit_camera_queue, local_barrier, edit_params: dict, stop_event, global_barrier):
     name = f"Cam {source + 1} View"
     while True:
         try:
@@ -90,6 +95,8 @@ def edit_camera_display(source, edit_camera_queue, edit_params: dict, stop_event
         else:
             cv2.imshow(name, frame)
             break
+    local_barrier.wait()
+
     print(f"Cam {source + 1} edit display currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
     global_barrier.wait()
 
@@ -103,20 +110,23 @@ def edit_camera_display(source, edit_camera_queue, edit_params: dict, stop_event
             frame = frames[1]
         cv2.imshow(name, frame)
         cv2.waitKey(1)
+    time.sleep(1)   # Wait for 1 sec to allow cv2 and ffmpeg time to stop
     cv2.destroyWindow(name)
 
 
-def write_video(source, stop_event, global_barrier):
+def write_video(source, local_barrier, stop_event, global_barrier):
     name = f"Cam {source + 1} Rec"
+    local_barrier.wait()
 
-    process = (ffmpeg.input(format='gdigrab', framerate=30, filename=f"title={name}")
-               .output(preset="ultrafast", filename=f"./output/{name} Output.avi")
+    process = (ffmpeg.input(format='gdigrab', framerate=30, filename=f"title={name}", loglevel='warning', )
+               .output(preset="ultrafast", filename=f"./output/video/{name} Output.mkv",)
                .overwrite_output())
     print(f"Cam {source + 1} writer currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
     global_barrier.wait()
+
     process = process.run_async(pipe_stdin=True)
 
     while not stop_event.is_set():
         time.sleep(0.1)       # running this (rather than pass) in the loop increases performance
-    process.communicate(str.encode("q"))
+    process.communicate(str.encode( "q"))
     process.terminate()
