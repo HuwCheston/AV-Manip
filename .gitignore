@@ -1,2 +1,5 @@
-output/*
-!output/test_output/
+/old/*
+/output/*
+/Reaper Media/*
+/venv/*
+
