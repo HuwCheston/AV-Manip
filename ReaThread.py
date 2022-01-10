@@ -17,5 +17,5 @@ class ReaThread:
         while not stop_event.is_set():
             time.sleep(0.1)
             if params['flipped']:
-                print('flipped')    # Placeholder for when I get round to building keypress functionality into ReaThread
+                pass    # Placeholder for when I get round to building keypress functionality into ReaThread
         self.project.stop()

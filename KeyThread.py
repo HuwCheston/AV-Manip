@@ -13,7 +13,9 @@ class KeyThread:
         # no use of the global_barrier to block it, as there was with the other threads.
 
     def main_loop(self, stop_event, params):
+        cv2.namedWindow('Keypress Manager', cv2.WINDOW_NORMAL)
         while True:
+            cv2.setWindowProperty('Keypress Manager', cv2.WND_PROP_TOPMOST, 1)  # Keep the keypress manager on top
             cv2.imshow('Keypress Manager', self.blank_image)
             key = cv2.waitKey(1) & 0xFF
             if key == ord('1'):
