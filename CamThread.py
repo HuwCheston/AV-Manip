@@ -128,5 +128,5 @@ def write_video(source, local_barrier, stop_event, global_barrier):
 
     while not stop_event.is_set():
         time.sleep(0.1)       # running this (rather than pass) in the loop increases performance
-    process.communicate(str.encode( "q"))
+    process.communicate(str.encode("q"))
     process.terminate()

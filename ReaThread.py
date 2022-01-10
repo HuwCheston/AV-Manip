@@ -8,6 +8,7 @@ class ReaThread:
         self.project = reapy.Project()
         self.params = params
         self.reaper_thread = threading.Thread(target=self.main_loop, args=(stop_event,))
+
         print(f"Reaper manager currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
         global_barrier.wait()
         self.reaper_thread.start()
@@ -17,5 +18,5 @@ class ReaThread:
         while not stop_event.is_set():
             time.sleep(0.1)
             if self.params['flipped']:
-                print('flipped')
+                print('flipped')    # Placeholder for when I get round to building keypress functionality into ReaThread
         self.project.stop()
