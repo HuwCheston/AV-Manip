@@ -1,17 +1,23 @@
-import threading
+from threading import Event, Barrier
 from CamThread import CamThread
 from KeyThread import KeyThread
 from ReaThread import ReaThread
 
-PARAMS = {
+# These variables can be edited to account for differing numbers of cameras or desired modification parameters
+num_cameras = 2
+params = {
     'flipped': False,
     'delayed': False,
+    # More can be added here and will be passed to all the appropriate threads (functionality needs to be built though)
 }
-STOPPER = threading.Event()
-BARRIER = threading.Barrier(9)
+
+# These variables shouldn't be edited
+STOPPER = Event()
+BARRIER = Barrier((4 * num_cameras) + 1)  # ReaThread uses 1 thread, each CamThread uses 4 threads
 
 if __name__ == "__main__":
-    camera1 = CamThread(source=0, stop_event=STOPPER, global_barrier=BARRIER, params=PARAMS)
-    camera2 = CamThread(source=1, stop_event=STOPPER, global_barrier=BARRIER, params=PARAMS)
-    reaper = ReaThread(stop_event=STOPPER, global_barrier=BARRIER, params=PARAMS)
-    keylogger = KeyThread(params=PARAMS, stop_event=STOPPER, )
+    cam_list = []
+    for num in range(num_cameras):
+        cam_list.append(CamThread(source=num, stop_event=STOPPER, global_barrier=BARRIER, params=params))
+    reaper = ReaThread(stop_event=STOPPER, global_barrier=BARRIER, params=params)
+    keylogger = KeyThread(params=params, stop_event=STOPPER)

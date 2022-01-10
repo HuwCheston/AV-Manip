@@ -1,16 +1,16 @@
 import cv2
 import threading
-import numpy as np
+from numpy import zeros, uint8
 
 
 class KeyThread:
     def __init__(self, params: dict, stop_event: threading.Event,):
-        self.blank_image = np.zeros(shape=[100, 100, 3], dtype=np.uint8)
+        self.blank_image = zeros(shape=[100, 100, 3], dtype=uint8)
         keypress_manager = threading.Thread(target=self.main_loop, args=(stop_event, params))
         keypress_manager.start()
 
         # There is no need for the keypress manager to start at the same time as the video/audio recording - so there is
-        # no use of the global_barrier to block it, as with the other threads.
+        # no use of the global_barrier to block it, as there was with the other threads.
 
     def main_loop(self, stop_event, params):
         while True:
@@ -25,5 +25,5 @@ class KeyThread:
                     params[param] = False
             if key == ord('q'):
                 break
-        stop_event.set()
+        stop_event.set()    # This sets the stop_event for ALL other threads!
         cv2.destroyWindow('Keypress Manager')

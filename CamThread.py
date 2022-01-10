@@ -4,7 +4,6 @@ import queue
 import ffmpeg
 import time
 from collections import deque
-import get_filename
 
 
 class CamThread:
