@@ -3,6 +3,7 @@ import threading
 import queue
 import ffmpeg
 import time
+import os
 from datetime import datetime
 from collections import deque
 
@@ -10,8 +11,8 @@ from collections import deque
 class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
         # Define class attributes
-        self.camera_queue = queue.Queue(maxsize=5)
-        self.edit_camera_queue = queue.Queue(maxsize=5)
+        self.researcher_cam_queue = queue.Queue(maxsize=5)
+        self.performer_cam_queue = queue.Queue(maxsize=5)
         self.local_barrier = threading.Barrier(4)
         self.source = source
         self.params = params
@@ -26,11 +27,18 @@ class CamThread:
             thread.start()
 
     def camera_reader(self, stop_event, global_barrier):
+        """
+        Grabs frame from USB camera source, puts to researcher/performer cam queue.
+        """
         # Initialisation
         cam = cv2.VideoCapture(self.source, cv2.CAP_DSHOW)
         _, frame = cam.read()
-        self.camera_queue.put(frame)
-        self.edit_camera_queue.put(frame)
+        if frame is None:
+            print('no frame!')
+            os._exit(1)
+        else:
+            self.researcher_cam_queue.put(frame)
+            self.performer_cam_queue.put(frame)
 
         # Wait for other threads to initialise
         print(f"Cam {self.source + 1} reader currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
@@ -43,23 +51,19 @@ class CamThread:
             _, frame = cam.read()
 
             # Put frame in queue for modification and viewing
-            self.camera_queue.put(frame)
-            self.edit_camera_queue.put(frame)
+            self.researcher_cam_queue.put(frame)
+            self.performer_cam_queue.put(frame)
 
         # Exit loop, cleanup and close thread
         cam.release()
 
     def display_researcher_camera(self, stop_event, global_barrier):
+        """
+        Grabs frame from researcher camera queue and displays it (without any manipulations).
+        """
         # Initialisation
         name = f"Cam {self.source + 1} Rec"
-        while True:
-            try:
-                frame = self.camera_queue.get(False)
-            except queue.Empty:
-                pass
-            else:
-                cv2.imshow(name, frame)
-                break
+        initialise_camera(n=name, q=self.researcher_cam_queue)
 
         # Wait for other threads to complete initialisation
         self.local_barrier.wait()
@@ -69,7 +73,7 @@ class CamThread:
         # Main loop
         while not stop_event.is_set():
             # Acquire frame from queue
-            frame = self.camera_queue.get()
+            frame = self.researcher_cam_queue.get()
 
             # Show frame
             cv2.imshow(name, frame)
@@ -80,17 +84,13 @@ class CamThread:
         cv2.destroyWindow(name)
 
     def display_performer_camera(self, stop_event, global_barrier):
+        """
+        Grabs frame from performer camera queue and displays it (with manipulations, if triggered by KeyThread).
+        """
         # Initialisation
         name = f"Cam {self.source + 1} View"
-        while True:
-            try:
-                frame = self.edit_camera_queue.get(False)
-            except queue.Empty:
-                pass
-            else:
-                cv2.imshow(name, frame)
-                break
         frames = deque(maxlen=150)
+        initialise_camera(n=name, q=self.performer_cam_queue)
 
         # Wait for other threads to complete initialisation
         self.local_barrier.wait()
@@ -100,7 +100,7 @@ class CamThread:
         # Main loop
         while not stop_event.is_set():
             # Acquire frame from queue
-            frame = self.edit_camera_queue.get()
+            frame = self.performer_cam_queue.get()
             frames.append(frame)    # Frames are added to the deque so they can be played later (for delay effect)
 
             # Modify frame
@@ -118,12 +118,16 @@ class CamThread:
         cv2.destroyWindow(name)
 
     def write_video(self, stop_event, global_barrier):
+        """
+        Initialises FFmpeg process to record researcher camera stream and save it in ./output/video
+        """
         # Initialisation
         winname = f"Cam {self.source + 1} Rec"
         filename = f'./output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
         self.local_barrier.wait()
         process = (ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={winname}", loglevel='warning',)
                    .output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080'))
+        # TODO: fix ffmpeg flags to ensure highest quality of output
 
         # Wait for other threads to complete initialisation
         print(f"Cam {self.source + 1} writer currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
@@ -142,7 +146,20 @@ class CamThread:
         get_video_stats(filename)
 
 
+def initialise_camera(n: str, q: queue.Queue) -> None:
+    while True:
+        try:
+            frame = q.get(False)
+        except queue.Empty:
+            time.sleep(1)
+        else:
+            cv2.imshow(n, frame)
+            break
+    return
+
+
 def get_video_stats(filename):
+    # TODO: implement this function
     vid = cv2.VideoCapture(filename)
     fps = vid.get(cv2.CAP_PROP_FPS)
     framecount = vid.get(cv2.CAP_PROP_FRAME_COUNT)

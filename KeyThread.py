@@ -12,6 +12,9 @@ class KeyThread:
         keypress_manager.start()
 
     def main_loop(self, stop_event, params):
+        """
+        Creates a new CV2 window, listens for keypresses, sends these to KeyThread/CamThread to trigger manipulations.
+        """
         # Initialisation
         cv2.namedWindow('Keypress Manager', cv2.WINDOW_NORMAL)
 
@@ -20,7 +23,7 @@ class KeyThread:
         # no use of the global_barrier to block it while the other threads initialise, as with CamThread and ReaThread
 
         # Main loop
-        while True:
+        while not stop_event.is_set():
             cv2.setWindowProperty('Keypress Manager', cv2.WND_PROP_TOPMOST, 1)  # Keep the keypress manager on top
             cv2.imshow('Keypress Manager', self.blank_image)
             key = cv2.waitKey(1) & 0xFF
@@ -35,8 +38,7 @@ class KeyThread:
                 for param in params.keys():
                     params[param] = False
             if key == ord('q'):     # Exit recording
-                break
+                stop_event.set()  # This sets the stop_event for ALL other threads!
 
         # Exit loop, cleanup and close thread
-        stop_event.set()    # This sets the stop_event for ALL other threads!
         cv2.destroyWindow('Keypress Manager')

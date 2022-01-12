@@ -17,6 +17,9 @@ class ReaThread:
         reaper_thread.start()
 
     def main_loop(self, stop_event, params):
+        """
+        Starts recording in Reaper, listens for keypresses from KeyThread to trigger manipulations.
+        """
         self.project.record()   # Start recording in Reaper
 
         # Main loop
