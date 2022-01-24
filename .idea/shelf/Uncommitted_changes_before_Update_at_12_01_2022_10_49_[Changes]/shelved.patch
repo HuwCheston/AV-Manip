@@ -1,0 +1,53 @@
+Index: main.rpp
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><REAPER_PROJECT 0.1 \"6.42/win64\" 1641979753\r\n  RIPPLE 0\r\n  GROUPOVERRIDE 0 0 0\r\n  AUTOXFADE 1\r\n  ENVATTACH 3\r\n  POOLEDENVATTACH 0\r\n  MIXERUIFLAGS 11 48\r\n  PEAKGAIN 1\r\n  FEEDBACK 0\r\n  PANLAW 1\r\n  PROJOFFS 0 0 0\r\n  MAXPROJLEN 0 600\r\n  GRID 3199 8 1 8 1 0 0 0\r\n  TIMEMODE 1 5 -1 30 0 0 -1\r\n  VIDEO_CONFIG 0 0 256\r\n  PANMODE 3\r\n  CURSOR 0\r\n  ZOOM 6.2932385734158 0 0\r\n  VZOOMEX 0 0\r\n  USE_REC_CFG 0\r\n  RECMODE 1\r\n  SMPTESYNC 0 30 100 40 1000 300 0 0 1 0 0\r\n  LOOP 0\r\n  LOOPGRAN 0 4\r\n  RECORD_PATH \"Reaper Media\" \"\"\r\n  <RECORD_CFG\r\n    ZXZhdxgAAA==\r\n  >\r\n  <APPLYFX_CFG\r\n  >\r\n  RENDER_FILE \"\"\r\n  RENDER_PATTERN \"\"\r\n  RENDER_FMT 0 2 0\r\n  RENDER_1X 0\r\n  RENDER_RANGE 1 0 0 18 1000\r\n  RENDER_RESAMPLE 3 0 1\r\n  RENDER_ADDTOPROJ 0\r\n  RENDER_STEMS 0\r\n  RENDER_DITHER 0\r\n  TIMELOCKMODE 1\r\n  TEMPOENVLOCKMODE 1\r\n  ITEMMIX 0\r\n  DEFPITCHMODE 589824 0\r\n  TAKELANE 1\r\n  SAMPLERATE 96000 1 0\r\n  <RENDER_CFG\r\n  >\r\n  LOCK 1\r\n  <METRONOME 6 2\r\n    VOL 0.25 0.125\r\n    FREQ 800 1600 1\r\n    BEATLEN 4\r\n    SAMPLES \"\" \"\"\r\n    PATTERN 2863311530 2863311529\r\n    MULT 1\r\n  >\r\n  GLOBAL_AUTO -1\r\n  TEMPO 120 4 4\r\n  PLAYRATE 1 0 0.25 4\r\n  SELECTION 6 6\r\n  SELECTION2 6 6\r\n  MASTERAUTOMODE 0\r\n  MASTERTRACKHEIGHT 0 0\r\n  MASTERPEAKCOL 16576\r\n  MASTERMUTESOLO 0\r\n  MASTERTRACKVIEW 0 0.6667 0.5 0.5 -1 -1 -1 0 0 0 -1 -1 0\r\n  MASTERHWOUT 0 0 1 0 0 0 0 -1\r\n  MASTER_NCH 2 2\r\n  MASTER_VOLUME 1 0 -1 -1 1\r\n  MASTER_FX 1\r\n  MASTER_SEL 0\r\n  <MASTERPLAYSPEEDENV\r\n    EGUID {83254EBF-214A-478E-A299-A993163AA905}\r\n    ACT 0 -1\r\n    VIS 0 1 1\r\n    LANEHEIGHT 0 0\r\n    ARM 0\r\n    DEFSHAPE 0 -1 -1\r\n  >\r\n  <TEMPOENVEX\r\n    EGUID {4A18E499-B9ED-499D-8789-07B5BDE9C7C0}\r\n    ACT 0 -1\r\n    VIS 1 0 1\r\n    LANEHEIGHT 0 0\r\n    ARM 0\r\n    DEFSHAPE 1 -1 -1\r\n  >\r\n  <PROJBAY\r\n  >\r\n  <TRACK {D63DD6FE-741A-4DB0-ACE0-F09EADBFC0DB}\r\n    NAME \"\"\r\n    PEAKCOL 16576\r\n    BEAT -1\r\n    AUTOMODE 0\r\n    VOLPAN 1 0 -1 -1 1\r\n    MUTESOLO 0 0 0\r\n    IPHASE 0\r\n    PLAYOFFS 0 1\r\n    ISBUS 0 0\r\n    BUSCOMP 0 0 0 0 0\r\n    SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1\r\n    FREEMODE 0\r\n    SEL 1\r\n    REC 1 0 1 0 0 0 0\r\n    VU 2\r\n    TRACKHEIGHT 0 0 0 0 -1 0\r\n    INQ 0 0 0 0.5 100 0 0 100\r\n    NCHAN 2\r\n    FX 1\r\n    TRACKID {D63DD6FE-741A-4DB0-ACE0-F09EADBFC0DB}\r\n    PERF 0\r\n    MIDIOUT -1\r\n    MAINSEND 1 0\r\n    <FXCHAIN\r\n      WNDRECT 717 131 716 240\r\n      SHOW 0\r\n      LASTSEL 0\r\n      DOCKED 0\r\n      BYPASS 0 0 0\r\n      <JS midi/midi_delay \"\"\r\n        0 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \r\n      >\r\n      FLOATPOS 0 0 0 0\r\n      FXID {3D692642-ABE3-488C-84D4-79C7F12F8C26}\r\n      WAK 0 0\r\n    >\r\n  >\r\n>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.rpp b/main.rpp
+--- a/main.rpp	(revision 0f76fefd4e2bb8259065ecc9c19ceed583aee1ce)
++++ b/main.rpp	(date 1641984534190)
+@@ -1,4 +1,4 @@
+-<REAPER_PROJECT 0.1 "6.42/win64" 1641979753
++<REAPER_PROJECT 0.1 "6.42/win64" 1641984534
+   RIPPLE 0
+   GROUPOVERRIDE 0 0 0
+   AUTOXFADE 1
+@@ -14,7 +14,7 @@
+   TIMEMODE 1 5 -1 30 0 0 -1
+   VIDEO_CONFIG 0 0 256
+   PANMODE 3
+-  CURSOR 0
++  CURSOR 6
+   ZOOM 6.2932385734158 0 0
+   VZOOMEX 0 0
+   USE_REC_CFG 0
+@@ -112,17 +112,24 @@
+     MIDIOUT -1
+     MAINSEND 1 0
+     <FXCHAIN
+-      WNDRECT 717 131 716 240
++      WNDRECT 689 390 716 180
+       SHOW 0
+-      LASTSEL 0
++      LASTSEL 1
+       DOCKED 0
+-      BYPASS 0 0 0
++      BYPASS 1 0 0
+       <JS midi/midi_delay ""
+         0 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+       >
+       FLOATPOS 0 0 0 0
+       FXID {3D692642-ABE3-488C-84D4-79C7F12F8C26}
+       WAK 0 0
++      BYPASS 1 0 0
++      <JS loser/WhiteNoise ""
++        -96 -11 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
++      >
++      FLOATPOS 0 0 0 0
++      FXID {E5406637-1A56-41B7-92D1-8D5DA8EA7960}
++      WAK 0 0
+     >
+   >
+ >
