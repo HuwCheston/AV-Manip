@@ -21,11 +21,18 @@ class ReaThread:
         Starts recording in Reaper, listens for keypresses from KeyThread to trigger manipulations.
         """
         self.project.record()   # Start recording in Reaper
+        keys = self.project.tracks[0]
 
         # Main loop
-        while not stop_event.is_set():  # stop_event is trigerred by KeyThread
-            time.sleep(0.1)     # Improves performance in main_loop
-            if params['flipped']:   # Placeholder for triggering modifications in Reaper when set by KeyThread
-                pass
+        while not stop_event.is_set():  # stop_event is triggered by KeyThread
+            # TODO: fix the logic here... this works for now, but won't when other FXs are added!
+            if params['delayed'] and not keys.fxs[0].is_enabled:    # Don't try and enable if already enabled!
+                keys.fxs[0].enable()
+
+            elif not params['delayed']:
+                for num in range(keys.n_fxs - 1):   # Don't want to disable final FX as it's the piano VST
+                    keys.fxs[num].disable()    # Disable all FXs
+
+            time.sleep(0.1)  # Improves performance in main_loop
 
         self.project.stop()     # Stops recording in Reaper
