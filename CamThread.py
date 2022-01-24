@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 from collections import deque
 
-
+# TODO: Refactor me please...
 class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
         # Define class attributes
