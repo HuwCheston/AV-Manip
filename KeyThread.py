@@ -28,6 +28,7 @@ class KeyThread:
             cv2.imshow('Keypress Manager', self.blank_image)
             key = cv2.waitKey(1) & 0xFF
 
+            # TODO: investigate using the switch syntax in Python 3.10
             # Detects keypresses to trigger modifications in CamThread and ReaThread
             if key == ord('1'):
                 params['flipped'] = True

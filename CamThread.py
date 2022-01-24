@@ -7,9 +7,13 @@ import os
 from datetime import datetime
 from collections import deque
 
-# TODO: Refactor me please...
+# TODO: Refactor this into a group of four classes, all created by the CamThread. Each class should have the same
+#  initialise/wait/loop functions, but split into different methods.
+
+# TODO: investigate using PyTest here!
 class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
+        # TODO: Queu and Barrier objects here have 'magic' numbers as parameters - use len(methods) etc.
         # Define class attributes
         self.researcher_cam_queue = queue.Queue(maxsize=5)
         self.performer_cam_queue = queue.Queue(maxsize=5)

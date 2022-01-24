@@ -23,6 +23,7 @@ class ReaThread:
         self.project.record()   # Start recording in Reaper
         keys = self.project.tracks[0]
 
+        # TODO: implement more FXs here...
         # Main loop
         while not stop_event.is_set():  # stop_event is triggered by KeyThread
             # TODO: fix the logic here... this works for now, but won't when other FXs are added!
