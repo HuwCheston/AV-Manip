@@ -2,7 +2,7 @@ from cv2 import cv2
 import threading
 from numpy import zeros, uint8
 
-
+# TODO: refactor in the same manner as CamThread
 class KeyThread:
     def __init__(self, params: dict, stop_event: threading.Event,):
         self.blank_image = zeros(shape=[100, 100, 3], dtype=uint8)  # Blank image for keypress manager to display
@@ -41,6 +41,7 @@ class KeyThread:
                 case 'r':
                     for param in params.keys():
                         params[param] = False
+                    params['reset'] = True
                 case 'q':
                     stop_event.set()
 

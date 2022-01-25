@@ -11,33 +11,37 @@ from collections import deque
 
 class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
-
         self.source = source
         self.params = params
-        self.queue_length = 5  # This can be changed to save memory if required
-        researcher_cam_queue = Queue(maxsize=self.queue_length)
-        performer_cam_queue = Queue(maxsize=self.queue_length)
+        self.queue_length = 128  # This can be changed to save memory if required
+        self.researcher_cam_queue = Queue(maxsize=self.queue_length)
+        self.performer_cam_queue = Queue(maxsize=self.queue_length)
+        self.global_barrier = global_barrier
+        self.stop_event = stop_event
+        self.start_threads(self.thread_init())
 
+    def thread_init(self):
         # Define threads and thread arguments
-        classes = [CamRead(source=self.source, performer_q=performer_cam_queue, researcher_q=researcher_cam_queue),
-                   ResearcherCamView(source=self.source, queue=researcher_cam_queue),
-                   PerformerCamView(source=self.source, queue=performer_cam_queue, params=self.params),
+        classes = [CamRead(source=self.source, perfor_q=self.performer_cam_queue, resear_q=self.researcher_cam_queue),
+                   ResearcherCamView(source=self.source, queue=self.researcher_cam_queue),
+                   PerformerCamView(source=self.source, queue=self.performer_cam_queue, params=self.params),
                    CamWrite(source=self.source)]
-        args = (global_barrier, stop_event)
-        self.threads = [threading.Thread(target=cl.start_cam, args=args) for cl in classes]
-        self.start_threads()
+        args = (self.global_barrier, self.stop_event)
+        threads = [threading.Thread(target=cl.start_cam, args=args) for cl in classes]
+        return threads
 
-    def start_threads(self):
-        for thread in self.threads:
+    @staticmethod
+    def start_threads(thread_list):
+        for thread in thread_list:
             thread.start()
 
 
 class CamRead:
-    def __init__(self, source, researcher_q, performer_q):
+    def __init__(self, source, resear_q, perfor_q):
         self.source = source
         self.cam = cv2.VideoCapture(self.source, cv2.CAP_DSHOW)
-        self.researcher_cam_queue = researcher_q
-        self.performer_cam_queue = performer_q
+        self.researcher_cam_queue = resear_q
+        self.performer_cam_queue = perfor_q
 
     def start_cam(self, global_barrier, stop_event):
         self.read_frame()
@@ -125,9 +129,10 @@ class PerformerCamView:
                     frame = cv2.flip(frame, 0)
                 case {'delayed': True}:
                     frame = frames[1]
-            cv2.moveWindow(self.name, -1500, 0)
-            small = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
-            cv2.imshow(self.name, small)
+
+            # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
+            frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
+            cv2.imshow(self.name, frame)
             cv2.waitKey(1)
 
     def exit_loop(self):
