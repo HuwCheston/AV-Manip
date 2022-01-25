@@ -4,16 +4,21 @@ from numpy import zeros, uint8
 
 
 class KeyThread:
-    def __init__(self, params: dict, stop_event: threading.Event,):
+    def __init__(self, params: dict, stop_event: threading.Event, global_barrier: threading.Barrier):
         self.blank_image = zeros(shape=[100, 100, 3], dtype=uint8)  # Blank image for keypress manager to display
         self.name = 'Keypress Manager'
-        keypress_manager = threading.Thread(target=self.start_keymanager, args=(stop_event, params))
+        keypress_manager = threading.Thread(target=self.start_keymanager, args=(global_barrier, stop_event, params))
         keypress_manager.start()
 
-    def start_keymanager(self, stop_event, params):
+    def start_keymanager(self, global_barrier, stop_event, params):
+        self.wait(global_barrier)
         self.cv2_setup()
         self.main_loop(stop_event, params)
         self.exit_loop()
+
+    def wait(self, global_barrier):
+        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
+        global_barrier.wait()
 
     def cv2_setup(self):
         cv2.namedWindow(self.name, cv2.WINDOW_NORMAL)

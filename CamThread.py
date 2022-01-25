@@ -149,7 +149,6 @@ class CamWrite:
         self.filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
 
     def start_cam(self, global_barrier, stop_event):
-        print('cam write running on latest version')
         self.wait(global_barrier)
         # TODO: fix ffmpeg flags to ensure highest quality of output
         process = (
