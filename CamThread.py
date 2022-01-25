@@ -7,6 +7,9 @@ import os
 from datetime import datetime
 from collections import deque
 
+# If you run into FileNotFound errors when importing ffmpeg-python, make sure that ffmpeg.exe is placed in the
+# Python/Scripts directory of your environment.
+
 # TODO: Refactor this into a group of four classes, all created by the CamThread. Each class should have the same
 #  initialise/wait/loop functions, but split into different methods.
 
@@ -125,11 +128,15 @@ class CamThread:
         """
         Initialises FFmpeg process to record researcher camera stream and save it in ./output/video
         """
+        # FFmpeg can have issues when writing video from high-DPI displays. I've got around this by lowering my
+        # display resolution, but I'm sure there are other ways of doing this too.
+
         # Initialisation
         winname = f"Cam {self.source + 1} Rec"
-        filename = f'./output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
+        filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
         self.local_barrier.wait()
-        process = (ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={winname}", loglevel='warning',)
+        process = (ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={winname}", loglevel='warning',
+                                probesize='500M')
                    .output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080'))
         # TODO: fix ffmpeg flags to ensure highest quality of output
 

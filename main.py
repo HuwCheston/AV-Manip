@@ -4,7 +4,7 @@ from KeyThread import KeyThread
 from ReaThread import ReaThread
 
 # These variables can be edited
-num_cameras = 2     # Number of cameras to try and read
+num_cameras = 1     # Number of cameras to try and read
 params = {
     'flipped': False,   # V: rotates orthogonally A: no modification
     'delayed': False,   # V: adds five-second delay A: adds five-second delay (not yet implemented)

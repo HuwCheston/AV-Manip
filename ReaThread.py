@@ -2,6 +2,9 @@ import reapy
 import time
 import threading
 
+# On certain machines (or a portable Reaper install), you may need to repeat the process of configuring Reapy every
+# time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
+# Action List -> Run Reascript), then call python -c "import reapy; reapy.configure_reaper()" in a terminal.
 
 class ReaThread:
     def __init__(self, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
