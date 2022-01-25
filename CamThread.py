@@ -1,4 +1,4 @@
-import cv2
+from cv2 import cv2
 import threading
 import ffmpeg
 import time
@@ -14,6 +14,8 @@ from collections import deque
 #  initialise/wait/loop functions, but split into different methods.
 
 # TODO: investigate using PyTest here!
+
+
 class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
 
@@ -177,3 +179,59 @@ def get_video_stats(filename):
     framecount = vid.get(cv2.CAP_PROP_FRAME_COUNT)
     duration = framecount / fps
     print(duration)
+
+
+class CamRead:
+    def __init__(self):
+        pass
+
+    def initialise(self):
+        pass
+
+    def wait(self):
+        pass
+
+    def main_loop(self):
+        pass
+
+
+class ResearcherCamView:
+    def __init__(self):
+        pass
+
+    def initialise(self):
+        pass
+
+    def wait(self):
+        pass
+
+    def main_loop(self):
+        pass
+
+
+class PerformerCamView:
+    def __init__(self):
+        pass
+
+    def initialise(self):
+        pass
+
+    def wait(self):
+        pass
+
+    def main_loop(self):
+        pass
+
+
+class CamWrite:
+    def __init__(self):
+        pass
+
+    def initialise(self):
+        pass
+
+    def wait(self):
+        pass
+
+    def main_loop(self):
+        pass

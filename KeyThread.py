@@ -1,4 +1,4 @@
-import cv2
+from cv2 import cv2
 import threading
 from numpy import zeros, uint8
 
@@ -18,7 +18,6 @@ class KeyThread:
         # Initialisation
         cv2.namedWindow('Keypress Manager', cv2.WINDOW_NORMAL)
         cv2.setWindowProperty('Keypress Manager', cv2.WND_PROP_TOPMOST, 1)  # Keep the keypress manager on top
-
 
         # Wait for other threads to initialise
         # There is no need for the keypress manager to start at the same time as the video/audio recording - so there is
