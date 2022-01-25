@@ -1,8 +1,8 @@
-from cv2 import cv2
 import threading
 import ffmpeg
 import time
 import os
+from cv2 import cv2
 from queue import Queue, Empty
 from datetime import datetime
 from collections import deque
@@ -163,7 +163,8 @@ class CamWrite:
         print(f"Cam {self.source + 1} Writer currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
         global_barrier.wait()
 
-    def main_loop(self, stop_event, process):
+    @staticmethod
+    def main_loop(stop_event, process):
         running_process = process.run_async(pipe_stdin=True)
         while not stop_event.is_set():
             time.sleep(0.1)  # running this (rather than pass) in the loop increases performance
