@@ -31,7 +31,7 @@ def cam_preview(preview_name, cam_id):
     # cam.set(cv2.CAP_PROP_BUFFERSIZE, 2)
     # cam.set(cv2.CAP_PROP_FPS, 30)
 
-    cam = CamGear(source=cam_id).start()
+    cam = CamGear(source=cam_id).start_thread()
     writer = WriteGear(output_filename='vidgear_out.mp4')
 
     # fourcc = cv2.VideoWriter_fourcc('X', 'V', 'I', 'D')

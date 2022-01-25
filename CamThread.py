@@ -20,7 +20,7 @@ class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
 
         # Define threads and thread arguments
-        methods = [self.camera_reader, self.display_researcher_camera, self.display_performer_camera, self.write_video]
+        methods = [self.camera_reader,]
         target_args = (stop_event, global_barrier)
         threads = [threading.Thread(target=method, args=target_args) for method in methods]
 
@@ -29,8 +29,18 @@ class CamThread:
         self.researcher_cam_queue = Queue(maxsize=queue_length)
         self.performer_cam_queue = Queue(maxsize=queue_length)
         self.local_barrier = threading.Barrier(len(threads))   # Barrier parties should equal number of running threads
+        # FIXME: Local barrier won't have the correct number of threads now I've refactored!
+
         self.source = source
         self.params = params
+
+
+        res_view = ResearcherCamView(source=self.source, queue=self.researcher_cam_queue)
+        threads.append(threading.Thread(target=res_view.start_cam, args=(self.local_barrier, global_barrier, stop_event)))
+        per_view = PerformerCamView(source=self.source, queue=self.performer_cam_queue, params=self.params)
+        threads.append(threading.Thread(target=per_view.start_cam, args=(self.local_barrier, global_barrier, stop_event)))
+        writer = CamWrite(source=self.source)
+        threads.append(threading.Thread(target=writer.start_cam, args=(global_barrier, self.local_barrier, stop_event)))
 
         # Start threads
         for thread in threads:
@@ -67,97 +77,8 @@ class CamThread:
         # Exit loop, cleanup and close thread
         cam.release()
 
-    def display_researcher_camera(self, stop_event, global_barrier):
-        """
-        Grabs frame from researcher camera queue and displays it (without any manipulations).
-        """
-        # Initialisation
-        name = f"Cam {self.source + 1} Rec"
-        initialise_camera(n=name, q=self.researcher_cam_queue)
-
-        # Wait for other threads to complete initialisation
-        self.local_barrier.wait()
-        print(f"Cam {self.source + 1} display currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
-        global_barrier.wait()
-
-        # Main loop
-        while not stop_event.is_set():
-            # Acquire frame from queue
-            frame = self.researcher_cam_queue.get()
-
-            # Show frame
-            cv2.imshow(name, frame)
-            cv2.waitKey(1)
-
-        # Exit loop, cleanup and close thread
-        time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
-        cv2.destroyWindow(name)
-
-    def display_performer_camera(self, stop_event, global_barrier):
-        """
-        Grabs frame from performer camera queue and displays it (with manipulations, if triggered by KeyThread).
-        """
-        # Initialisation
-        name = f"Cam {self.source + 1} View"
-        frames = deque(maxlen=150)
-        initialise_camera(n=name, q=self.performer_cam_queue)
-
-        # Wait for other threads to complete initialisation
-        self.local_barrier.wait()
-        print(f"Cam {self.source + 1} edit display currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
-        global_barrier.wait()
-
-        # Main loop
-        while not stop_event.is_set():
-            # Acquire frame from queue
-            frame = self.performer_cam_queue.get()
-            frames.append(frame)    # Frames are added to the deque so they can be played later (for delay effect)
-
-            # Modify frame
-            if self.params['flipped']:
-                frame = cv2.flip(frame, 0)
-            if self.params['delayed']:
-                frame = frames[1]
-
-            # Show modified frame
-            cv2.imshow(name, frame)
-            cv2.waitKey(1)
-
-        # Exit loop, cleanup and close thread
-        time.sleep(1)   # Wait for 1 sec to allow cv2 and ffmpeg time to stop
-        cv2.destroyWindow(name)
-
     def write_video(self, stop_event, global_barrier):
-        """
-        Initialises FFmpeg process to record researcher camera stream and save it in ./output/video
-        """
-        # FFmpeg can have issues when writing video from high-DPI displays. I've got around this by lowering my
-        # display resolution, but I'm sure there are other ways of doing this too.
-
-        # Initialisation
-        winname = f"Cam {self.source + 1} Rec"
-        filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
-        self.local_barrier.wait()
-        process = (ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={winname}", loglevel='warning',
-                                probesize='500M')
-                   .output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080'))
-        # TODO: fix ffmpeg flags to ensure highest quality of output
-
-        # Wait for other threads to complete initialisation
-        print(f"Cam {self.source + 1} writer currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
-        global_barrier.wait()
-
-        # Main loop
-        process = process.run_async(pipe_stdin=True)
-        while not stop_event.is_set():
-            time.sleep(0.1)       # running this (rather than pass) in the loop increases performance
-
-        # Exit loop, cleanup and close thread
-        process.communicate(str.encode("q"))    # Send quit command to ffmpeg process
-        process.terminate()
-
-        # Print stats about the video file
-        get_video_stats(filename)
+        pass
 
 
 def initialise_camera(n: str, q: Queue) -> None:
@@ -196,42 +117,100 @@ class CamRead:
 
 
 class ResearcherCamView:
-    def __init__(self):
-        pass
+    def __init__(self, source: int, queue: Queue):
+        self.name = f"Cam {source + 1} Rec"
+        self.queue = queue
 
-    def initialise(self):
-        pass
+    def start_cam(self, local_barrier, global_barrier, stop_event):
+        initialise_camera(n=self.name, q=self.queue)
+        self.wait(local_barrier, global_barrier)
+        self.main_loop(stop_event)
+        self.exit_loop()
 
-    def wait(self):
-        pass
+    def wait(self, local_barrier, global_barrier):
+        local_barrier.wait()
+        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
+        global_barrier.wait()
 
-    def main_loop(self):
-        pass
+    def main_loop(self, stop_event):
+        while not stop_event.is_set():
+            # Acquire frame from queue
+            frame = self.queue.get()
+            cv2.imshow(self.name, frame)
+            cv2.waitKey(1)
+
+    def exit_loop(self):
+        time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
+        cv2.destroyWindow(self.name)
 
 
 class PerformerCamView:
-    def __init__(self):
-        pass
+    def __init__(self, source: int, queue: Queue, params: dict):
+        self.name = f"Cam {source + 1} View"
+        self.queue = queue
+        self.params = params
 
-    def initialise(self):
-        pass
+    def start_cam(self, local_barrier, global_barrier, stop_event):
+        initialise_camera(n=self.name, q=self.queue)
+        self.wait(local_barrier, global_barrier)
+        self.main_loop(stop_event)
+        self.exit_loop()
 
-    def wait(self):
-        pass
+    def wait(self, local_barrier, global_barrier):
+        local_barrier.wait()
+        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
+        global_barrier.wait()
 
-    def main_loop(self):
-        pass
+    def main_loop(self, stop_event):
+        frames = deque(maxlen=150)
+        while not stop_event.is_set():
+            frame = self.queue.get()
+            frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
+
+            # TODO: replace this with match - case syntax (see KeyThread)
+            # Modify frame
+            if self.params['flipped']:
+                frame = cv2.flip(frame, 0)
+            if self.params['delayed']:
+                frame = frames[1]
+
+            cv2.imshow(self.name, frame)
+            cv2.waitKey(1)
+
+    def exit_loop(self):
+        time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
+        cv2.destroyWindow(self.name)
 
 
 class CamWrite:
-    def __init__(self):
-        pass
+    def __init__(self, source: int):
+        self.source = source
+        self.window_name = f"Cam {self.source + 1} Rec"
+        self.filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
+        # TODO: fix ffmpeg flags to ensure highest quality of output
 
-    def initialise(self):
-        pass
+    def start_cam(self, local_barrier, global_barrier, stop_event):
+        print('cam write running on latest version')
+        self.wait(local_barrier, global_barrier)
+        process = (
+            ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={self.window_name}", loglevel='warning',
+                         probesize='500M')
+            .output(filename=self.filename, pix_fmt='yuv420p', video_size='1920x1080'))
+        self.main_loop(stop_event, process)
+        self.exit_loop()
 
-    def wait(self):
-        pass
+    def wait(self, local_barrier, global_barrier):
+        local_barrier.wait()
+        print(f"Cam {self.source + 1} Writer currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
+        global_barrier.wait()
 
-    def main_loop(self):
-        pass
+    def main_loop(self, stop_event, process):
+        running_process = process.run_async(pipe_stdin=True)
+        while not stop_event.is_set():
+            time.sleep(0.1)  # running this (rather than pass) in the loop increases performance
+        running_process.communicate(str.encode("q"))  # Send quit command to ffmpeg process
+        running_process.terminate()
+
+    def exit_loop(self):
+        # Print stats about the video file
+        get_video_stats(self.filename)
