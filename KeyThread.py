@@ -17,6 +17,8 @@ class KeyThread:
         """
         # Initialisation
         cv2.namedWindow('Keypress Manager', cv2.WINDOW_NORMAL)
+        cv2.setWindowProperty('Keypress Manager', cv2.WND_PROP_TOPMOST, 1)  # Keep the keypress manager on top
+
 
         # Wait for other threads to initialise
         # There is no need for the keypress manager to start at the same time as the video/audio recording - so there is
@@ -24,22 +26,24 @@ class KeyThread:
 
         # Main loop
         while not stop_event.is_set():
-            cv2.setWindowProperty('Keypress Manager', cv2.WND_PROP_TOPMOST, 1)  # Keep the keypress manager on top
             cv2.imshow('Keypress Manager', self.blank_image)
-            key = cv2.waitKey(1) & 0xFF
 
-            # TODO: investigate using the switch syntax in Python 3.10
             # Detects keypresses to trigger modifications in CamThread and ReaThread
-            if key == ord('1'):
-                params['flipped'] = True
-            if key == ord('2'):
-                params['delayed'] = True
-
-            if key == ord('r'):     # Reset the audio/video to real time
-                for param in params.keys():
-                    params[param] = False
-            if key == ord('q'):     # Exit recording
-                stop_event.set()  # This sets the stop_event for ALL other threads!
+            key = chr(cv2.waitKey(1) % 255)
+            match key:
+                case '1':
+                    params['flipped'] = True
+                case '2':
+                    params['delayed'] = True
+                case '3':
+                    print('Manipulation 3 (not yet implemented)')
+                case '4':
+                    print('Manipulation 4 (not yet implemented)')
+                case 'r':
+                    for param in params.keys():
+                        params[param] = False
+                case 'q':
+                    stop_event.set()
 
         # Exit loop, cleanup and close thread
         cv2.destroyWindow('Keypress Manager')

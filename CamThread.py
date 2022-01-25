@@ -1,9 +1,9 @@
 import cv2
 import threading
-import queue
 import ffmpeg
 import time
 import os
+from queue import Queue, Empty
 from datetime import datetime
 from collections import deque
 
@@ -16,18 +16,19 @@ from collections import deque
 # TODO: investigate using PyTest here!
 class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
-        # TODO: Queu and Barrier objects here have 'magic' numbers as parameters - use len(methods) etc.
-        # Define class attributes
-        self.researcher_cam_queue = queue.Queue(maxsize=5)
-        self.performer_cam_queue = queue.Queue(maxsize=5)
-        self.local_barrier = threading.Barrier(4)
-        self.source = source
-        self.params = params
 
         # Define threads and thread arguments
         methods = [self.camera_reader, self.display_researcher_camera, self.display_performer_camera, self.write_video]
         target_args = (stop_event, global_barrier)
         threads = [threading.Thread(target=method, args=target_args) for method in methods]
+
+        # Define class attributes
+        queue_length = 128  # This can be changed to save memory if required
+        self.researcher_cam_queue = Queue(maxsize=queue_length)
+        self.performer_cam_queue = Queue(maxsize=queue_length)
+        self.local_barrier = threading.Barrier(len(threads))   # Barrier parties should equal number of running threads
+        self.source = source
+        self.params = params
 
         # Start threads
         for thread in threads:
@@ -157,11 +158,11 @@ class CamThread:
         get_video_stats(filename)
 
 
-def initialise_camera(n: str, q: queue.Queue) -> None:
+def initialise_camera(n: str, q: Queue) -> None:
     while True:
         try:
             frame = q.get(False)
-        except queue.Empty:
+        except Empty:
             time.sleep(1)
         else:
             cv2.imshow(n, frame)
