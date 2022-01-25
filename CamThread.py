@@ -125,7 +125,9 @@ class PerformerCamView:
                     frame = cv2.flip(frame, 0)
                 case {'delayed': True}:
                     frame = frames[1]
-            cv2.imshow(self.name, frame)
+            cv2.moveWindow(self.name, -1500, 0)
+            small = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
+            cv2.imshow(self.name, small)
             cv2.waitKey(1)
 
     def exit_loop(self):
