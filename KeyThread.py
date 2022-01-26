@@ -1,49 +1,46 @@
-from cv2 import cv2
 import threading
-from numpy import zeros, uint8
+import tkinter as tk
 
-
+# TODO: experiment with using a Tkinter window, rather than a blank CV2 window - will enable buttons, rather than keys
 class KeyThread:
     def __init__(self, params: dict, stop_event: threading.Event, global_barrier: threading.Barrier):
-        self.blank_image = zeros(shape=[100, 100, 3], dtype=uint8)  # Blank image for keypress manager to display
         self.name = 'Keypress Manager'
-        keypress_manager = threading.Thread(target=self.start_keymanager, args=(global_barrier, stop_event, params))
-        keypress_manager.start()
+        self.stop_event = stop_event
+        self.root = tk.Tk()
+        self.root.title = self.name
+        self.start_keymanager(global_barrier, params)
 
-    def start_keymanager(self, global_barrier, stop_event, params):
+    def start_keymanager(self, global_barrier, params):
         self.wait(global_barrier)
-        self.cv2_setup()
-        self.main_loop(stop_event, params)
-        self.exit_loop()
+        self.tk_setup(params)
+        self.main_loop()
 
     def wait(self, global_barrier):
         print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
         global_barrier.wait()
 
-    def cv2_setup(self):
-        cv2.namedWindow(self.name, cv2.WINDOW_NORMAL)
-        cv2.setWindowProperty(self.name, cv2.WND_PROP_TOPMOST, 1)  # Keep the keypress manager on top
+    def tk_setup(self, params):
+        def manipulate(manip):
+            nonlocal params
+            params[manip] = True
 
-    def main_loop(self, stop_event, params):
-        while not stop_event.is_set():
-            cv2.imshow(self.name, self.blank_image)
-            # Detects keypresses to trigger modifications in CamThread and ReaThread
-            key = chr(cv2.waitKey(1) % 255)
-            match key:
-                case '1':
-                    params['flipped'] = True
-                case '2':
-                    params['delayed'] = True
-                case '3':
-                    print('Manipulation 3 (not yet implemented)')
-                case '4':
-                    print('Manipulation 4 (not yet implemented)')
-                case 'r':
-                    for param in params.keys():
-                        params[param] = False
-                    params['reset'] = True
-                case 'q':
-                    stop_event.set()
+        def reset():
+            nonlocal params
+            for param in params.keys():
+                params[param] = False
+            params['reset'] = True
+
+        canvas = tk.Canvas(self.root, width=500, height=400, bd=0, highlightthickness=0)
+        canvas.pack()
+        b_list = [tk.Button(canvas, text=p.title(), command=lambda p=p: manipulate(p)) if p != 'reset'
+                  else tk.Button(canvas, text=p.title(), command=reset) for p in params.keys()]
+        b_list.append(tk.Button(canvas, text="Quit", command=self.exit_loop))
+        for b in b_list:
+            b.pack()
+
+    def main_loop(self):
+        self.root.mainloop()
 
     def exit_loop(self):
-        cv2.destroyWindow(self.name)
+        self.stop_event.set()
+        self.root.destroy()

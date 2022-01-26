@@ -1,5 +1,8 @@
+/.idea/*
+/__pycache__/*
 /old/*
 /output/*
+/Reaper/*
 /Reaper Media/*
 /venv/*
 

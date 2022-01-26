@@ -8,6 +8,10 @@ num_cameras = 1     # Number of cameras to try and read
 params = {
     'flipped': False,   # V: rotates orthogonally A: no modification
     'delayed': False,   # V: adds five-second delay A: adds five-second delay (not yet implemented)
+    'blanked': False,
+    'looped': False,
+    'pitch control': False,
+    'volume control': False,
     'reset': False
     # Add more parameters as booleans here...
 }
