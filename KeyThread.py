@@ -20,21 +20,33 @@ class KeyThread:
         global_barrier.wait()
 
     def tk_setup(self, params):
+        def set_delay():
+            nonlocal params
+            params['delay time'] = d_time.get()
+
         def manipulate(manip):
             nonlocal params
             params[manip] = True
 
         def reset():
             nonlocal params
-            for param in params.keys():
-                params[param] = False
+            for p in params.keys():
+                if isinstance(params[p], bool):
+                    params[p] = False
             params['reset'] = True
+
+        # TODO: add option to set variable delay time, to be read by CamThread and ReaThread
 
         canvas = tk.Canvas(self.root, width=500, height=400, bd=0, highlightthickness=0)
         canvas.pack()
+
+        d_time = tk.Entry(canvas)
+        d_time_get = tk.Button(canvas, text='Set', command=set_delay)
         b_list = [tk.Button(canvas, text=p.title(), command=lambda p=p: manipulate(p)) if p != 'reset'
                   else tk.Button(canvas, text=p.title(), command=reset) for p in params.keys()]
         b_list.append(tk.Button(canvas, text="Quit", command=self.exit_loop))
+        d_time.pack()
+        d_time_get.pack()
         for b in b_list:
             b.pack()
 

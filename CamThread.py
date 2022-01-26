@@ -116,9 +116,10 @@ class PerformerCamView:
         global_barrier.wait()
 
     def main_loop(self, stop_event):
+        # TODO: implement variable delay timing here (can be set with numbers in KeyThread)
         fps = 30
-        lag_secs = 5    # This can be edited to set a different timeframe to lag the performer video by
-        frames = deque(maxlen=(fps*lag_secs))
+        max_lag_secs = 10    # Edit this to set the maximum amount of time the performer can be lagged by
+        frames = deque(maxlen=(fps*max_lag_secs))
         while not stop_event.is_set():
             frame = self.queue.get()
             frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
@@ -128,7 +129,7 @@ class PerformerCamView:
                 case {'flipped': True}:
                     frame = cv2.flip(frame, 0)
                 case {'delayed': True}:
-                    frame = frames[1]
+                    frame = frames[-(fps*int(self.params['delay time']))]
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
