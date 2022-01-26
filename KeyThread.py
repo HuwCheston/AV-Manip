@@ -22,7 +22,7 @@ class KeyThread:
     def tk_setup(self, params):
         def set_delay():
             nonlocal params
-            params['delay time'] = d_time.get()
+            params['delay time'] = int(d_time.get())
 
         def manipulate(manip):
             nonlocal params
