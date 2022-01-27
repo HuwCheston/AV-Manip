@@ -60,6 +60,7 @@ class KeyThread:
             elif p == '*quit':
                 tk_list.append(tk.Button(canvas, text=p[1:].title(), command=self.exit_loop))
 
+        # TODO: Surely there's a better way to organise the GUI than this...
         for b in tk_list:
             b.pack()
 
