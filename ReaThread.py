@@ -33,12 +33,13 @@ class ReaThread:
     def main_loop(self, stop_event, params):
         keys = self.project.tracks[0]
         while not stop_event.is_set():  # stop_event is triggered by KeyThread
+            keys.fxs[0].params[0] = params['*delay time']
             match params:
                 case {'delayed': True} if not keys.fxs[0].is_enabled:
                     keys.fxs[0].enable()
-                case {'reset': True}:
+                case {'*reset': True}:
                     self.disable_fxs()
-                    params['reset'] = False
+                    params['*reset'] = False
             time.sleep(0.1)  # Improves performance in main_loop
 
     def exit_loop(self):

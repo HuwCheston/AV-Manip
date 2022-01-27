@@ -117,8 +117,7 @@ class PerformerCamView:
 
     def main_loop(self, stop_event):
         fps = 30
-        max_lag_secs = 10    # Edit this to set the maximum amount of time the performer can be lagged by
-        frames = deque(maxlen=(fps*max_lag_secs))
+        frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
         while not stop_event.is_set():
             frame = self.queue.get()
             frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
@@ -129,13 +128,7 @@ class PerformerCamView:
                     frame = cv2.flip(frame, 0)
                 case {'delayed': True}:
                     # TODO: test list vs deque comparison
-                    try:
-                        frame_num = round(fps*(self.params['delay time']/1000))
-                    except IndexError as e:
-                        print("Delay time is too long - can't go that far back! Try increasing max_lag_secs variable.")
-                    else:
-                        frame = frames[-frame_num]
-
+                    frame = frames[-round(fps*(self.params['*delay time']/1000))]
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)

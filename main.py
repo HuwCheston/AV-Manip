@@ -8,13 +8,16 @@ num_cameras = 1     # Number of cameras to try and read
 params = {
     'flipped': False,   # V: rotates orthogonally A: no modification
     'delayed': False,   # V: adds five-second delay A: adds five-second delay (not yet implemented)
-    'delay time': 1000,
     'blanked': False,
     'looped': False,
     'pitch control': False,
     'volume control': False,
-    'reset': False
+    '*delay time': 1000,  # The default amount of time to delay V/A by. Can be changed in GUI
+    '*max delay time': 10000,  # The max amount of time (ms) to delay V/A by. Will affect memory consumption!
+    '*reset': False,
+    '*quit': False,
     # Add more parameters as booleans here...
+    # Params beginning with * are system parameters and will not be displayed in GUI
 }
 
 # These variables shouldn't be edited
