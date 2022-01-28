@@ -1,6 +1,7 @@
 import threading
 import tkinter as tk
 
+
 class KeyThread:
     def __init__(self, params: dict, stop_event: threading.Event, global_barrier: threading.Barrier):
         self.name = 'Keypress Manager'
@@ -33,13 +34,21 @@ class KeyThread:
                     d_time.delete(0, 'end')
                     d_time.insert(0, 'Out of bounds')
 
-        def manipulate(manip):
+        def manipulate(manip, button):
+            reset()
             params[manip] = True
+            button.config(bg='green')
 
         def reset():
+            for button in tk_list:
+                if isinstance(button, tk.Button):
+                    button.config(bg="SystemButtonFace")
+
             for param in params.keys():
                 if isinstance(params[param], bool):
                     params[param] = False
+
+            # TODO: can this be replaced with an event? Will need to change ReaThread too
             params['*reset'] = True
 
         tk_list = []
@@ -52,7 +61,9 @@ class KeyThread:
 
         for p in params.keys():
             if not p.startswith('*'):
-                tk_list.append(tk.Button(canvas, text=p.title(), command=lambda x=p: manipulate(x)))
+                b = tk.Button(canvas, text=p.title())
+                b.config(fg='black', command=lambda manip=p, button=b: manipulate(manip, button))
+                tk_list.append(b)
             elif p == '*reset':
                 tk_list.append(tk.Button(canvas, text=p[1:].title(), command=reset))
             elif p == '*quit':
