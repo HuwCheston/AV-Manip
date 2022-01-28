@@ -1,12 +1,10 @@
+from threading import Event
+
 # These parameters can all be edited by the user before running the program to
 # TODO: add proper documentation for these parameters
 params = {
     'flipped': False,  # V: rotates orthogonally A: no modification
     'delayed': False,  # V: adds five-second delay A: adds five-second delay (not yet implemented)
-    'blanked': False,
-    'looped': False,
-    'pitch control': False,
-    'volume control': False,
     '*delay time': 1000,  # The default amount of time to delay V/A by. Can be changed in GUI
     '*max delay time': 10000,  # The max amount of time (ms) to allow V/A delay by. Affects memory consumption!
     # Will trigger an edit of Reaper JSFX parameters if exceeds currently set values.
@@ -15,6 +13,12 @@ params = {
         'Medium': 200,
         'Long': 1000,
     },  # More presets can be added as above and will be configured to work automatically
+    'blanked': False,
+    'loop rec': False,
+    'loop play': False,
+    'loop clear': False,
+    'pitch control': False,
+    'volume control': False,
     '*reset': False,
     '*quit': False,
     # TODO: set this value to create tracks in ReaThread if not enough already exist

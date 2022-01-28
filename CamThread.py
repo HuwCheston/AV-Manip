@@ -2,6 +2,7 @@ import threading
 import ffmpeg
 import time
 import os
+from copy import deepcopy
 from cv2 import cv2
 from queue import Queue, Empty
 from datetime import datetime
@@ -117,18 +118,47 @@ class PerformerCamView:
 
     def main_loop(self, stop_event):
         fps = 30
-        frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
+        delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
+        loop_frames = []
         while not stop_event.is_set():
             frame = self.queue.get()
-            frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
+            delay_frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
 
             # Modify frame
             match self.params:
                 case {'flipped': True}:
                     frame = cv2.flip(frame, 0)
+
                 case {'delayed': True}:
                     # TODO: test list vs deque comparison
-                    frame = frames[-round(fps*(self.params['*delay time']/1000))]
+                    frame = delay_frames[-round(fps*(self.params['*delay time']/1000))]
+
+                # TODO: This logic works, but I think it could be better...
+                # TODO: recording loop twice causes both loops to be appended to each other. Should delete itself first?
+                case {'loop rec': True}:
+                    try:
+                        loop_frames.append(frame)
+                    except UnboundLocalError:
+                        loop_frames = [frame]
+
+                case {'loop play': True}:
+                    try:
+                        loop_frames_iter
+                    except NameError:
+                        loop_frames_iter = deepcopy(loop_frames)
+                    try:
+                        frame = loop_frames_iter[0]
+                    except IndexError:
+                        loop_frames_iter = deepcopy(loop_frames)
+                    else:
+                        del loop_frames_iter[0]
+
+                case {'loop clear': True}:
+                    try:
+                        del loop_frames
+                        del loop_frames_iter
+                    except UnboundLocalError:
+                        pass
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
