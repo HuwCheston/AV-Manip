@@ -120,6 +120,7 @@ class PerformerCamView:
         fps = 30
         delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
         loop_frames = []
+        loop_var = 0
         while not stop_event.is_set():
             frame = self.queue.get()
             delay_frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
@@ -136,29 +137,20 @@ class PerformerCamView:
                 # TODO: This logic works, but I think it could be better...
                 # TODO: recording loop twice causes both loops to be appended to each other. Should delete itself first?
                 case {'loop rec': True}:
-                    try:
-                        loop_frames.append(frame)
-                    except UnboundLocalError:
-                        loop_frames = [frame]
+                    if loop_var > 0:
+                        loop_var = 0
+                        loop_frames.clear()
+                    loop_frames.append(frame)
 
                 case {'loop play': True}:
-                    try:
-                        loop_frames_iter
-                    except NameError:
-                        loop_frames_iter = deepcopy(loop_frames)
-                    try:
-                        frame = loop_frames_iter[0]
-                    except IndexError:
-                        loop_frames_iter = deepcopy(loop_frames)
-                    else:
-                        del loop_frames_iter[0]
+                    if loop_var >= len(loop_frames):
+                        loop_var = 0
+                    frame = loop_frames[loop_var]
+                    loop_var += 1
 
                 case {'loop clear': True}:
-                    try:
-                        del loop_frames
-                        del loop_frames_iter
-                    except UnboundLocalError:
-                        pass
+                    loop_var = 0
+                    loop_frames.clear()
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
