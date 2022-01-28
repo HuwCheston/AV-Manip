@@ -1,7 +1,6 @@
 import threading
 import tkinter as tk
 
-# TODO: experiment with using a Tkinter window, rather than a blank CV2 window - will enable buttons, rather than keys
 class KeyThread:
     def __init__(self, params: dict, stop_event: threading.Event, global_barrier: threading.Barrier):
         self.name = 'Keypress Manager'
@@ -19,6 +18,7 @@ class KeyThread:
         print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
         global_barrier.wait()
 
+    # TODO: refactor these into multiple functions (or class?)
     def tk_setup(self, params):
         def set_delay():
             try:
@@ -37,12 +37,10 @@ class KeyThread:
             params[manip] = True
 
         def reset():
-            for p in params.keys():
-                if isinstance(params[p], bool):
-                    params[p] = False
+            for param in params.keys():
+                if isinstance(params[param], bool):
+                    params[param] = False
             params['*reset'] = True
-
-        # TODO: add option to set variable delay time, to be read by CamThread and ReaThread
 
         tk_list = []
         canvas = tk.Canvas(self.root, width=500, height=400, bd=0, highlightthickness=0)
@@ -54,11 +52,17 @@ class KeyThread:
 
         for p in params.keys():
             if not p.startswith('*'):
-                tk_list.append(tk.Button(canvas, text=p.title(), command=lambda p=p: manipulate(p)))
+                tk_list.append(tk.Button(canvas, text=p.title(), command=lambda x=p: manipulate(x)))
             elif p == '*reset':
                 tk_list.append(tk.Button(canvas, text=p[1:].title(), command=reset))
             elif p == '*quit':
                 tk_list.append(tk.Button(canvas, text=p[1:].title(), command=self.exit_loop))
+            elif p == '*delay time presets':
+                for (k, v) in params[p].items():
+                    tk_list.append(
+                        tk.Button(canvas, text=f'{k} - {str(v)}', command=lambda x=v: [d_time.delete(0, 'end'),
+                                                                                       d_time.insert(0, str(x)),
+                                                                                       set_delay()]))
 
         # TODO: Surely there's a better way to organise the GUI than this...
         for b in tk_list:

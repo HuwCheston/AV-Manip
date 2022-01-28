@@ -15,6 +15,11 @@ params = {
     'volume control': False,
     '*delay time': 1000,  # The default amount of time to delay V/A by. Can be changed in GUI
     '*max delay time': 10000,  # The max amount of time (ms) to delay V/A by. Affects memory consumption!
+    '*delay time presets': {
+        'Short': 50,
+        'Medium': 200,
+        'Long': 1000,
+    },
     '*reset': False,
     '*quit': False,
     # Add more parameters as booleans here...
