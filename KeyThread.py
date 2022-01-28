@@ -56,6 +56,7 @@ class KeyThread:
         tk_list.append(canvas)
 
         d_time = tk.Entry(canvas)
+        d_time.insert(0, str(params['*delay time']))
         tk_list.append(d_time)
         tk_list.append(tk.Button(canvas, text='Set Delay Time', command=set_delay))
 

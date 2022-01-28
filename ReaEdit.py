@@ -1,9 +1,8 @@
-import fileinput
 import re
 
+fx_location = './Reaper/Effects/midi/'
 
 def edit_reaper_fx(params):
-    fx_location = './Reaper/Effects/midi/'
     files = {
         fx_location + 'midi_delay': params['*max delay time'],
     }
@@ -18,4 +17,5 @@ def edit_reaper_fx(params):
             new_file = open(file, "w")
             new_file.writelines(data)
             new_file.close()
-            print(f"Rewrote {file}, line {data[2]}Will need to recompile FX!")
+            print(f"Rewrote VST {file} parameters (line {data[2]}) to match user input."
+                  f"Will need to recompile FX in Reaper (open FX in chain - Edit - Full Recompile/Reset)")
