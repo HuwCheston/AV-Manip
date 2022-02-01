@@ -2,6 +2,7 @@ import threading
 import ffmpeg
 import time
 import os
+import numpy as np
 from cv2 import cv2
 from queue import Queue, Empty
 from datetime import datetime
@@ -125,7 +126,8 @@ class PerformerCamView:
 
         cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\lbpcascade_frontalface_improved.xml")
         scale_factor = 1.4
-        box_dim = 30
+        dim = 60
+        detected_face = ()
 
         while not stop_event.is_set():
             frame = self.queue.get()
@@ -158,10 +160,18 @@ class PerformerCamView:
                     loop_frames.clear()
 
                 case {'blanked': True}:
-                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                    faces = cascade.detectMultiScale(gray, scale_factor, 4)
-                    for (x, y, w, h) in faces:
-                        cv2.rectangle(frame, (x-box_dim, y-box_dim), (x+w+box_dim, y+h+box_dim), (0, 0, 0), -1)
+                    faces = cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), scale_factor, 4)
+                    if isinstance(faces, np.ndarray):
+                        for (x, y, w, h) in faces:
+                            cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
+                            detected_face = (x, y, w, h)
+                    else:
+                        try:
+                            (x, y, w, h) = detected_face
+                        except ValueError:
+                            pass
+                        else:
+                            cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
 
                 case {'*reset': True}:
                     if len(loop_frames) > 0:

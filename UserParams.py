@@ -24,8 +24,6 @@ params = {
     '*quit': False,
     # TODO: set this value to create tracks in ReaThread if not enough already exist
     '*participants': 1,  # Number of cameras to try and read
-
-
     # Add more parameters as here...
     # Params beginning with * are system parameters and will not be displayed in GUI
 }
