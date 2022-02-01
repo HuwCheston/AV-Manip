@@ -40,16 +40,15 @@ class KeyThread:
             button.config(bg='green')
 
         def reset():
+            # TODO: can this be replaced with an event? Will need to change ReaThread too
+            params['*reset'] = True
             for button in tk_list:
                 if isinstance(button, tk.Button):
                     button.config(bg="SystemButtonFace")
-
+            params['*reset lock'].acquire()
             for param in params.keys():
                 if isinstance(params[param], bool):
                     params[param] = False
-
-            # TODO: can this be replaced with an event? Will need to change ReaThread too
-            params['*reset'] = True
 
         tk_list = []
         canvas = tk.Canvas(self.root, width=500, height=400, bd=0, highlightthickness=0)

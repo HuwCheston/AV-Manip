@@ -2,7 +2,6 @@ import threading
 import ffmpeg
 import time
 import os
-from copy import deepcopy
 from cv2 import cv2
 from queue import Queue, Empty
 from datetime import datetime
@@ -119,8 +118,15 @@ class PerformerCamView:
     def main_loop(self, stop_event):
         fps = 30
         delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
+
         loop_frames = []
         loop_var = 0
+        has_loop = False
+
+        cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\lbpcascade_frontalface_improved.xml")
+        scale_factor = 1.4
+        box_dim = 30
+
         while not stop_event.is_set():
             frame = self.queue.get()
             delay_frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
@@ -131,15 +137,14 @@ class PerformerCamView:
                     frame = cv2.flip(frame, 0)
 
                 case {'delayed': True}:
-                    # TODO: test list vs deque comparison
                     frame = delay_frames[-round(fps*(self.params['*delay time']/1000))]
 
                 # TODO: This logic works, but I think it could be better...
-                # TODO: recording loop twice causes both loops to be appended to each other. Should delete itself first?
                 case {'loop rec': True}:
-                    if loop_var > 0:
+                    if has_loop:
                         loop_var = 0
                         loop_frames.clear()
+                        has_loop = False
                     loop_frames.append(frame)
 
                 case {'loop play': True}:
@@ -151,6 +156,18 @@ class PerformerCamView:
                 case {'loop clear': True}:
                     loop_var = 0
                     loop_frames.clear()
+
+                case {'blanked': True}:
+                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    faces = cascade.detectMultiScale(gray, scale_factor, 4)
+                    for (x, y, w, h) in faces:
+                        cv2.rectangle(frame, (x-box_dim, y-box_dim), (x+w+box_dim, y+h+box_dim), (0, 0, 0), -1)
+
+                case {'*reset': True}:
+                    if len(loop_frames) > 0:
+                        loop_var = 0
+                        has_loop = True
+                    self.params['*reset lock'].release()
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)

@@ -39,9 +39,12 @@ class ReaThread:
             match params:
                 case {'delayed': True} if not keys.fxs[0].is_enabled:
                     keys.fxs[0].enable()
+                # case {'loop rec': True}:
+                #     keys.fxs[2].enable()
                 case {'*reset': True}:
                     self.disable_fxs()
-                    params['*reset'] = False
+                    params['*reset lock'].release()
+
             time.sleep(0.1)  # Improves performance in main_loop
 
     def exit_loop(self):
