@@ -48,7 +48,7 @@ class CamRead:
         # TODO: check and make sure this doesn't break anything!
         # FIXME: Change of FPS may require restart of program due to threading...
         self.cam.set(cv2.CAP_PROP_FPS, params["*fps"])
-        params["*fps"] = self.cam.get(cv2.CAP_PROP_FPS)
+        params["*fps"] = round(self.cam.get(cv2.CAP_PROP_FPS))
 
     def start_cam(self, global_barrier, stop_event):
         self.read_frame()
@@ -123,10 +123,8 @@ class PerformerCamView:
         global_barrier.wait()
 
     def main_loop(self, stop_event):
-        # TODO: refactor these nicely into dictionaries
-        fps = 30
-        delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
-        print(self.params['*fps'])
+        # TODO: refactor these nicely into dictionaries as with loop_params
+        delay_frames = deque(maxlen=round(self.params['*fps']*(self.params['*max delay time']/1000)))
 
         loop_params = {
             "frames": [],
@@ -136,7 +134,24 @@ class PerformerCamView:
 
         # TODO: refactor these nicely into dictionaries
         # TODO: Add support for different cascades
-        cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\lbpcascade_frontalface_improved.xml")
+        cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
+        blanking_params = {
+            "face": {
+                "cascade": cv2.CascadeClassifier(f'{cascade_location}\lbpcascade_frontalface_improved.xml'),
+                "scaleFactor": 1.4,
+                "minNeighbors": 4,
+                "dimensions": 60,
+                "previous_detection": (),
+            },
+            "eye": {
+                "cascade": cv2.CascadeClassifier(f'{cascade_location}\haarcascade_eye_tree_eyeglasses.xml'),
+                "scaleFactor": 3.0,
+                "minNeighbors": 3,
+                "dimensions": 15,
+                "previous_detection": (),
+            }
+        }
+
         eye_cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\haarcascade_eye_tree_eyeglasses.xml")
         scale_factor = 1.4
         dim = 30
@@ -149,12 +164,11 @@ class PerformerCamView:
 
             # Modify frame
             match self.params:
-                # TODO: refactor these all into methods
                 case {'flipped': True}:
                     frame = cv2.flip(frame, 0)  # This is a test manip and probably won't be used
 
                 case {'delayed': True}:
-                    frame = delay_frames[-round(fps*(self.params['*delay time']/1000))]
+                    frame = delay_frames[-round(self.params['*fps']*(self.params['*delay time']/1000))]
 
                 case {'loop rec': True}:
                     self._manip_loop_rec(frame, loop_params)
@@ -167,7 +181,7 @@ class PerformerCamView:
                     loop_params["frames"].clear()
 
                 case {'blank face': True}:
-                    frame, detected_face = self._manip_blank_region(cascade, detected_face, dim, frame, scale_factor)
+                    frame = self._manip_blank_region(frame, params=blanking_params["face"])
 
                 # TODO: refactor this to use the _manip_blank_region function call as well
                 case {'blank eyes': True}:
@@ -176,13 +190,17 @@ class PerformerCamView:
                         cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
 
                 case {'*reset': True}:
-                    # TODO: I don't like that this returns an object (it works fine though)
+                    # TODO: I don't like that this function call returns an object (it works fine though)
                     detected_face = self._reset_manips(detected_face, loop_params)
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
             cv2.imshow(self.name, frame)
             cv2.waitKey(1)
+
+    def exit_loop(self):
+        time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
+        cv2.destroyWindow(self.name)
 
     def _reset_manips(self, detected_face, loop_params):
         if len(loop_params["frames"]) > 0:
@@ -192,49 +210,52 @@ class PerformerCamView:
         self.params['*reset lock'].release()
         return detected_face
 
-    def _manip_loop_play(self, frame, loop_params):
-        if loop_params["var"] >= len(loop_params["frames"]):
-            loop_params["var"] = 0
-        frame = loop_params["frames"][loop_params["var"]]
-        loop_params["var"] += 1
+    def _manip_loop_play(self, frame, params):
+        if params["var"] >= len(params["frames"]):
+            params["var"] = 0
+        frame = params["frames"][params["var"]]
+        params["var"] += 1
         return frame
 
-    def _manip_loop_rec(self, frame, loop_params):
-        if loop_params["has_loop"]:
-            loop_params["var"] = 0
-            loop_params["frames"].clear()
-            loop_params["has_loop"] = False
-        loop_params["frames"].append(frame)
+    def _manip_loop_rec(self, frame, params):
+        if params["has_loop"]:
+            params["var"] = 0
+            params["frames"].clear()
+            params["has_loop"] = False
+        params["frames"].append(frame)
 
-    def _manip_blank_region(self, cascade, detection, dim, frame, scale_factor):
-        regions = cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), scale_factor, 4)
+    def _manip_blank_region(self, frame, params):
+        regions = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
+                                                     params["scaleFactor"], params["minNeighbors"])
         if isinstance(regions, np.ndarray):
             for (x, y, w, h) in regions:
-                cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
-                detection = (x, y, w, h)
+                cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
+                              (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
+                params["previous_detection"] = (x, y, w, h)
         else:
             try:
-                (x, y, w, h) = detection
+                (x, y, w, h) = params["previous_detection"]
             except ValueError:
                 pass
             else:
-                cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
-        return frame, detection
-
-    def exit_loop(self):
-        time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
-        cv2.destroyWindow(self.name)
+                cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
+                              (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
+        return frame,
 
 
 class CamWrite:
     # If you run into FileNotFound errors when importing ffmpeg-python, make sure that ffmpeg.exe is placed in the
     # Python/Scripts directory of your environment.
+
     def __init__(self, source: int):
         self.source = source
         self.window_name = f"Cam {self.source + 1} Rec"
         self.filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
 
     def start_cam(self, global_barrier, stop_event):
+        # On high-resolution monitors, gdigrab may not display black padding around the captured video. I'd suggest
+        # changing your monitor display resolution if this is an issue, as I can't find a workaround in ffmpeg.
+
         self.wait(global_barrier)
         # TODO: fix ffmpeg flags to ensure highest quality of output
         process = (
@@ -258,6 +279,7 @@ class CamWrite:
 
     def exit_loop(self):
         # Print stats about the video file
+        # TODO: implement this function (as a separate file?)
         get_video_stats(self.filename)
 
 
@@ -274,9 +296,8 @@ def initialise_camera(n: str, q: Queue) -> None:
 
 
 def get_video_stats(filename):
-    # TODO: implement this function (as a separate file?)
     vid = cv2.VideoCapture(filename)
-    fps = vid.get(cv2.CAP_PROP_FPS)
+    fps = vid.get(cv2.CAP_PROP_FPS)     # TODO: this should use user_params['*fps'] instead, I think
     framecount = vid.get(cv2.CAP_PROP_FRAME_COUNT)
     duration = framecount / fps
     print(duration)
