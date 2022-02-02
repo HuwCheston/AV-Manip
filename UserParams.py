@@ -1,7 +1,7 @@
 from threading import Lock
 
-# These parameters can all be edited by the user before running the program to
-# TODO: add proper documentation for these parameters
+# These parameters can all be edited by the user before running the program
+# TODO: add proper documentation for these parameters (this is outdated)
 params = {
     'flipped': False,  # V: rotates orthogonally A: no modification
     'delayed': False,  # V: adds five-second delay A: adds five-second delay (not yet implemented)
@@ -25,6 +25,7 @@ params = {
     '*quit': False,
     # TODO: set this value to create tracks in ReaThread if not enough already exist
     '*participants': 1,  # Number of cameras to try and read
+    '*fps': 30,     # 30 here works well for me!
     # Add more parameters as here...
     # Params beginning with * are system parameters and will not be displayed in GUI
 }

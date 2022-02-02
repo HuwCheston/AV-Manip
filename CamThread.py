@@ -23,7 +23,8 @@ class CamThread:
 
     def thread_init(self):
         # Define threads and thread arguments
-        classes = [CamRead(source=self.source, perfor_q=self.performer_cam_queue, resear_q=self.researcher_cam_queue),
+        classes = [CamRead(source=self.source, perfor_q=self.performer_cam_queue,
+                           resear_q=self.researcher_cam_queue, params=self.params),
                    ResearcherCamView(source=self.source, queue=self.researcher_cam_queue),
                    PerformerCamView(source=self.source, queue=self.performer_cam_queue, params=self.params),
                    CamWrite(source=self.source)]
@@ -38,11 +39,16 @@ class CamThread:
 
 
 class CamRead:
-    def __init__(self, source, resear_q, perfor_q):
+    def __init__(self, source, params, resear_q, perfor_q):
         self.source = source
         self.cam = cv2.VideoCapture(self.source, cv2.CAP_DSHOW)
         self.researcher_cam_queue = resear_q
         self.performer_cam_queue = perfor_q
+
+        # TODO: check and make sure this doesn't break anything!
+        # FIXME: Change of FPS may require restart of program due to threading...
+        self.cam.set(cv2.CAP_PROP_FPS, params["*fps"])
+        params["*fps"] = self.cam.get(cv2.CAP_PROP_FPS)
 
     def start_cam(self, global_barrier, stop_event):
         self.read_frame()
@@ -120,6 +126,7 @@ class PerformerCamView:
         # TODO: refactor these nicely into dictionaries
         fps = 30
         delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
+        print(self.params['*fps'])
 
         loop_params = {
             "frames": [],
@@ -144,25 +151,16 @@ class PerformerCamView:
             match self.params:
                 # TODO: refactor these all into methods
                 case {'flipped': True}:
-                    # This is a test manip and probably won't be used
-                    frame = cv2.flip(frame, 0)
+                    frame = cv2.flip(frame, 0)  # This is a test manip and probably won't be used
 
                 case {'delayed': True}:
                     frame = delay_frames[-round(fps*(self.params['*delay time']/1000))]
 
-                # TODO: This logic works, but I think it could be better...
                 case {'loop rec': True}:
-                    if loop_params["has_loop"]:
-                        loop_params["var"] = 0
-                        loop_params["frames"].clear()
-                        loop_params["has_loop"] = False
-                    loop_params["frames"].append(frame)
+                    self._manip_loop_rec(frame, loop_params)
 
                 case {'loop play': True}:
-                    if loop_params["var"] >= len(loop_params["frames"]):
-                        loop_params["var"] = 0
-                    frame = loop_params["frames"][loop_params["var"]]
-                    loop_params["var"] += 1
+                    frame = self._manip_loop_play(frame, loop_params)
 
                 case {'loop clear': True}:
                     loop_params["var"] = 0
@@ -171,22 +169,42 @@ class PerformerCamView:
                 case {'blank face': True}:
                     frame, detected_face = self._manip_blank_region(cascade, detected_face, dim, frame, scale_factor)
 
+                # TODO: refactor this to use the _manip_blank_region function call as well
                 case {'blank eyes': True}:
                     eyes = eye_cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 3, 3)
                     for (x, y, w, h) in eyes:
                         cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
 
                 case {'*reset': True}:
-                    if len(loop_params["frames"]) > 0:
-                        loop_params["var"] = 0
-                        loop_params["has_loop"] = True
-                    detected_face = ()
-                    self.params['*reset lock'].release()
+                    # TODO: I don't like that this returns an object (it works fine though)
+                    detected_face = self._reset_manips(detected_face, loop_params)
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
             cv2.imshow(self.name, frame)
             cv2.waitKey(1)
+
+    def _reset_manips(self, detected_face, loop_params):
+        if len(loop_params["frames"]) > 0:
+            loop_params["var"] = 0
+            loop_params["has_loop"] = True
+        detected_face = ()
+        self.params['*reset lock'].release()
+        return detected_face
+
+    def _manip_loop_play(self, frame, loop_params):
+        if loop_params["var"] >= len(loop_params["frames"]):
+            loop_params["var"] = 0
+        frame = loop_params["frames"][loop_params["var"]]
+        loop_params["var"] += 1
+        return frame
+
+    def _manip_loop_rec(self, frame, loop_params):
+        if loop_params["has_loop"]:
+            loop_params["var"] = 0
+            loop_params["frames"].clear()
+            loop_params["has_loop"] = False
+        loop_params["frames"].append(frame)
 
     def _manip_blank_region(self, cascade, detection, dim, frame, scale_factor):
         regions = cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), scale_factor, 4)
