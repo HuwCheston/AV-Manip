@@ -43,7 +43,11 @@ class ReaThread:
                 #     keys.fxs[2].enable()
                 case {'*reset': True}:
                     self.disable_fxs()
-                    params['*reset lock'].release()
+                    # FIXME: Occasionally getting a RunTime Error here (release unlocked lock)
+                    try:
+                        params['*reset lock'].release()
+                    except RuntimeError:
+                        pass
 
             time.sleep(0.1)  # Improves performance in main_loop
 

@@ -120,9 +120,11 @@ class PerformerCamView:
         fps = 30
         delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
 
-        loop_frames = []
-        loop_var = 0
-        has_loop = False
+        loop_params = {
+            "frames": [],
+            "var": 0,
+            "has_loop": False,
+        }
 
         cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\lbpcascade_frontalface_improved.xml")
         scale_factor = 1.4
@@ -131,7 +133,7 @@ class PerformerCamView:
 
         while not stop_event.is_set():
             frame = self.queue.get()
-            delay_frames.append(frame)  # Frames are added to the deque so they can be played later (for delay effect)
+            delay_frames.append(frame)  # Frames are always added to the deque so they can be played later (for delay)
 
             # Modify frame
             match self.params:
@@ -143,46 +145,50 @@ class PerformerCamView:
 
                 # TODO: This logic works, but I think it could be better...
                 case {'loop rec': True}:
-                    if has_loop:
-                        loop_var = 0
-                        loop_frames.clear()
-                        has_loop = False
-                    loop_frames.append(frame)
+                    if loop_params["has_loop"]:
+                        loop_params["var"] = 0
+                        loop_params["frames"].clear()
+                        loop_params["has_loop"] = False
+                    loop_params["frames"].append(frame)
 
                 case {'loop play': True}:
-                    if loop_var >= len(loop_frames):
-                        loop_var = 0
-                    frame = loop_frames[loop_var]
-                    loop_var += 1
+                    if loop_params["var"] >= len(loop_params["frames"]):
+                        loop_params["var"] = 0
+                    frame = loop_params["frames"][loop_params["var"]]
+                    loop_params["var"] += 1
 
                 case {'loop clear': True}:
-                    loop_var = 0
-                    loop_frames.clear()
+                    loop_params["var"] = 0
+                    loop_params["frames"].clear()
 
                 case {'blanked': True}:
-                    faces = cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), scale_factor, 4)
-                    if isinstance(faces, np.ndarray):
-                        for (x, y, w, h) in faces:
-                            cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
-                            detected_face = (x, y, w, h)
-                    else:
-                        try:
-                            (x, y, w, h) = detected_face
-                        except ValueError:
-                            pass
-                        else:
-                            cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
+                    frame, detected_face = self._manip_blank_region(cascade, detected_face, dim, frame, scale_factor)
 
                 case {'*reset': True}:
-                    if len(loop_frames) > 0:
-                        loop_var = 0
-                        has_loop = True
+                    if len(loop_params["frames"]) > 0:
+                        loop_params["var"] = 0
+                        loop_params["has_loop"] = True
                     self.params['*reset lock'].release()
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
             cv2.imshow(self.name, frame)
             cv2.waitKey(1)
+
+    def _manip_blank_region(self, cascade, detection, dim, frame, scale_factor):
+        regions = cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), scale_factor, 4)
+        if isinstance(regions, np.ndarray):
+            for (x, y, w, h) in regions:
+                cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
+                detection = (x, y, w, h)
+        else:
+            try:
+                (x, y, w, h) = detection
+            except ValueError:
+                pass
+            else:
+                cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
+        return frame, detection
 
     def exit_loop(self):
         time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
