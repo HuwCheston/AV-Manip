@@ -117,6 +117,7 @@ class PerformerCamView:
         global_barrier.wait()
 
     def main_loop(self, stop_event):
+        # TODO: refactor these nicely into dictionaries
         fps = 30
         delay_frames = deque(maxlen=round((fps*(self.params['*max delay time']/1000))))
 
@@ -126,10 +127,14 @@ class PerformerCamView:
             "has_loop": False,
         }
 
+        # TODO: refactor these nicely into dictionaries
+        # TODO: Add support for different cascades
         cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\lbpcascade_frontalface_improved.xml")
+        eye_cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\haarcascade_eye_tree_eyeglasses.xml")
         scale_factor = 1.4
-        dim = 60
+        dim = 30
         detected_face = ()
+        detected_eyes = []
 
         while not stop_event.is_set():
             frame = self.queue.get()
@@ -137,7 +142,9 @@ class PerformerCamView:
 
             # Modify frame
             match self.params:
+                # TODO: refactor these all into methods
                 case {'flipped': True}:
+                    # This is a test manip and probably won't be used
                     frame = cv2.flip(frame, 0)
 
                 case {'delayed': True}:
@@ -161,13 +168,19 @@ class PerformerCamView:
                     loop_params["var"] = 0
                     loop_params["frames"].clear()
 
-                case {'blanked': True}:
+                case {'blank face': True}:
                     frame, detected_face = self._manip_blank_region(cascade, detected_face, dim, frame, scale_factor)
+
+                case {'blank eyes': True}:
+                    eyes = eye_cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 3, 3)
+                    for (x, y, w, h) in eyes:
+                        cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
 
                 case {'*reset': True}:
                     if len(loop_params["frames"]) > 0:
                         loop_params["var"] = 0
                         loop_params["has_loop"] = True
+                    detected_face = ()
                     self.params['*reset lock'].release()
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor

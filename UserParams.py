@@ -13,7 +13,8 @@ params = {
         'Medium': 200,
         'Long': 1000,
     },  # More presets can be added as above and will be configured to work automatically
-    'blanked': False,
+    'blank face': False,
+    'blank eyes': False,
     'loop rec': False,
     'loop play': False,
     'loop clear': False,
