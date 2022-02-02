@@ -135,28 +135,26 @@ class PerformerCamView:
         # TODO: refactor these nicely into dictionaries
         # TODO: Add support for different cascades
         cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
-        blanking_params = {
+        blank_params = {
             "face": {
                 "cascade": cv2.CascadeClassifier(f'{cascade_location}\lbpcascade_frontalface_improved.xml'),
                 "scaleFactor": 1.4,
                 "minNeighbors": 4,
                 "dimensions": 60,
-                "previous_detection": (),
+                "previous_detection": np.zeros(4),
             },
             "eye": {
                 "cascade": cv2.CascadeClassifier(f'{cascade_location}\haarcascade_eye_tree_eyeglasses.xml'),
-                "scaleFactor": 3.0,
+                "scaleFactor": 2.7,
                 "minNeighbors": 3,
                 "dimensions": 15,
-                "previous_detection": (),
+                "previous_detection_l": np.zeros(4),
+                "previous_detection_r": np.zeros(4),
             }
         }
 
-        eye_cascade = cv2.CascadeClassifier(r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info\haarcascade_eye_tree_eyeglasses.xml")
-        scale_factor = 1.4
-        dim = 30
+        # TODO: replace this (and all the other times it's called)
         detected_face = ()
-        detected_eyes = []
 
         while not stop_event.is_set():
             frame = self.queue.get()
@@ -174,20 +172,18 @@ class PerformerCamView:
                     self._manip_loop_rec(frame, loop_params)
 
                 case {'loop play': True}:
-                    frame = self._manip_loop_play(frame, loop_params)
+                    frame = self._manip_loop_play(loop_params)
 
                 case {'loop clear': True}:
                     loop_params["var"] = 0
                     loop_params["frames"].clear()
 
                 case {'blank face': True}:
-                    frame = self._manip_blank_region(frame, params=blanking_params["face"])
+                    self._manip_detect_face_region(frame, params=blank_params["face"])
 
                 # TODO: refactor this to use the _manip_blank_region function call as well
                 case {'blank eyes': True}:
-                    eyes = eye_cascade.detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), 3, 3)
-                    for (x, y, w, h) in eyes:
-                        cv2.rectangle(frame, (x - dim, y - dim), (x + w + dim, y + h + dim), (0, 0, 0), -1)
+                    self._manip_detect_eye_regions(frame, params=blank_params['eye'])
 
                 case {'*reset': True}:
                     # TODO: I don't like that this function call returns an object (it works fine though)
@@ -207,10 +203,13 @@ class PerformerCamView:
             loop_params["var"] = 0
             loop_params["has_loop"] = True
         detected_face = ()
-        self.params['*reset lock'].release()
+        try:
+            self.params['*reset lock'].release()
+        except RuntimeError:
+            pass
         return detected_face
 
-    def _manip_loop_play(self, frame, params):
+    def _manip_loop_play(self, params):
         if params["var"] >= len(params["frames"]):
             params["var"] = 0
         frame = params["frames"][params["var"]]
@@ -224,24 +223,51 @@ class PerformerCamView:
             params["has_loop"] = False
         params["frames"].append(frame)
 
-    def _manip_blank_region(self, frame, params):
+    def _manip_detect_face_region(self, frame, params):
         regions = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
                                                      params["scaleFactor"], params["minNeighbors"])
         if isinstance(regions, np.ndarray):
-            for (x, y, w, h) in regions:
-                cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
-                              (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
-                params["previous_detection"] = (x, y, w, h)
+            for region in regions:
+                params["previous_detection"] = self._manip_plot_blanked_region(frame, params, region)
         else:
-            try:
-                (x, y, w, h) = params["previous_detection"]
-            except ValueError:
-                pass
-            else:
-                cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
-                              (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
-        return frame,
+            self._manip_plot_blanked_region(frame, params, region=params["previous_detection"])
 
+    def _manip_detect_eye_regions(self, frame, params,):
+        eyes = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
+                                                  params["scaleFactor"], params["minNeighbors"])
+
+        # Detected two eyes
+        if len(eyes) == 2:
+            params['previous_detection_l'] = eyes[0]
+            params['previous_detection_r'] = eyes[1]
+
+        # Only detected one eye
+        elif len(eyes) == 1:
+            # Left eye probably missing
+            if eyes[0][0] < params['previous_detection_l'][0]:
+                params['previous_detection_r'] = eyes[0]
+                eyes = np.array([params['previous_detection_l'], eyes[0]], dtype='object')
+            # Right eye probably missing
+            else:
+                params['previous_detection_l'] = eyes[0]
+                eyes = np.array([eyes[0], params['previous_detection_r']], dtype='object')
+
+        # Both eyes missing
+        else:
+            eyes = np.array([params['previous_detection_l'], params['previous_detection_r']])
+
+        for eye in eyes:
+            self._manip_plot_blanked_region(frame, params=params, region=eye)
+
+    def _manip_plot_blanked_region(self, frame, params, region):
+        try:
+            (x, y, w, h) = region
+        except TypeError:
+            pass
+        else:
+            cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
+                          (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
+            return x, y, w, h
 
 class CamWrite:
     # If you run into FileNotFound errors when importing ffmpeg-python, make sure that ffmpeg.exe is placed in the
