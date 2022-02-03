@@ -132,8 +132,6 @@ class PerformerCamView:
             "has_loop": False,
         }
 
-        # TODO: refactor these nicely into dictionaries
-        # TODO: Add support for different cascades
         cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
         blank_params = {
             "face": {
@@ -142,20 +140,17 @@ class PerformerCamView:
                 "minNeighbors": 4,
                 "dimensions": 60,
                 "previous_detection": np.zeros(4),
+                "minNum": 1
             },
             "eye": {
                 "cascade": cv2.CascadeClassifier(f'{cascade_location}\haarcascade_eye_tree_eyeglasses.xml'),
                 "scaleFactor": 2.7,
                 "minNeighbors": 3,
-                "dimensions": 15,
-                "previous_detection_l": np.zeros(4),
-                "previous_detection_r": np.zeros(4),
-                "previous_detection": np.zeros((2, 4))
+                "dimensions": 1,
+                "previous_detection": np.full((2, 4), fill_value=100),   # Make sure fill - dimensions > 0!
+                "minNum": 2,
             }
         }
-
-        # TODO: replace this (and all the other times it's called)
-        detected_face = ()
 
         while not stop_event.is_set():
             frame = self.queue.get()
@@ -180,11 +175,11 @@ class PerformerCamView:
                     loop_params["frames"].clear()
 
                 case {'blank face': True}:
-                    self._manip_detect_face_region(frame, params=blank_params["face"])
+                    self._manip_detect_blanked_region(frame, params=blank_params["face"])
 
-                # TODO: refactor this to use the _manip_blank_region function call as well
                 case {'blank eyes': True}:
-                    self._manip_detect_eye_regions(frame, params=blank_params['eye'])
+                    # TODO: implement error correction if only one eye detected (i'm lazy and this is hard)
+                    self._manip_detect_blanked_region(frame, params=blank_params['eye'])
 
                 case {'*reset': True}:
                     # TODO: I don't like that this function call returns an object (it works fine though)
@@ -199,16 +194,13 @@ class PerformerCamView:
         time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
         cv2.destroyWindow(self.name)
 
-    def _reset_manips(self, detected_face, loop_params):
-        if len(loop_params["frames"]) > 0:
-            loop_params["var"] = 0
-            loop_params["has_loop"] = True
-        detected_face = ()
+    def _reset_manips(self, loop_params):
+        loop_params["var"] = 0
+        loop_params["has_loop"] = True
         try:
             self.params['*reset lock'].release()
         except RuntimeError:
             pass
-        return detected_face
 
     def _manip_loop_play(self, params):
         if params["var"] >= len(params["frames"]):
@@ -224,40 +216,15 @@ class PerformerCamView:
             params["has_loop"] = False
         params["frames"].append(frame)
 
-    def _manip_detect_face_region(self, frame, params):
+    def _manip_detect_blanked_region(self, frame, params):
         regions = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
                                                      params["scaleFactor"], params["minNeighbors"])
-        if isinstance(regions, np.ndarray):
-            for region in regions:
-                params["previous_detection"] = self._manip_plot_blanked_region(frame, params, region)
+        if len(regions) == params["minNum"]:
+            params["previous_detection"] = regions
         else:
-            self._manip_plot_blanked_region(frame, params, region=params["previous_detection"])
-
-    def _manip_detect_eye_regions(self, frame, params,):
-        eyes = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
-                                                  params["scaleFactor"], params["minNeighbors"])
-        eyes = eyes[eyes[:, 0].argsort()]
-
-        # Detected two eyes
-        if len(eyes) == 2:
-            params['previous_detection'] = eyes
-
-        # Only detected one eye
-        elif len(eyes) == 1:
-            # Left eye probably missing
-            if eyes[0][0] < params['previous_detection'][0][0]:
-                eyes = np.array([params['previous_detection'][1], eyes[0]])
-            # Right eye probably missing
-            else:
-                eyes = np.array([eyes[0], params['previous_detection'][0]])
-
-        # Both eyes missing
-        else:
-            eyes = params['previous_detection']
-        eyes = eyes[eyes[:, 0].argsort()]
-
-        for eye in eyes:
-            self._manip_plot_blanked_region(frame, params, region=eye)
+            regions = params["previous_detection"]
+        for region in regions:
+            self._manip_plot_blanked_region(frame, params, region)
 
     def _manip_plot_blanked_region(self, frame, params, region):
         try:
@@ -267,7 +234,6 @@ class PerformerCamView:
         else:
             cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
                           (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
-            return x, y, w, h
 
 class CamWrite:
     # If you run into FileNotFound errors when importing ffmpeg-python, make sure that ffmpeg.exe is placed in the
