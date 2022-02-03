@@ -123,7 +123,7 @@ class PerformerCamView:
         global_barrier.wait()
 
     def main_loop(self, stop_event):
-        # TODO: refactor these nicely into dictionaries as with loop_params
+        # TODO: refactor these into UserParams.py somehow - they're taking up a lot of space here.
         delay_frames = deque(maxlen=round(self.params['*fps']*(self.params['*max delay time']/1000)))
 
         loop_params = {
@@ -135,15 +135,15 @@ class PerformerCamView:
         cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
         blank_params = {
             "face": {
-                "cascade": cv2.CascadeClassifier(f'{cascade_location}\lbpcascade_frontalface_improved.xml'),
+                "cascade": cv2.CascadeClassifier(fr'{cascade_location}\lbpcascade_frontalface_improved.xml'),
                 "scaleFactor": 1.4,
                 "minNeighbors": 4,
                 "dimensions": 60,
-                "previous_detection": np.zeros(4),
+                "previous_detection": np.full((1, 4), fill_value=100),
                 "minNum": 1
             },
             "eye": {
-                "cascade": cv2.CascadeClassifier(f'{cascade_location}\haarcascade_eye_tree_eyeglasses.xml'),
+                "cascade": cv2.CascadeClassifier(fr'{cascade_location}\haarcascade_eye_tree_eyeglasses.xml'),
                 "scaleFactor": 2.7,
                 "minNeighbors": 3,
                 "dimensions": 1,
@@ -182,8 +182,7 @@ class PerformerCamView:
                     self._manip_detect_blanked_region(frame, params=blank_params['eye'])
 
                 case {'*reset': True}:
-                    # TODO: I don't like that this function call returns an object (it works fine though)
-                    detected_face = self._reset_manips(detected_face, loop_params)
+                    self._reset_manips(loop_params, blank_params)
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
@@ -194,13 +193,12 @@ class PerformerCamView:
         time.sleep(1)  # Wait for 1 sec to allow cv2 and ffmpeg time to stop
         cv2.destroyWindow(self.name)
 
-    def _reset_manips(self, loop_params):
-        loop_params["var"] = 0
-        loop_params["has_loop"] = True
-        try:
-            self.params['*reset lock'].release()
-        except RuntimeError:
-            pass
+    def _manip_loop_rec(self, frame, params):
+        if params["has_loop"]:
+            params["var"] = 0
+            params["frames"].clear()
+            params["has_loop"] = False
+        params["frames"].append(frame)
 
     def _manip_loop_play(self, params):
         if params["var"] >= len(params["frames"]):
@@ -208,13 +206,6 @@ class PerformerCamView:
         frame = params["frames"][params["var"]]
         params["var"] += 1
         return frame
-
-    def _manip_loop_rec(self, frame, params):
-        if params["has_loop"]:
-            params["var"] = 0
-            params["frames"].clear()
-            params["has_loop"] = False
-        params["frames"].append(frame)
 
     def _manip_detect_blanked_region(self, frame, params):
         regions = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
@@ -234,6 +225,18 @@ class PerformerCamView:
         else:
             cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
                           (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
+
+    def _reset_manips(self, loop_params, blank_params):
+        # TODO: this could look a bit nicer i'm sure
+        loop_params["var"] = 0
+        loop_params["has_loop"] = True
+        blank_params['face']['previous_detection'] = np.full((1, 4), fill_value=100)
+        blank_params['eye']['previous_detection'] = np.full((1, 4), fill_value=100)
+        try:
+            self.params['*reset lock'].release()
+        except RuntimeError:
+            pass
+
 
 class CamWrite:
     # If you run into FileNotFound errors when importing ffmpeg-python, make sure that ffmpeg.exe is placed in the
