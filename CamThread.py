@@ -150,6 +150,7 @@ class PerformerCamView:
                 "dimensions": 15,
                 "previous_detection_l": np.zeros(4),
                 "previous_detection_r": np.zeros(4),
+                "previous_detection": np.zeros((2, 4))
             }
         }
 
@@ -235,34 +236,33 @@ class PerformerCamView:
     def _manip_detect_eye_regions(self, frame, params,):
         eyes = params["cascade"].detectMultiScale(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY),
                                                   params["scaleFactor"], params["minNeighbors"])
+        eyes = eyes[eyes[:, 0].argsort()]
 
         # Detected two eyes
         if len(eyes) == 2:
-            params['previous_detection_l'] = eyes[0]
-            params['previous_detection_r'] = eyes[1]
+            params['previous_detection'] = eyes
 
         # Only detected one eye
         elif len(eyes) == 1:
             # Left eye probably missing
-            if eyes[0][0] < params['previous_detection_l'][0]:
-                params['previous_detection_r'] = eyes[0]
-                eyes = np.array([params['previous_detection_l'], eyes[0]], dtype='object')
+            if eyes[0][0] < params['previous_detection'][0][0]:
+                eyes = np.array([params['previous_detection'][1], eyes[0]])
             # Right eye probably missing
             else:
-                params['previous_detection_l'] = eyes[0]
-                eyes = np.array([eyes[0], params['previous_detection_r']], dtype='object')
+                eyes = np.array([eyes[0], params['previous_detection'][0]])
 
         # Both eyes missing
         else:
-            eyes = np.array([params['previous_detection_l'], params['previous_detection_r']])
+            eyes = params['previous_detection']
+        eyes = eyes[eyes[:, 0].argsort()]
 
         for eye in eyes:
-            self._manip_plot_blanked_region(frame, params=params, region=eye)
+            self._manip_plot_blanked_region(frame, params, region=eye)
 
     def _manip_plot_blanked_region(self, frame, params, region):
         try:
             (x, y, w, h) = region
-        except TypeError:
+        except ValueError:
             pass
         else:
             cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
