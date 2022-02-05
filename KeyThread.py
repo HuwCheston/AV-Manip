@@ -1,4 +1,5 @@
 import threading
+from tkinter import Button
 from TkGui import TkGui
 
 
@@ -45,10 +46,11 @@ class KeyThread:
                 d_time.insert(0, 'Out of bounds')
 
     def reset_manips(self):
-        # TODO: can this be replaced with an event? Will need to change ReaThread too
         self.params['*reset'] = True
-        for button in self.gui.tk_list:
-            button.config(bg="SystemButtonFace")
+        # TODO: this returns weak errors as not all items in tk_list are buttons (thus don't have bg= param)
+        for b in self.gui.tk_list:
+            if isinstance(b, Button):
+                b.config(bg="SystemButtonFace")
         self.params['*reset lock'].acquire()
         for param in self.params.keys():
             if isinstance(self.params[param], bool):

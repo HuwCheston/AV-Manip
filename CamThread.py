@@ -162,6 +162,7 @@ class PerformerCamView:
                     frame = cv2.flip(frame, 0)  # This is a test manip and probably won't be used
 
                 case {'delayed': True}:
+                    # TODO: Need to catch errors here if delayed time is outside recorded range
                     frame = delay_frames[-round(self.params['*fps']*(self.params['*delay time']/1000))]
 
                 case {'loop rec': True}:
