@@ -12,6 +12,7 @@ params = {
         'Short': 50,
         'Medium': 200,
         'Long': 1000,
+        'Longer': 5000,
     },  # More presets can be added as above and will be configured to work automatically
     'blank face': False,
     'blank eyes': False,
