@@ -1,5 +1,4 @@
 import threading
-import tkinter as tk
 from TkGui import TkGui
 
 
@@ -49,8 +48,7 @@ class KeyThread:
         # TODO: can this be replaced with an event? Will need to change ReaThread too
         self.params['*reset'] = True
         for button in self.gui.tk_list:
-            if isinstance(button, tk.Button):
-                button.config(bg="SystemButtonFace")
+            button.config(bg="SystemButtonFace")
         self.params['*reset lock'].acquire()
         for param in self.params.keys():
             if isinstance(self.params[param], bool):

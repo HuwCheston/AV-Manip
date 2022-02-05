@@ -1,40 +1,58 @@
 import tkinter as tk
+import webbrowser
 
 
 class TkGui:
     def __init__(self, params, keythread):
         self.root = tk.Tk()
+        self.root.attributes('-topmost', 'true')
+        self.root.iconbitmap("cms-logo.ico")
+
         self.params = params
         self.keythread = keythread
         self.tk_list = []
 
     def tk_setup(self):
-        self.root.attributes('-topmost', 'true')
-        panes = [self.info_pane, self.command_pane, self.delay_pane, self.loop_pane, self.loop_pane,
-                 self.blank_pane, self.control_pane, self.flip_pane]
+        panes = [
+            self.info_pane,
+            self.command_pane,
+            self.delay_pane,
+            self.loop_pane,
+            self.loop_pane,
+            self.blank_pane,
+            self.control_pane,
+            self.flip_pane
+        ]
+
         # TODO: why does this need to be num+1?
         for num, pane in enumerate(panes):
             pane(col_num=num+1)
 
     def info_pane(self, col_num):
-        texts = ['AV-Manip (v.0.1)',
-                 '© Huw Cheston, 2022',
-                 f'Active participants: {str(self.params["*participants"])}',
-                 f'Camera FPS: {str(self.params["*fps"])}']
+        texts = [
+            'AV-Manip (v.0.1)',
+            '© Huw Cheston, 2022',
+            f'Active participants: {str(self.params["*participants"])}',
+            f'Camera FPS: {str(self.params["*fps"])}'
+        ]
 
         info_frame = tk.Frame(self.root, padx=10, pady=1)
-        img_label = tk.Label(info_frame)
+        img_label = tk.Label(info_frame, cursor = "hand2")
         img_label.image = tk.PhotoImage(file="cms-logo.gif")
         img_label['image'] = img_label.image
+        img_label.bind("<Button-1>", lambda e: webbrowser.open_new("https://cms.mus.cam.ac.uk/"))
+
         labels = [img_label] + [tk.Label(info_frame, text=text) for text in texts]
         self.organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
         info_frame.grid(row=1, column=col_num)
 
     def command_pane(self, col_num):
         command_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        command_tk_list = [tk.Label(command_tk_frame, text='Commands'),
-                           tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
-                           tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop)]
+        command_tk_list = [
+            tk.Label(command_tk_frame, text='Commands'),
+            tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
+            tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop)
+        ]
         self.organise_pane(tk_list=command_tk_list, col_num=col_num)
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
