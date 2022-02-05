@@ -21,13 +21,12 @@ class KeyThread:
         global_barrier.wait()
 
     def tk_setup(self):
-        self.info_pane(1)
-        self.command_pane(2)
-        self.delay_pane(3)
-        self.loop_pane(4)
-        self.blank_pane(5)
-        self.control_pane(6)
-        self.flip_pane(7)
+        panes = [self.info_pane, self.command_pane, self.delay_pane, self.loop_pane, self.loop_pane,
+                 self.blank_pane, self.control_pane, self.flip_pane]
+        # TODO: disable having to suppress the inspection here...
+        for num, pane in enumerate(panes):
+            # noinspection PyArgumentList
+            pane(col_num=num+1)
 
     def main_loop(self):
         self.root.attributes('-topmost', 'true')
@@ -38,21 +37,21 @@ class KeyThread:
         self.root.destroy()
 
     def info_pane(self, col_num):
+        # TODO: fix this and set it to use self.organise_gui
         info_frame = tk.Frame(self.root, padx=10, pady=1)
         info_frame.grid(row=1, column=col_num)
         img_label = tk.Label(info_frame)
         img_label.image = tk.PhotoImage(file="cms-logo.gif")
         img_label['image'] = img_label.image
         img_label.grid(row=1, column=col_num, sticky="n", padx=10, pady=10)
-        version = tk.Label(info_frame, text='AV-Manip (v.0.1)')
-        version.grid(row=2, column=col_num)
-        # TODO: make this a hyperlink (see stack overflow)
-        copyright = tk.Label(info_frame, text='© Huw Cheston, 2022')
-        copyright.grid(row=3, column=col_num)
-        participants = tk.Label(info_frame, text=f'Active participants: {str(self.params["*participants"])}')
-        participants.grid(row=4, column=col_num)
-        participants = tk.Label(info_frame, text=f'Camera FPS: {str(self.params["*fps"])}')
-        participants.grid(row=5, column=col_num)
+
+        labels = ['AV-Manip (v.0.1)',
+                  '© Huw Cheston, 2022',
+                  f'Active participants: {str(self.params["*participants"])}',
+                  f'Camera FPS: {str(self.params["*fps"])}']
+        for (num, label) in enumerate(labels):
+            l = tk.Label(info_frame, text=label)
+            l.grid(row=num, column=col_num)
 
     def command_pane(self, col_num):
         command_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
