@@ -1,7 +1,6 @@
 import threading
 from tkinter import Button
 from TkGui import TkGui
-import time
 
 
 class KeyThread:

@@ -33,7 +33,7 @@ class TkGui:
         texts = [
             'AV-Manip (v.0.1)',
             '© Huw Cheston, 2022',
-            f'Active participants: {str(self.params["*participants"])}',
+            f'Active cameras: {str(self.params["*participants"])}',
             f'Camera FPS: {str(self.params["*fps"])}'
         ]
 

@@ -1,5 +1,3 @@
-from threading import Lock
-
 # These parameters can all be edited by the user before running the program
 # TODO: add proper documentation for these parameters (this is outdated)
 params = {
@@ -27,7 +25,6 @@ params = {
     'control volume': False,
     '*reset audio': False,
     '*reset video': False,
-    '*reset lock': Lock(),
     '*quit': False,
     # TODO: set this value to create tracks in ReaThread if not enough already exist
     '*participants': 1,  # Number of cameras to try and read
