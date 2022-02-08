@@ -1,6 +1,7 @@
 import threading
 from tkinter import Button
 from TkGui import TkGui
+import time
 
 
 class KeyThread:
@@ -46,12 +47,12 @@ class KeyThread:
                 d_time.insert(0, 'Out of bounds')
 
     def reset_manips(self):
-        self.params['*reset'] = True
-        # TODO: this returns weak errors as not all items in tk_list are buttons (thus don't have bg= param)
+        self.params['*reset video'] = True  # This param is reset to False by CamThread once resetting has completed
+        self.params['*reset audio'] = True  # This param is reset to False by ReaThread once resetting has completed
+
         for b in self.gui.tk_list:
             if isinstance(b, Button):
                 b.config(bg="SystemButtonFace")
-        self.params['*reset lock'].acquire()
         for param in self.params.keys():
-            if isinstance(self.params[param], bool):
+            if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False

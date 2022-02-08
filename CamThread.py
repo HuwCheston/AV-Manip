@@ -14,7 +14,7 @@ class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
         self.source = source
         self.params = params
-        self.queue_length = 128  # This can be changed to save memory if required
+        self.queue_length = 64  # This can be changed to save memory if required
         self.researcher_cam_queue = Queue(maxsize=self.queue_length)
         self.performer_cam_queue = Queue(maxsize=self.queue_length)
         self.global_barrier = global_barrier
@@ -124,6 +124,7 @@ class PerformerCamView:
 
     def main_loop(self, stop_event):
         # TODO: refactor these into UserParams.py somehow - they're taking up a lot of space here.
+        # TODO: alternatively, refactor these into attributes of PerformerCamView class
         delay_frames = deque(maxlen=round(self.params['*fps']*(self.params['*max delay time']/1000)))
 
         loop_params = {
@@ -163,6 +164,7 @@ class PerformerCamView:
 
                 case {'delayed': True}:
                     # TODO: Need to catch errors here if delayed time is outside recorded range
+                    # Out-of-sync delay is likely a performance issue (e.g. overheating laptop!)
                     frame = delay_frames[-round(self.params['*fps']*(self.params['*delay time']/1000))]
 
                 case {'loop rec': True}:
@@ -175,6 +177,11 @@ class PerformerCamView:
                     loop_params["var"] = 0
                     loop_params["frames"].clear()
 
+                case {'pause video': True} | {'pause both': True}:
+                    if self.params['*pause frame'] is None:
+                        self.params['*pause frame'] = frame
+                    frame = self.params['*pause frame']
+
                 case {'blank face': True}:
                     self._manip_detect_blanked_region(frame, params=blank_params["face"])
 
@@ -182,7 +189,7 @@ class PerformerCamView:
                     # TODO: implement error correction if only one eye detected (i'm lazy and this is hard)
                     self._manip_detect_blanked_region(frame, params=blank_params['eye'])
 
-                case {'*reset': True}:
+                case {'*reset video': True}:
                     self._reset_manips(loop_params, blank_params)
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
@@ -231,12 +238,10 @@ class PerformerCamView:
         # TODO: this could look a bit nicer i'm sure
         loop_params["var"] = 0
         loop_params["has_loop"] = True
+        self.params['*pause frame'] = None
         blank_params['face']['previous_detection'] = np.full((1, 4), fill_value=100)
         blank_params['eye']['previous_detection'] = np.full((1, 4), fill_value=100)
-        try:
-            self.params['*reset lock'].release()
-        except RuntimeError:
-            pass
+        self.params['*reset video'] = False
 
 
 class CamWrite:

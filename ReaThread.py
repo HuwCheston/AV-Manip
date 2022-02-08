@@ -10,47 +10,51 @@ import threading
 class ReaThread:
     def __init__(self, global_barrier: threading.Barrier, stop_event: threading.Event, params: dict):
         self.project = reapy.Project()  # Initialise the Reaper project in Python
-        reaper_thread = threading.Thread(target=self.start_reaper, args=(global_barrier, stop_event, params))
+        self.params = params
+
+        reaper_thread = threading.Thread(target=self.start_reaper, args=(global_barrier, stop_event))
         reaper_thread.start()
 
-    def start_reaper(self, global_barrier, stop_event, params):
-        self.disable_fxs()
+    def start_reaper(self, global_barrier, stop_event):
+        self.reset_manips()
         self.wait(global_barrier)
         self.project.record()
-        self.main_loop(stop_event, params)
+        self.main_loop(stop_event)
         self.exit_loop()
-
-    def disable_fxs(self):
-        for track in self.project.tracks:
-            for num in range(track.n_fxs - 1):
-                track.fxs[num].disable()
 
     @staticmethod
     def wait(global_barrier):
         print(f"Reaper manager currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
         global_barrier.wait()
 
-    def main_loop(self, stop_event, params):
+    def main_loop(self, stop_event):
         keys = self.project.tracks[0]
         while not stop_event.is_set():  # stop_event is triggered by KeyThread
             # TODO: Does this need to be checked every loop iteration?
-            keys.fxs[0].params[0] = params['*delay time']
+            keys.fxs[0].params[0] = self.params['*delay time']
 
-            match params:
+            match self.params:
                 case {'delayed': True} if not keys.fxs[0].is_enabled:
                     keys.fxs[0].enable()
+
+                case {'pause audio': True} | {'pause both': True}:
+                    self.project.mute_all_tracks()
+
                 # case {'loop rec': True}:
                 #     keys.fxs[2].enable()
-                case {'*reset': True}:
-                    self.disable_fxs()
-                    # FIXME: Occasionally getting a RunTime Error here (release unlocked lock)
-                    try:
-                        params['*reset lock'].release()
-                    except RuntimeError:
-                        pass
+
+                case {'*reset audio': True}:
+                    self.reset_manips()
 
             time.sleep(0.1)  # Improves performance in main_loop
 
+    def reset_manips(self):
+        self.project.unmute_all_tracks()
+        for track in self.project.tracks:
+            for num in range(track.n_fxs - 1):
+                track.fxs[num].disable()
+        self.params['*reset audio'] = False
+
     def exit_loop(self):
         self.project.stop()
-        self.disable_fxs()
+        self.reset_manips()

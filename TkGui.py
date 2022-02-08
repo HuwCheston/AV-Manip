@@ -19,7 +19,7 @@ class TkGui:
             self.command_pane,
             self.delay_pane,
             self.loop_pane,
-            self.loop_pane,
+            self.pause_pane,
             self.blank_pane,
             self.control_pane,
             self.flip_pane
@@ -93,6 +93,10 @@ class TkGui:
 
     def blank_pane(self, col_num):
         manip_str = 'blank'
+        self.populate_tk_list(manip_str, col_num=col_num)
+
+    def pause_pane(self, col_num):
+        manip_str = 'pause'
         self.populate_tk_list(manip_str, col_num=col_num)
 
     def control_pane(self, col_num):
