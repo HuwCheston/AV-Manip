@@ -1,8 +1,11 @@
 # These parameters can be edited by the user before running the program and should adjust system settings automatically
+cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
 user_params = {
     '*participants': 1,     # Number of cameras/tracks to try and read
     # TODO: set this value to create more tracks in ReaThread if not enough exist already
     '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)
+    '*resolution': '640x480',   # Camera resolution (for researcher view and recording)
+    '*scaling': 2.0,     # Amount to scale up the performer camera view by
 
     '*delay time': 1000,    # The default delay time (<= max delay time: can be changed when program is running)
     '*max delay time': 10000,   # The maximum amount of time available for delay (will configure Reaper JSFX if needed)
@@ -27,6 +30,11 @@ sys_params = {
     'loop rec': False,  # Starts recording video for later playback
     'loop play': False,  # Plays previously recorded video
     'loop clear': False,    # Clears any previously recorded video from memory
+    '*loop params': {
+            "frames": [],
+            "var": 0,
+            "has_loop": False,
+        },
 
     'pause video': False,   # Stops performer's view of video
     'pause audio': False,   # Stops performer's audio

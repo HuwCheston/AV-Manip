@@ -44,17 +44,28 @@ class CamRead:
         self.cam = cv2.VideoCapture(self.source, cv2.CAP_DSHOW)
         self.researcher_cam_queue = resear_q
         self.performer_cam_queue = perfor_q
-
-        # TODO: check and make sure this doesn't break anything!
-        # FIXME: Change of FPS may require restart of program due to threading...
-        self.cam.set(cv2.CAP_PROP_FPS, params["*fps"])
-        params["*fps"] = round(self.cam.get(cv2.CAP_PROP_FPS))
+        self.params = params
+        self.config_cam()
 
     def start_cam(self, global_barrier, stop_event):
         self.read_frame()
         self.wait(global_barrier)
         self.main_loop(stop_event)
         self.exit_loop()
+
+    def config_cam(self):
+        # Set the FPS
+        # Change of FPS may require restart of program due to threading...
+        # TODO: check and make sure this doesn't break anything!
+        self.cam.set(cv2.CAP_PROP_FPS, self.params["*fps"])
+        self.params["*fps"] = round(self.cam.get(cv2.CAP_PROP_FPS))
+
+        # Set the resolution
+        res = self.params['*resolution'].split('x')
+        self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, float(res[0]))
+        self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, float(res[1]))
+        self.params['*resolution'] = f'{round(self.cam.get(cv2.CAP_PROP_FRAME_WIDTH))}x' \
+                                     f'{round(self.cam.get(cv2.CAP_PROP_FRAME_HEIGHT))}'
 
     def read_frame(self):
         _, frame = self.cam.read()
@@ -123,16 +134,10 @@ class PerformerCamView:
         global_barrier.wait()
 
     def main_loop(self, stop_event):
-        # TODO: refactor these into UserParams.py somehow - they're taking up a lot of space here.
-        # TODO: alternatively, refactor these into attributes of PerformerCamView class
         delay_frames = deque(maxlen=round(self.params['*fps']*(self.params['*max delay time']/1000)))
+        loop_params = self.params['*loop params']
 
-        loop_params = {
-            "frames": [],
-            "var": 0,
-            "has_loop": False,
-        }
-
+        # TODO: refactor these into UserParams.py somehow - they're taking up a lot of space here.
         cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
         blank_params = {
             "face": {
@@ -193,7 +198,7 @@ class PerformerCamView:
                     self._reset_manips(loop_params, blank_params)
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
-            frame = cv2.resize(frame, (0, 0), fx=2.0, fy=2.0)
+            frame = cv2.resize(frame, (0, 0), fx=self.params['*scaling'], fy=self.params['*scaling'])
             cv2.imshow(self.name, frame)
             cv2.waitKey(1)
 

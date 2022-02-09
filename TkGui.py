@@ -48,14 +48,20 @@ class TkGui:
         info_frame.grid(row=1, column=col_num)
 
     def command_pane(self, col_num):
+        p_res = 'x'.join([str(round(int(i) * self.params['*scaling'])) for i in self.params['*resolution'].split('x')])
         command_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         command_tk_list = [
             tk.Label(command_tk_frame, text='Commands'),
             tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
-            tk.Button(command_tk_frame, text='Info', command=lambda: tk.messagebox.showinfo(title='Info', message=f'Active cameras: {str(self.params["*participants"])}\nCamera FPS: {str(self.params["*fps"])}')),
+            tk.Button(command_tk_frame, text='Info',
+                      command=lambda:
+                      tk.messagebox.showinfo(title='Info',
+                                             message=f'Active cameras: {str(self.params["*participants"])}\n'
+                                                     f'Camera FPS: {str(self.params["*fps"])}\n'
+                                                     f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
+                                                     f'Performer Camera Resolution: {p_res}')),
             tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
-        # TODO: would be nice to have a button here that displays a messagebox with info...
         self.organise_pane(tk_list=command_tk_list, col_num=col_num)
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
