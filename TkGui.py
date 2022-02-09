@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from tkinter import ttk
 import webbrowser
 
@@ -6,6 +7,7 @@ import webbrowser
 class TkGui:
     def __init__(self, params, keythread):
         self.root = tk.Tk()
+        self.root.title('AV-Manip')
         self.root.attributes('-topmost', 'true')
         self.root.iconbitmap("cms-logo.ico")
 
@@ -30,20 +32,18 @@ class TkGui:
             pane(col_num=num + 1)
 
     def info_pane(self, col_num):
-        texts = [
-            'AV-Manip (v.0.1)',
-            '© Huw Cheston, 2022',
-            f'Active cameras: {str(self.params["*participants"])}',
-            f'Camera FPS: {str(self.params["*fps"])}'
-        ]
-
         info_frame = tk.Frame(self.root, padx=10, pady=1)
-        img_label = tk.Label(info_frame, cursor="hand2")
-        img_label.image = tk.PhotoImage(file="cms-logo.gif")
-        img_label['image'] = img_label.image
-        img_label.bind("<Button-1>", lambda e: webbrowser.open_new("https://cms.mus.cam.ac.uk/"))
+        labels = {
+            tk.Label(info_frame, text='CMS logo'): lambda e: webbrowser.open_new("https://cms.mus.cam.ac.uk/"),
+            tk.Label(info_frame, text='AV-Manip (v.0.1)'): lambda e: webbrowser.open_new('https://github.com/HuwCheston/AV-Manip/'),
+            tk.Label(info_frame, text='© Huw Cheston, 2022'): lambda e: webbrowser.open_new('https://github.com/HuwCheston/'),
+        }
+        for (label, func) in labels.items():
+            label.bind('<Button-1>', func)
+            if label['text'] == 'CMS logo':
+                label.image = tk.PhotoImage(file="cms-logo.gif")
+                label['image'] = label.image
 
-        labels = [img_label] + [tk.Label(info_frame, text=text) for text in texts]
         self.organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
         info_frame.grid(row=1, column=col_num)
 
@@ -52,8 +52,10 @@ class TkGui:
         command_tk_list = [
             tk.Label(command_tk_frame, text='Commands'),
             tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
-            tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop)
+            tk.Button(command_tk_frame, text='Info', command=lambda: tk.messagebox.showinfo(title='Info', message=f'Active cameras: {str(self.params["*participants"])}\nCamera FPS: {str(self.params["*fps"])}')),
+            tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
+        # TODO: would be nice to have a button here that displays a messagebox with info...
         self.organise_pane(tk_list=command_tk_list, col_num=col_num)
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 

@@ -1,34 +1,48 @@
-# These parameters can all be edited by the user before running the program
-# TODO: add proper documentation for these parameters (this is outdated)
-params = {
-    'flipped': False,  # V: rotates orthogonally A: no modification
-    'delayed': False,  # V: adds five-second delay A: adds five-second delay (not yet implemented)
-    '*delay time': 1000,  # The default amount of time to delay V/A by. Can be changed in GUI
-    '*max delay time': 10000,  # The max amount of time (ms) to allow V/A delay by. Affects memory consumption!
-    # Will trigger an edit of Reaper JSFX parameters if exceeds currently set values.
-    '*delay time presets': {
+# These parameters can be edited by the user before running the program and should adjust system settings automatically
+user_params = {
+    '*participants': 1,     # Number of cameras/tracks to try and read
+    # TODO: set this value to create more tracks in ReaThread if not enough exist already
+    '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)
+
+    '*delay time': 1000,    # The default delay time (<= max delay time: can be changed when program is running)
+    '*max delay time': 10000,   # The maximum amount of time available for delay (will configure Reaper JSFX if needed)
+    '*delay time presets': {    # Preset delay times to display in GUI (must be <= max delay time)
         'Short': 50,
         'Medium': 200,
         'Long': 1000,
         'Longer': 5000,
-    },  # More presets can be added as above and will be configured to work automatically
-    'blank face': False,
-    'blank eyes': False,
-    'loop rec': False,
-    'loop play': False,
-    'loop clear': False,
-    'pause video': False,
-    'pause audio': False,
-    'pause both': False,
-    '*pause frame': None,
-    'control pitch': False,
-    'control volume': False,
-    '*reset audio': False,
-    '*reset video': False,
-    '*quit': False,
-    # TODO: set this value to create tracks in ReaThread if not enough already exist
-    '*participants': 1,  # Number of cameras to try and read
-    '*fps': 30,     # 30 here works well for me!
-    # Add more parameters as here...
-    # Params beginning with * are system parameters and will not be displayed in GUI
+        # Add more delay presets here - they will be configured in the GUI automatically
+    },
 }
+
+# These parameters should not be adjusted by the user (unless to add more manipulations)
+sys_params = {
+    'flipped': False,  # Rotates video orthogonally: used as a test manipulation, unlikely to be useful
+
+    'delayed': False,  # Adds delay of X seconds to video and audio: amount of delay can be adjusted
+
+    'blank face': False,    # Uses ML to blank performers face. Error detection in place.
+    'blank eyes': False,    # Uses ML to blank performers eyes. Some error detection in place, could be improved
+
+    'loop rec': False,  # Starts recording video for later playback
+    'loop play': False,  # Plays previously recorded video
+    'loop clear': False,    # Clears any previously recorded video from memory
+
+    'pause video': False,   # Stops performer's view of video
+    'pause audio': False,   # Stops performer's audio
+    'pause both': False,    # Stops performer's audio and video channel
+    '*pause frame': None,   # Stores the video frame immediately before implementing the pause
+
+    'control pitch': False,     # Not implemented
+    'control volume': False,    # Not implemented
+
+    '*reset audio': False,  # Resets audio back to normal (i.e. no manipulations)
+    '*reset video': False,  # Resets video back to normal (i.e. no manipulations)
+    '*quit': False,     # Quits the program
+}
+
+params = user_params | sys_params
+
+# TODO: refactor the (changeable) user params and the (unchangeable) system params into two seperate dictionaries.
+#  The user params should be changeable in a .txt file, and then joined with the system params into one dictionary
+#  when the program runs (with checks to ensure that they don't conflict, e.g. delay presets out of range!)

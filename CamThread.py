@@ -274,7 +274,7 @@ class CamWrite:
     def main_loop(stop_event, process):
         running_process = process.run_async(pipe_stdin=True)
         while not stop_event.is_set():
-            time.sleep(0.1)  # running this (rather than pass) in the loop increases performance
+            time.sleep(0.1)  # running this (rather than pass) in the loop improves performance
         running_process.communicate(str.encode("q"))  # Send quit command to ffmpeg process
         running_process.terminate()
 

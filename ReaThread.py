@@ -6,6 +6,10 @@ import threading
 # time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
 # Action List -> Run Reascript), then call python -c "import reapy; reapy.configure_reaper()" in a terminal.
 
+# TODO: I think the way this should be structured is as follows. A single ReaThread object is created, which manages
+#  the project paramaters. This creates child classes equal to the number of participants. Each child has it's own
+#  attributes relating to the participant + their partner's audio. The central ReaThread class runs the mainloop,
+#  which triggers the modifications in the child classes.
 
 class ReaThread:
     def __init__(self, global_barrier: threading.Barrier, stop_event: threading.Event, params: dict):
@@ -22,6 +26,7 @@ class ReaThread:
         self.main_loop(stop_event)
         self.exit_loop()
 
+    # TODO: i'm still not sure on the use of the staticmethod decorator here...
     @staticmethod
     def wait(global_barrier):
         print(f"Reaper manager currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
