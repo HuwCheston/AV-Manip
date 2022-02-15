@@ -14,22 +14,29 @@ class VariableDelay:
         self.root = root
         self.variable_delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
 
-        self.dist = np.zeros(1)
+        self.dist = None
         self.delay_value = float
         self.delay_time = float
 
-        self.mu_frame, self.mu_entry = self.mu_sig_entry(text='Mu')
-        self.sigma_frame, self.sigma_entry = self.mu_sig_entry(text='Sigma')
-        self.get_new_dist = tk.Button(self.variable_delay_frame, command=self.get_new_distribution, text='Get Distribution')
-        self.plot_dist_button = tk.Button(self.variable_delay_frame, command=self.plot_distribution, text='Plot Distribution')
+        self.mu_frame, self.mu_entry = self.get_tk_entry(text='Mu')
+        self.sigma_frame, self.sigma_entry = self.get_tk_entry(text='Sigma')
+        self.low_timer_frame, self.low_timer = self.get_tk_scale(text='Lower')
+        self.high_timer_frame, self.high_timer = self.get_tk_scale(text='Upper')
+
+        self.get_new_dist = tk.Button(self.variable_delay_frame, command=self.get_new_distribution,
+                                      text='Get Distribution')
+        self.plot_dist_button = tk.Button(self.variable_delay_frame, command=self.plot_distribution,
+                                          text='Plot Distribution')
 
         self.tk_list = [tk.Label(self.variable_delay_frame, text='Variable Delay'),
                         self.mu_frame,
                         self.sigma_frame,
+                        self.low_timer_frame,
+                        self.high_timer_frame,
                         self.get_new_dist,
                         self.plot_dist_button]
 
-    def mu_sig_entry(self, text):
+    def get_tk_entry(self, text):
         frame = tk.Frame(self.variable_delay_frame)
         label = tk.Label(frame, text=text + ':')
         entry = tk.Entry(frame, width=5)
@@ -38,6 +45,15 @@ class VariableDelay:
         entry.grid(row=1, column=2)
         ms.grid(row=1, column=3)
         return frame, entry
+
+    def get_tk_scale(self, text):
+        frame = tk.Frame(self.variable_delay_frame)
+        label = tk.Label(frame,)
+        # TODO: Replace scale boundaries in user params
+        scale = tk.Scale(frame, from_=0, to=1000, orient='horizontal', label=text + ' boundary:')
+        label.grid(row=1, column=1)
+        scale.grid(row=1, column=2)
+        return frame, scale
 
     def get_new_distribution(self, ):
         try:
@@ -81,4 +97,3 @@ class VariableDelay:
         toolbar = NavigationToolbar2Tk(canvas, newwindow)
         toolbar.update()
         canvas.get_tk_widget().pack()
-
