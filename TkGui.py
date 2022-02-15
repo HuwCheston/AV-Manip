@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
+from VariableDelay import VariableDelay
 import webbrowser
 
 
@@ -20,6 +21,7 @@ class TkGui:
             self.info_pane,
             self.command_pane,
             self.delay_pane,
+            self.variable_delay_pane,
             self.loop_pane,
             self.pause_pane,
             self.blank_pane,
@@ -66,12 +68,13 @@ class TkGui:
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
     def delay_pane(self, col_num):
+        # TODO: refactor this into a separate class?
         delay_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         delay_time_frame = tk.Frame(delay_tk_frame)
         d_time = tk.Entry(delay_time_frame, width=15)
         d_time.insert(0, str(self.params['*delay time']))
         msec = tk.Label(delay_time_frame, text='msec')
-        delay_tk_list = [tk.Label(delay_tk_frame, text='Delay')]
+        delay_tk_list = [tk.Label(delay_tk_frame, text='Fixed Delay')]
         b = tk.Button(delay_tk_frame, text='Start Delay')
         b.config(fg='black', command=lambda manip='delayed', button=b: self.keythread.enable_manip(manip, button))
         delay_tk_list.append(b)
@@ -90,10 +93,15 @@ class TkGui:
         delay_tk_list.append(combobox)
         self.organise_pane(tk_list=delay_tk_list, col_num=1)
         delay_tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        delay_time_frame.grid(column=1, row=10, sticky="n", padx=10, pady=10)
+        delay_time_frame.grid(column=1, row=len(delay_tk_list)+1, sticky="n", padx=10, pady=10)
         d_time.grid(row=1, column=1, sticky='n')
         msec.grid(row=1, column=2, sticky='n')
         self.tk_list.extend(delay_tk_list)
+
+    def variable_delay_pane(self, col_num):
+        variable_delay = VariableDelay(params=self.params, root=self.root)
+        variable_delay.variable_delay_frame.grid(column=col_num, row=1)
+        self.organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
 
     def loop_pane(self, col_num):
         manip_str = 'loop'

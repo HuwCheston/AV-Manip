@@ -37,7 +37,7 @@ class KeyThread:
             d = int(d_time.get())
         except ValueError:
             d_time.delete(0, 'end')
-            d_time.insert(0, 'Not a number')
+            d_time.insert(0, 'Invalid')
         else:
             if 0 < d < self.params['*max delay time']:
                 self.params['*delay time'] = d
