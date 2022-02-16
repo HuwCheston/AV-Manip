@@ -47,18 +47,24 @@ class VariableDelay:
                         ]
 
     def get_tk_buttons(self):
-        values = {"Linear": 0,
-                  "Gaussian": 1}
-        texts = [['Low:', 'High:'], ['Mu:', 'Sigma:']]
+        # TODO: convert this into a combobox
+        # TODO: add more distributions
+        # TODO: check Poisson distribution is working
+        values = {"Uniform": 0,
+                  "Gaussian": 1,
+                  "Poisson": 2}
+        texts = [['Low:', 'High:'], ['Mu:', 'Sigma:'], ['Expected:', 'N/A']]
         frame = tk.Frame(self.variable_delay_frame)
 
         buttons = [tk.Radiobutton(frame, text=t, variable=self.distribution_type, value=val,
                                   command=lambda: [self.label_1.configure(text=texts[self.distribution_type.get()][0]),
                                                    self.label_2.configure(text=texts[self.distribution_type.get()][1])])
                    for (t, val) in values.items()]
-
         for (num, button) in enumerate(buttons):
             button.grid(row=1, column=num)
+
+        lab = tk.Label(frame, text='dist.')
+        lab.grid(row=1, column=len(buttons)+1)
         return frame, buttons
 
     def get_tk_entry(self, text):
@@ -78,11 +84,15 @@ class VariableDelay:
             for entry in [self.entry_1, self.entry_2]:
                 entry.delete(0, 'end')
                 entry.insert(0, 'NaN')
+        # TODO: set shape of distribution as parameter
         else:
             if self.distribution_type.get() == 0:
-                self.dist = np.linspace(val1, val2, 1000)
+                self.dist = np.random.uniform(val1, val2, 1000)
             elif self.distribution_type.get() == 1:
                 self.dist = np.random.normal(val1, val2, 1000)
+            # TODO: Check poisson implementation
+            elif self.distribution_type.get() == 2:
+                self.dist = np.random.poisson(val1, 1000)
             self.delay_value = np.random.choice(self.dist)
 
     def plot_distribution(self,):
@@ -119,6 +129,7 @@ class VariableDelay:
         canvas.get_tk_widget().pack()
 
     def get_random_delay(self):
+        self.delay_time_entry.config(state='normal')
         while self.params['delayed']:
             self.delay_value = abs(np.random.choice(self.dist))
             self.delay_time_entry.delete(0, 'end')
@@ -126,3 +137,4 @@ class VariableDelay:
             self.keythread.set_delay_time(d_time=self.delay_time_entry)
             time.sleep(self.delay_value/1000)
         self.delay_time_entry.delete(0, 'end')
+        self.delay_time_entry.config(state='readonly')

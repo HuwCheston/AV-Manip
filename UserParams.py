@@ -15,6 +15,7 @@ user_params = {
         'Long': 1000,
         'Longer': 5000,
         # Add more delay presets here - they will be configured in the GUI automatically
+    '*var delay samples': 1000,     # Number of samples to draw when creating variable delay distributions.
     },
 }
 
