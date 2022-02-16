@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
-from tkinter import ttk
+from tkinter import messagebox, scrolledtext, ttk
 from VariableDelay import VariableDelay
 import webbrowser
 
@@ -11,6 +10,7 @@ class TkGui:
         self.root.title('AV-Manip')
         self.root.attributes('-topmost', 'true')
         self.root.iconbitmap("cms-logo.ico")
+        self.logging_window = None
 
         self.params = params
         self.keythread = keythread
@@ -45,7 +45,8 @@ class TkGui:
             if label['text'] == 'CMS logo':
                 label.image = tk.PhotoImage(file="cms-logo.gif")
                 label['image'] = label.image
-
+        self.logging_window = tk.scrolledtext.ScrolledText(info_frame, height=5, width=20, state='disabled', wrap='word')
+        labels[self.logging_window] = None
         self.organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
         info_frame.grid(row=1, column=col_num)
 

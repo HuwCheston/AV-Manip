@@ -84,7 +84,6 @@ class VariableDelay:
             for entry in [self.entry_1, self.entry_2]:
                 entry.delete(0, 'end')
                 entry.insert(0, 'NaN')
-        # TODO: set shape of distribution as parameter
         else:
             func = eval(self.params['*var delay distributions'][self.combo.get()]['function'])
             self.dist = func(val1, val2, self.params['*var delay samples'])
@@ -96,7 +95,8 @@ class VariableDelay:
         x_bin, y_bin = self.get_hist(ax)
         ax.annotate(text=f'{round(x_bin, 2)}ms', xy=(x_bin, y_bin), xytext=(x_bin, y_bin + 0.005),
                     arrowprops=dict(arrowstyle="->", connectionstyle="arc3"))
-        # if self.distribution_type.get() != 0:
+
+        # TODO: I think we should only get the LoBF if a certain distribution type is selected...
         x, y = self.get_gauss_curve()
         ax.plot(x, y)
         self.pack_distribution_display(fig, newwindow)

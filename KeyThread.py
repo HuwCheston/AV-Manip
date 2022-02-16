@@ -35,6 +35,9 @@ class KeyThread:
         self.reset_manips()
         self.params[manip] = True
         button.config(bg='green')
+        self.gui.logging_window.config(state='normal')
+        self.gui.logging_window.insert('end', f'\n{manip} now active.')
+        self.gui.logging_window.config(state='disabled')
 
     def set_delay_time(self, d_time):
         try:
@@ -59,3 +62,7 @@ class KeyThread:
         for param in self.params.keys():
             if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False
+
+        self.gui.logging_window.config(state='normal')
+        self.gui.logging_window.insert('end', '\nAll manipulations reset.')
+        self.gui.logging_window.config(state='disabled')
