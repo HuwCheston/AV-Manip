@@ -15,8 +15,22 @@ user_params = {
         'Long': 1000,
         'Longer': 5000,
         # Add more delay presets here - they will be configured in the GUI automatically
-    '*var delay samples': 1000,     # Number of samples to draw when creating variable delay distributions.
     },
+    '*var delay samples': 1000,  # Number of samples to draw when creating variable delay distributions.
+    '*var delay distributions': {
+        "Uniform": {    # Name of the distribution to be displayed in the combobox
+            "text": ["Low:", "High:"],  # Options to be displayed next to the two entry fields
+            "function": "np.random.uniform",    # Numpy function used to create the distribution as ndarray
+        },
+        "Gaussian": {
+            "text": ["Mu:", "Sigma:"],
+            "function": "np.random.normal",
+        },
+        "Poisson": {
+            "text": ["Expected:", "N/A:"],
+            "function": "np.random.poisson",
+        },
+    }   # Add more distributions here in the format above - they will be configured in the GUI automatically
 }
 
 # These parameters should not be adjusted by the user (unless to add more manipulations)
@@ -25,8 +39,8 @@ sys_params = {
 
     'delayed': False,  # Adds delay of X seconds to video and audio: amount of delay can be adjusted
 
-    'blank face': False,    # Uses ML to blank performers face. Error detection in place.
-    'blank eyes': False,    # Uses ML to blank performers eyes. Some error detection in place, could be improved
+    'blank face': False,    # Uses ML (Haar-like) to blank performers face. Error detection in place.
+    'blank eyes': False,    # Uses ML (Haar-like) to blank performers eyes. Some error detection in place, improvable?
 
     'loop rec': False,  # Starts recording video for later playback
     'loop play': False,  # Plays previously recorded video

@@ -82,9 +82,8 @@ class TkGui:
                                        command=lambda: self.keythread.set_delay_time(d_time)))
 
         preset_list = [v for (k, v) in self.params["*delay time presets"].items()]
-        combobox = ttk.Combobox(delay_tk_frame,
-                                values=[f'{k} - {v} msec' for (k, v) in self.params["*delay time presets"].items()],
-                                state='readonly')
+        combobox = ttk.Combobox(delay_tk_frame, state='readonly',
+                                values=[f'{k} - {v} msec' for (k, v) in self.params["*delay time presets"].items()])
         combobox.set('Delay Time Presets')
         combobox.bind("<<ComboboxSelected>>",
                       lambda e: [d_time.delete(0, 'end'),
