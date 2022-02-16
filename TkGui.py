@@ -99,9 +99,10 @@ class TkGui:
         self.tk_list.extend(delay_tk_list)
 
     def variable_delay_pane(self, col_num):
-        variable_delay = VariableDelay(params=self.params, root=self.root)
+        variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)
         variable_delay.variable_delay_frame.grid(column=col_num, row=1)
         self.organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
+        self.tk_list.append(variable_delay.start_delay_button)
 
     def loop_pane(self, col_num):
         manip_str = 'loop'

@@ -1,4 +1,5 @@
 import threading
+import time
 from tkinter import Button
 from TkGui import TkGui
 
@@ -24,6 +25,9 @@ class KeyThread:
         self.gui.root.mainloop()
 
     def exit_loop(self):
+        self.reset_manips()
+        # TODO: Implement something before this to state that the program is shutting down...
+        time.sleep(3)   # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
         self.stop_event.set()
         self.gui.root.destroy()
 
