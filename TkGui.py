@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
-from VariableDelay import VariableDelay
+from DelayPanes import VariableDelay, MovingDelay
 import webbrowser
 
 
@@ -22,6 +22,7 @@ class TkGui:
             self.command_pane,
             self.delay_pane,
             self.variable_delay_pane,
+            self.moving_delay_pane,
             self.loop_pane,
             self.pause_pane,
             self.blank_pane,
@@ -104,6 +105,11 @@ class TkGui:
         variable_delay.variable_delay_frame.grid(column=col_num, row=1)
         self.organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
         self.tk_list.append(variable_delay.start_delay_button)
+
+    def moving_delay_pane(self, col_num):
+        moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread)
+        moving_delay.moving_delay_frame.grid(column=col_num, row=1)
+        self.organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
 
     def loop_pane(self, col_num):
         manip_str = 'loop'

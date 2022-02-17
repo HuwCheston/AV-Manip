@@ -30,8 +30,13 @@ user_params = {
         "Poisson": {
             "text": ["Expected:", "N/A:"],
             "function": "np.random.poisson",
-        },
-    }   # Add more distributions here in the format above - they will be configured in the GUI automatically
+        }, # Add more distributions here in the format above - they will be configured in the GUI automatically
+    },
+    '*moving delay distributions': [
+        'Linear',
+        'Exponential'
+    ]
+    # Add more distributions here in the format above - they will be configured in the GUI automatically
 }
 
 # These parameters should not be adjusted by the user (unless to add more manipulations)
