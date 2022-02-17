@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Implemented variable delay resample rate">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Began implementing a logging window (finish this tomorrow)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Reaper Media/01-220112_0932.wav" beforeDir="false" />
@@ -15,7 +15,7 @@
       <change beforePath="$PROJECT_DIR$/Reaper Media/01-220112_1134.wav" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Reaper Media/01-220112_1134.wav.reapeaks" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VariableDelay.py" beforeDir="false" afterPath="$PROJECT_DIR$/VariableDelay.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserParams.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserParams.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output/video/10-01-22_16.43.17_cam1_out.avi" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output/video/10-01-22_16.43.17_cam2_out.avi" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/output/video/12-01-22_09.32.53_cam1_out.avi" beforeDir="false" />
@@ -226,14 +226,8 @@
       <workItem from="1644439265722" duration="7738000" />
       <workItem from="1644936836709" duration="12721000" />
       <workItem from="1644996849968" duration="15726000" />
-      <workItem from="1645035709119" duration="5733000" />
-    </task>
-    <task id="LOCAL-00010" summary="Commit before working on PMH TODOs">
-      <created>1643106741613</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1643106741613</updated>
+      <workItem from="1645035709119" duration="5971000" />
+      <workItem from="1645091743100" duration="2475000" />
     </task>
     <task id="LOCAL-00011" summary="Pattern matching implemented in KeyThread.py">
       <created>1643110980878</created>
@@ -571,7 +565,14 @@
       <option name="project" value="LOCAL" />
       <updated>1645043647045</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="Began implementing a logging window (finish this tomorrow)">
+      <created>1645045418198</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1645045418198</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -602,7 +603,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Refactored manips -&gt; dict. Implemented custom FPS (may break things!)" />
     <MESSAGE value="Began work on general blanking function. Commit fails!" />
     <MESSAGE value="More work on eye tracking" />
     <MESSAGE value="Eye tracking improvements (revert to this one for one eye error-correction)" />
@@ -627,7 +627,8 @@
     <MESSAGE value="Implemented variable audio/visual delay in OpenCV and Reaper" />
     <MESSAGE value="Began working on poisson distribution (buggy!)" />
     <MESSAGE value="Implemented variable delay resample rate" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented variable delay resample rate" />
+    <MESSAGE value="Began implementing a logging window (finish this tomorrow)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Began implementing a logging window (finish this tomorrow)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -643,7 +644,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1644941006218" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1645045153671" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1645092957476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

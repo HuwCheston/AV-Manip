@@ -6,6 +6,7 @@ user_params = {
     '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)
     '*resolution': '640x480',   # Camera resolution (for researcher view and recording)
     '*scaling': 2.0,     # Amount to scale up the performer camera view by
+    '*exit time': 3,    # Number of seconds to wait before exiting the program
 
     '*delay time': 1000,    # The default delay time (<= max delay time: can be changed when program is running)
     '*max delay time': 10000,   # The maximum amount of time available for delay (will configure Reaper JSFX if needed)

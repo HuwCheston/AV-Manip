@@ -26,8 +26,12 @@ class KeyThread:
 
     def exit_loop(self):
         self.reset_manips()
-        # TODO: Implement something before this to state that the program is shutting down...
-        time.sleep(3)   # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
+        # TODO: fix this so that sleeping time is logged
+        for num in range(self.params['*exit time'], 0, -1):
+            # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
+            time.sleep(1)
+            # self.log_text('asdf')
+            # self.gui.root.after(num*1000, func=self.log_text(f'\nExiting in {num}...'))
         self.stop_event.set()
         self.gui.root.destroy()
 
@@ -35,9 +39,7 @@ class KeyThread:
         self.reset_manips()
         self.params[manip] = True
         button.config(bg='green')
-        self.gui.logging_window.config(state='normal')
-        self.gui.logging_window.insert('end', f'\n{manip} now active.')
-        self.gui.logging_window.config(state='disabled')
+        self.log_text(text=f'\n{manip} now active.')
 
     def set_delay_time(self, d_time):
         try:
@@ -62,7 +64,10 @@ class KeyThread:
         for param in self.params.keys():
             if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False
+        self.log_text(text='\nResetting...')
 
+    def log_text(self, text):
         self.gui.logging_window.config(state='normal')
-        self.gui.logging_window.insert('end', '\nAll manipulations reset.')
+        self.gui.logging_window.insert('end', text)
+        self.gui.logging_window.see("end")
         self.gui.logging_window.config(state='disabled')

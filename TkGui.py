@@ -45,7 +45,8 @@ class TkGui:
             if label['text'] == 'CMS logo':
                 label.image = tk.PhotoImage(file="cms-logo.gif")
                 label['image'] = label.image
-        self.logging_window = tk.scrolledtext.ScrolledText(info_frame, height=5, width=20, state='disabled', wrap='word')
+        self.logging_window = tk.scrolledtext.ScrolledText(info_frame, height=5, width=20, state='disabled', wrap='word', font='TkDefaultFont')
+        self.logging_window.insert('end', 'Started')
         labels[self.logging_window] = None
         self.organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
         info_frame.grid(row=1, column=col_num)
