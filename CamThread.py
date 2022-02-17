@@ -7,6 +7,8 @@ from cv2 import cv2
 from queue import Queue, Empty
 from datetime import datetime
 from collections import deque
+
+
 # TODO: investigate using PyTest here!
 
 
@@ -134,7 +136,7 @@ class PerformerCamView:
         global_barrier.wait()
 
     def main_loop(self, stop_event):
-        delay_frames = deque(maxlen=round(self.params['*fps']*(self.params['*max delay time']/1000)))
+        delay_frames = deque(maxlen=round(self.params['*fps'] * (self.params['*max delay time'] / 1000)))
         loop_params = self.params['*loop params']
 
         # TODO: refactor these into UserParams.py somehow - they're taking up a lot of space here.
@@ -153,7 +155,7 @@ class PerformerCamView:
                 "scaleFactor": 2.7,
                 "minNeighbors": 3,
                 "dimensions": 1,
-                "previous_detection": np.full((2, 4), fill_value=100),   # Make sure fill - dimensions > 0!
+                "previous_detection": np.full((2, 4), fill_value=100),  # Make sure fill - dimensions > 0!
                 "minNum": 2,
             }
         }
@@ -170,7 +172,11 @@ class PerformerCamView:
                 case {'delayed': True}:
                     # TODO: Need to catch errors here if delayed time is outside recorded range
                     # Out-of-sync delay is likely a performance issue (e.g. overheating laptop!)
-                    frame = delay_frames[-round(self.params['*fps']*(self.params['*delay time']/1000))]
+
+                    frame_num = -round(self.params['*fps'] * (self.params['*delay time'] / 1000))
+                    # If returned frame_num is 0, will underflow to start of delay_frames, so set frame to -1 instead
+                    # TODO: check this doesn't lead to a measurable performance decrease
+                    frame = delay_frames[frame_num if frame_num != 0 else -1]
 
                 case {'loop rec': True}:
                     self._manip_loop_rec(frame, loop_params)
@@ -266,8 +272,7 @@ class CamWrite:
         # TODO: fix ffmpeg flags to ensure highest quality of output
         process = (
             ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={self.window_name}", loglevel='warning',
-                         probesize='500M')
-            .output(filename=self.filename, pix_fmt='yuv420p', video_size='1920x1080'))
+                         probesize='500M').output(filename=self.filename, pix_fmt='yuv420p', video_size='1920x1080'))
         self.main_loop(stop_event, process)
         self.exit_loop()
 
@@ -303,7 +308,7 @@ def initialise_camera(n: str, q: Queue) -> None:
 
 def get_video_stats(filename):
     vid = cv2.VideoCapture(filename)
-    fps = vid.get(cv2.CAP_PROP_FPS)     # TODO: this should use user_params['*fps'] instead, I think
+    fps = vid.get(cv2.CAP_PROP_FPS)  # TODO: this should use user_params['*fps'] instead, I think
     framecount = vid.get(cv2.CAP_PROP_FRAME_COUNT)
     duration = framecount / fps
     print(duration)

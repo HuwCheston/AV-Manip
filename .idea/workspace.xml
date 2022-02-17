@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="More work on logging window">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Began implementing moving delay (linear/exponential)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserParams.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserParams.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VariableDelay.py" beforeDir="false" afterPath="$PROJECT_DIR$/DelayPanes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CamThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/CamThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DelayPanes.py" beforeDir="false" afterPath="$PROJECT_DIR$/DelayPanes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -206,14 +205,7 @@
       <workItem from="1644936836709" duration="12721000" />
       <workItem from="1644996849968" duration="15726000" />
       <workItem from="1645035709119" duration="5971000" />
-      <workItem from="1645091743100" duration="11032000" />
-    </task>
-    <task id="LOCAL-00012" summary="Commit before refactoring CamThread.py">
-      <created>1643111704744</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1643111704744</updated>
+      <workItem from="1645091743100" duration="15740000" />
     </task>
     <task id="LOCAL-00013" summary="Began process of refactoring CamThread.py">
       <created>1643118994261</created>
@@ -551,7 +543,14 @@
       <option name="project" value="LOCAL" />
       <updated>1645105576906</updated>
     </task>
-    <option name="localTasksCounter" value="61" />
+    <task id="LOCAL-00061" summary="Began implementing moving delay (linear/exponential)">
+      <created>1645113910484</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1645113910485</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -582,7 +581,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="More work on eye tracking" />
     <MESSAGE value="Eye tracking improvements (revert to this one for one eye error-correction)" />
     <MESSAGE value="Reverted to previous eye tracking error correction method" />
     <MESSAGE value="Some slight refactoring - should now be stable." />
@@ -607,7 +605,8 @@
     <MESSAGE value="Implemented variable delay resample rate" />
     <MESSAGE value="Began implementing a logging window (finish this tomorrow)" />
     <MESSAGE value="More work on logging window" />
-    <option name="LAST_COMMIT_MESSAGE" value="More work on logging window" />
+    <MESSAGE value="Began implementing moving delay (linear/exponential)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Began implementing moving delay (linear/exponential)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -623,7 +622,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1645110079557" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1645113855432" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1645118065658" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

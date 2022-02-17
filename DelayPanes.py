@@ -59,7 +59,7 @@ class VariableDelay:
         # TODO: check Poisson distribution is working
         combo = ttk.Combobox(self.variable_delay_frame, state='readonly',
                              values=[k for (k, _) in self.params['*var delay distributions'].items()])
-        combo.set('Variable Delay Distribution')
+        combo.set('Delay Distribution')
         combo.bind('<<ComboboxSelected>>', lambda e: [self.label_1
                    .configure(text=self.params['*var delay distributions'][combo.get()]['text'][0]),
                                                       self.label_2
@@ -143,7 +143,13 @@ class MovingDelay:
         self.get_new_space = tk.Button(self.moving_delay_frame, command=self.get_new_space,
                                        text='Get Space')
         self.plot_dist_button = tk.Button(self.moving_delay_frame, command=self.plot_distribution,
-                                          text='Plot Distribution')
+                                          text='Plot Space')
+        self.start_delay_button = tk.Button(self.moving_delay_frame,
+                                            command=lambda:
+                                            [self.keythread.enable_manip(manip='delayed',
+                                                                         button=self.start_delay_button),
+                                             threading.Thread(target=self.get_moving_delay, daemon=True).start()],
+                                            text='Start Delay')
 
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = self.get_tk_entry(text='Delay Time:')
         self.delay_time_entry.config(state='readonly')
@@ -156,7 +162,8 @@ class MovingDelay:
                         self.frame_4,
                         self.get_new_space,
                         self.plot_dist_button,
-                        self.delay_time_entry
+                        self.start_delay_button,
+                        self.delay_time_frame,
                         ]
 
     def get_tk_entry(self, text):
@@ -172,7 +179,7 @@ class MovingDelay:
     def get_tk_combo(self):
         combo = ttk.Combobox(self.moving_delay_frame, state='readonly',
                              values=self.params['*moving delay distributions'])
-        combo.set('Moving Delay Space')
+        combo.set('Delay Space')
         return combo
 
     def get_new_space(self):
@@ -195,7 +202,7 @@ class MovingDelay:
         else:   # Breaks out in case of incorrect input
             return
 
-        self.dist = np.round(self.dist, 0)  # We need to round as we can't have decimal ms values in Reaper/OpenCV
+        self.dist = np.round(self.dist, 0)  # We need to round as we can't use decimal ms values in Reaper/OpenCV
 
     def plot_distribution(self,):
         x = np.linspace(start=0, stop=len(self.dist), num=len(self.dist), endpoint=True)
@@ -208,6 +215,23 @@ class MovingDelay:
 
         pack_distribution_display(fig)
 
+    def get_moving_delay(self):
+        self.delay_time_entry.config(state='normal')
+        resample = try_get_entries([self.resample_entry])[0]/1000
+        for num in self.dist:
+            self.delay_value = num
+
+            self.delay_time_entry.delete(0, 'end')
+            self.delay_time_entry.insert(0, str(int(self.delay_value)))
+            self.keythread.set_delay_time(d_time=self.delay_time_entry)
+
+            if self.params['delayed']:
+                time.sleep(resample)
+            else:
+                break
+        # while self.params['delayed']:
+        #     time.sleep(resample)
+
 
 def try_get_entries(entries: list):
     try:
@@ -216,7 +240,7 @@ def try_get_entries(entries: list):
         for entry in entries:
             entry.delete(0, 'end')
             entry.insert(0, 'NaN')
-        return False
+        return
     else:
         return tuple(ints)
 
