@@ -1,6 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox, scrolledtext, ttk
-from DelayPanes import VariableDelay, MovingDelay
+from tkinter import messagebox, scrolledtext
+from DelayPanes import VariableDelay, MovingDelay, FixedDelay
 import webbrowser
 
 
@@ -20,7 +20,7 @@ class TkGui:
         panes = [
             self.info_pane,
             self.command_pane,
-            self.delay_pane,
+            self.fixed_delay_pane,
             self.variable_delay_pane,
             self.moving_delay_pane,
             self.loop_pane,
@@ -70,45 +70,21 @@ class TkGui:
         self.organise_pane(tk_list=command_tk_list, col_num=col_num)
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
-    def delay_pane(self, col_num):
-        # TODO: refactor this into a separate class?
-        delay_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        delay_time_frame = tk.Frame(delay_tk_frame)
-        d_time = tk.Entry(delay_time_frame, width=15)
-        d_time.insert(0, str(self.params['*delay time']))
-        msec = tk.Label(delay_time_frame, text='msec')
-        delay_tk_list = [tk.Label(delay_tk_frame, text='Fixed Delay')]
-        b = tk.Button(delay_tk_frame, text='Start Delay')
-        b.config(fg='black', command=lambda manip='delayed', button=b: self.keythread.enable_manip(manip, button))
-        delay_tk_list.append(b)
-        delay_tk_list.append(tk.Button(delay_tk_frame, text='Set Delay Time',
-                                       command=lambda: self.keythread.set_delay_time(d_time)))
-
-        preset_list = [v for (k, v) in self.params["*delay time presets"].items()]
-        combobox = ttk.Combobox(delay_tk_frame, state='readonly',
-                                values=[f'{k} - {v} msec' for (k, v) in self.params["*delay time presets"].items()])
-        combobox.set('Delay Time Presets')
-        combobox.bind("<<ComboboxSelected>>",
-                      lambda e: [d_time.delete(0, 'end'),
-                                 d_time.insert(0, str(preset_list[combobox.current()])),
-                                 self.keythread.set_delay_time(d_time)])
-        delay_tk_list.append(combobox)
-        self.organise_pane(tk_list=delay_tk_list, col_num=1)
-        delay_tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        delay_time_frame.grid(column=1, row=len(delay_tk_list)+1, sticky="n", padx=10, pady=10)
-        d_time.grid(row=1, column=1, sticky='n')
-        msec.grid(row=1, column=2, sticky='n')
-        self.tk_list.extend(delay_tk_list)
+    def fixed_delay_pane(self, col_num):
+        fixed_delay = FixedDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
+        fixed_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+        self.organise_pane(tk_list=fixed_delay.tk_list, col_num=col_num)
+        self.tk_list.append(fixed_delay.start_delay_button)
 
     def variable_delay_pane(self, col_num):
         variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)
-        variable_delay.variable_delay_frame.grid(column=col_num, row=1)
+        variable_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
         self.tk_list.append(variable_delay.start_delay_button)
 
     def moving_delay_pane(self, col_num):
         moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
-        moving_delay.moving_delay_frame.grid(column=col_num, row=1)
+        moving_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
         self.tk_list.append(moving_delay.start_delay_button)
 
