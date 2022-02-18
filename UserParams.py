@@ -34,7 +34,8 @@ user_params = {
     },
     '*moving delay distributions': [
         'Linear',
-        'Exponential'
+        'Exponential',
+        'Natural Log'
     ]
     # Add more distributions here in the format above - they will be configured in the GUI automatically
 }

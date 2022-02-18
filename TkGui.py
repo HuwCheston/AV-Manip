@@ -110,6 +110,7 @@ class TkGui:
         moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread)
         moving_delay.moving_delay_frame.grid(column=col_num, row=1)
         self.organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
+        self.tk_list.append(moving_delay.start_delay_button)
 
     def loop_pane(self, col_num):
         manip_str = 'loop'

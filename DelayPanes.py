@@ -140,6 +140,9 @@ class MovingDelay:
         self.frame_3, self.length_entry, self.label_3 = self.get_tk_entry(text='Length:')
         self.frame_4, self.resample_entry, self.label_4 = self.get_tk_entry(text='Resample:')
 
+        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = self.get_tk_entry(text='Delay Time:')
+        self.delay_time_entry.config(state='readonly')
+
         self.get_new_space = tk.Button(self.moving_delay_frame, command=self.get_new_space,
                                        text='Get Space')
         self.plot_dist_button = tk.Button(self.moving_delay_frame, command=self.plot_distribution,
@@ -150,9 +153,6 @@ class MovingDelay:
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.get_moving_delay, daemon=True).start()],
                                             text='Start Delay')
-
-        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = self.get_tk_entry(text='Delay Time:')
-        self.delay_time_entry.config(state='readonly')
 
         self.tk_list = [tk.Label(self.moving_delay_frame, text='Moving Delay'),
                         self.combo,
@@ -193,16 +193,30 @@ class MovingDelay:
                                     endpoint=True)
 
         elif str(self.combo.get()) == 'Exponential':
-            self.dist = np.logspace(start=np.log(start) if start != 0 else 0,
+            self.dist = np.logspace(start=np.log(start) if start != 0 else 0,   # We can't have log 0, so replace with 0
                                     stop=np.log(end),
                                     num=int(length / resample),
                                     endpoint=True,
                                     base=np.exp(1))
 
+        elif str(self.combo.get()) == 'Natural Log':
+            # Get a natural log array by computing the log of a linear interpolation
+            self.dist = np.log(np.linspace(start=1 if start <= 0 else start,    # We can't have log 0, so replace with 1
+                                           stop=end,
+                                           num=int(length / resample),
+                                           endpoint=True))
+
+            # Scale the array back to match.
+            # (I'm sure there are better ways of doing this: but, man, am I bad at math.)
+            self.dist *= end / self.dist.max()
+
         else:   # Breaks out in case of incorrect input
             return
 
-        self.dist = np.round(self.dist, 0)  # We need to round as we can't use decimal ms values in Reaper/OpenCV
+        # We need to round the array as we can't use decimal ms values in Reaper/OpenCV
+        self.dist = np.round(self.dist, 0).astype(np.int64)
+        self.keythread.log_text(f'\n New array calculated!')
+
 
     def plot_distribution(self,):
         x = np.linspace(start=0, stop=len(self.dist), num=len(self.dist), endpoint=True)
@@ -218,6 +232,7 @@ class MovingDelay:
     def get_moving_delay(self):
         self.delay_time_entry.config(state='normal')
         resample = try_get_entries([self.resample_entry])[0]/1000
+        start = time.time()
         for num in self.dist:
             self.delay_value = num
 
@@ -229,8 +244,8 @@ class MovingDelay:
                 time.sleep(resample)
             else:
                 break
-        # while self.params['delayed']:
-        #     time.sleep(resample)
+        end = time.time()
+        self.keythread.log_text(f'\nMoving delay finished in {round(end-start, 2)} secs!')
 
 
 def try_get_entries(entries: list):
