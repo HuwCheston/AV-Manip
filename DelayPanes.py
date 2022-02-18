@@ -143,15 +143,19 @@ class MovingDelay:
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = self.get_tk_entry(text='Delay Time:')
         self.delay_time_entry.config(state='readonly')
 
-        self.get_new_space = tk.Button(self.moving_delay_frame, command=self.get_new_space,
-                                       text='Get Space')
+        self.get_new_space_button = tk.Button(self.moving_delay_frame, command=self.get_new_space,
+                                              text='Get Space')
+        self.flip_delay_button = tk.Button(self.moving_delay_frame, command=self.flip_delay_space,
+                                           text='Flip Delay')
         self.plot_dist_button = tk.Button(self.moving_delay_frame, command=self.plot_distribution,
                                           text='Plot Space')
         self.start_delay_button = tk.Button(self.moving_delay_frame,
                                             command=lambda:
                                             [self.keythread.enable_manip(manip='delayed',
                                                                          button=self.start_delay_button),
-                                             threading.Thread(target=self.get_moving_delay, daemon=True).start()],
+                                             threading.Thread(target=self.get_moving_delay,
+                                                              daemon=True)
+                                                      .start()],
                                             text='Start Delay')
 
         self.tk_list = [tk.Label(self.moving_delay_frame, text='Moving Delay'),
@@ -160,7 +164,8 @@ class MovingDelay:
                         self.frame_2,
                         self.frame_3,
                         self.frame_4,
-                        self.get_new_space,
+                        self.get_new_space_button,
+                        self.flip_delay_button,
                         self.plot_dist_button,
                         self.start_delay_button,
                         self.delay_time_frame,
@@ -215,8 +220,12 @@ class MovingDelay:
 
         # We need to round the array as we can't use decimal ms values in Reaper/OpenCV
         self.dist = np.round(self.dist, 0).astype(np.int64)
-        self.keythread.log_text(f'\n New array calculated!')
+        self.keythread.log_text(f'\nNew array calculated!')
 
+    def flip_delay_space(self):
+        self.get_new_space()
+        self.dist = np.flip(self.dist)
+        self.keythread.log_text(f'\nArray flipped!')
 
     def plot_distribution(self,):
         x = np.linspace(start=0, stop=len(self.dist), num=len(self.dist), endpoint=True)
@@ -233,19 +242,29 @@ class MovingDelay:
         self.delay_time_entry.config(state='normal')
         resample = try_get_entries([self.resample_entry])[0]/1000
         start = time.time()
-        for num in self.dist:
-            self.delay_value = num
 
+        # Iterate through our delay array
+        for num in self.dist:
             self.delay_time_entry.delete(0, 'end')
-            self.delay_time_entry.insert(0, str(int(self.delay_value)))
+            self.delay_time_entry.insert(0, num)
             self.keythread.set_delay_time(d_time=self.delay_time_entry)
 
+            # If we're still delaying, wait for the resample rate
             if self.params['delayed']:
                 time.sleep(resample)
             else:
                 break
+
+        # Log completion time in the gui console (to check against length inputted by user)
         end = time.time()
         self.keythread.log_text(f'\nMoving delay finished in {round(end-start, 2)} secs!')
+
+        # If the delay has climbed all the way down to 0, we can turn off the delay as it's now unnecessary
+        if self.params['*delay time'] == 0:
+            self.keythread.reset_manips()
+            self.delay_time_entry.delete(0, 'end')  # Only delete the text if we're turning off the delay
+
+        self.delay_time_entry.config(state='readonly')
 
 
 def try_get_entries(entries: list):

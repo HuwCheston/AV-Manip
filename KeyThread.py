@@ -42,13 +42,16 @@ class KeyThread:
         self.log_text(text=f'\n{manip} now active.')
 
     def set_delay_time(self, d_time):
+        # TODO: this function should be implemented as a general function (rather than method) in DelayPanes.py
+        #  instead, as that's where it is used
         try:
             d = int(d_time.get())
         except ValueError:
             d_time.delete(0, 'end')
             d_time.insert(0, 'Invalid')
         else:
-            if 0 < d < self.params['*max delay time']:
+            # We might feasibly want to use d=0 when ramping up the delay time
+            if 0 <= d < self.params['*max delay time']:
                 self.params['*delay time'] = d
             else:
                 d_time.delete(0, 'end')
@@ -67,6 +70,7 @@ class KeyThread:
         self.log_text(text='\nResetting...')
 
     def log_text(self, text):
+        # TODO: this should really be a method of TkGui instead
         self.gui.logging_window.config(state='normal')
         self.gui.logging_window.insert('end', text)
         self.gui.logging_window.see("end")
