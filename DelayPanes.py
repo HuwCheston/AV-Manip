@@ -29,7 +29,7 @@ class FixedDelay:
         self.combo = self.get_tk_combo()
 
         self.set_delay_button = tk.Button(self.delay_frame,
-                                          command=lambda: self.keythread.set_delay_time(self.entry_1),
+                                          command=lambda: set_delay_time(params=self.params, d_time=self.entry_1),
                                           text='Set Delay')
         self.start_delay_button = tk.Button(self.delay_frame,
                                             command=lambda:
@@ -62,7 +62,7 @@ class FixedDelay:
         combo.bind("<<ComboboxSelected>>",
                    lambda e: [self.entry_1.delete(0, 'end'),
                               self.entry_1.insert(0, str(preset_list[combo.current()])),
-                              self.keythread.set_delay_time(self.entry_1)])
+                              set_delay_time(d_time=self.entry_1, params=self.params)])
         return combo
 
 
@@ -175,7 +175,7 @@ class VariableDelay:
             self.delay_value = abs(np.random.choice(self.dist))
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, str(round(self.delay_value)))
-            self.keythread.set_delay_time(d_time=self.delay_time_entry)
+            set_delay_time(params=self.params, d_time=self.delay_time_entry)
             time.sleep(int(self.delay_time_entry.get()) / 1000 if 'selected' in self.checkbutton.state() else int(
                 self.entry_3.get()) / 1000)
         self.delay_time_entry.delete(0, 'end')
@@ -306,7 +306,7 @@ class MovingDelay:
         for num in self.dist:
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, num)
-            self.keythread.set_delay_time(d_time=self.delay_time_entry)
+            set_delay_time(params=self.params, d_time=self.delay_time_entry)
 
             # If we're still delaying, wait for the resample rate
             if self.params['delayed']:
@@ -346,3 +346,18 @@ def pack_distribution_display(fig):
     toolbar = NavigationToolbar2Tk(canvas, newwindow)
     toolbar.update()
     canvas.get_tk_widget().pack()
+
+
+def set_delay_time(params, d_time: tk.Entry):
+    try:
+        d = int(d_time.get())
+    except ValueError:
+        d_time.delete(0, 'end')
+        d_time.insert(0, 'Invalid')
+    else:
+        # We might feasibly want to use d=0 when ramping up the delay time
+        if 0 <= d < params['*max delay time']:
+            params['*delay time'] = d
+        else:
+            d_time.delete(0, 'end')
+            d_time.insert(0, 'Out of bounds')
