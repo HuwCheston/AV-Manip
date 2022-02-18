@@ -37,19 +37,23 @@ class TkGui:
     def info_pane(self, col_num):
         info_frame = tk.Frame(self.root, padx=10, pady=1)
         labels = {
-            tk.Label(info_frame, text='CMS logo'): lambda e: webbrowser.open_new("https://cms.mus.cam.ac.uk/"),
-            tk.Label(info_frame, text='AV-Manip (v.0.1)'): lambda e: webbrowser.open_new('https://github.com/HuwCheston/AV-Manip/'),
-            tk.Label(info_frame, text='© Huw Cheston, 2022'): lambda e: webbrowser.open_new('https://github.com/HuwCheston/'),
+            tk.Label(info_frame, text='CMS logo'): lambda e: webbrowser.open_new(
+                "https://cms.mus.cam.ac.uk/"),
+            tk.Label(info_frame, text='AV-Manip (v.0.1)'): lambda e: webbrowser.open_new(
+                'https://github.com/HuwCheston/AV-Manip/'),
+            tk.Label(info_frame, text='© Huw Cheston, 2022'): lambda e: webbrowser.open_new(
+                'https://github.com/HuwCheston/'),
         }
         for (label, func) in labels.items():
             label.bind('<Button-1>', func)
             if label['text'] == 'CMS logo':
                 label.image = tk.PhotoImage(file="cms-logo.gif")
                 label['image'] = label.image
-        self.logging_window = tk.scrolledtext.ScrolledText(info_frame, height=5, width=20, state='disabled', wrap='word', font='TkDefaultFont')
+        self.logging_window = tk.scrolledtext.ScrolledText(info_frame, height=5, width=20, state='disabled',
+                                                           wrap='word', font='TkDefaultFont')
         self.logging_window.insert('end', 'Started')
         labels[self.logging_window] = None
-        self.organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
+        organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
         info_frame.grid(row=1, column=col_num)
 
     def command_pane(self, col_num):
@@ -67,25 +71,26 @@ class TkGui:
                                                      f'Performer Camera Resolution: {p_res}')),
             tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
-        self.organise_pane(tk_list=command_tk_list, col_num=col_num)
+        organise_pane(tk_list=command_tk_list, col_num=col_num)
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
+    # TODO: collapse these into a single function - a combobox that displays whichever delay type when selected
     def fixed_delay_pane(self, col_num):
         fixed_delay = FixedDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         fixed_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        self.organise_pane(tk_list=fixed_delay.tk_list, col_num=col_num)
+        organise_pane(tk_list=fixed_delay.tk_list, col_num=col_num)
         self.tk_list.append(fixed_delay.start_delay_button)
 
     def variable_delay_pane(self, col_num):
         variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)
         variable_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        self.organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
+        organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
         self.tk_list.append(variable_delay.start_delay_button)
 
     def moving_delay_pane(self, col_num):
         moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         moving_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        self.organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
+        organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
         self.tk_list.append(moving_delay.start_delay_button)
 
     def loop_pane(self, col_num):
@@ -116,16 +121,17 @@ class TkGui:
                 b = tk.Button(frame, text=k.title())
                 b.config(fg='black', command=lambda manip=k, button=b: self.keythread.enable_manip(manip, button))
                 tk_list.append(b)
-        self.organise_pane(tk_list=tk_list, col_num=col_num)
+        organise_pane(tk_list=tk_list, col_num=col_num)
         frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.tk_list.extend(tk_list)
-
-    def organise_pane(self, tk_list, col_num, px=10, py=1):
-        for row_num, b in enumerate(tk_list):
-            b.grid(row=row_num, column=col_num, padx=px, pady=py)
 
     def log_text(self, text):
         self.logging_window.config(state='normal')
         self.logging_window.insert('end', text)
         self.logging_window.see("end")
         self.logging_window.config(state='disabled')
+
+
+def organise_pane(tk_list, col_num, px=10, py=1):
+    for row_num, b in enumerate(tk_list):
+        b.grid(row=row_num, column=col_num, padx=px, pady=py)
