@@ -107,7 +107,7 @@ class TkGui:
         self.tk_list.append(variable_delay.start_delay_button)
 
     def moving_delay_pane(self, col_num):
-        moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread)
+        moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         moving_delay.moving_delay_frame.grid(column=col_num, row=1)
         self.organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
         self.tk_list.append(moving_delay.start_delay_button)
@@ -147,3 +147,9 @@ class TkGui:
     def organise_pane(self, tk_list, col_num, px=10, py=1):
         for row_num, b in enumerate(tk_list):
             b.grid(row=row_num, column=col_num, padx=px, pady=py)
+
+    def log_text(self, text):
+        self.logging_window.config(state='normal')
+        self.logging_window.insert('end', text)
+        self.logging_window.see("end")
+        self.logging_window.config(state='disabled')

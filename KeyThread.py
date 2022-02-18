@@ -30,8 +30,8 @@ class KeyThread:
         for num in range(self.params['*exit time'], 0, -1):
             # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
             time.sleep(1)
-            # self.log_text('asdf')
-            # self.gui.root.after(num*1000, func=self.log_text(f'\nExiting in {num}...'))
+            # self.gui.log_text('asdf')
+            # self.gui.root.after(num*1000, func=self.gui.log_text(f'\nExiting in {num}...'))
         self.stop_event.set()
         self.gui.root.destroy()
 
@@ -39,7 +39,7 @@ class KeyThread:
         self.reset_manips()
         self.params[manip] = True
         button.config(bg='green')
-        self.log_text(text=f'\n{manip} now active.')
+        self.gui.log_text(text=f'\n{manip} now active.')
 
     def set_delay_time(self, d_time):
         # TODO: this function should be implemented as a general function (rather than method) in DelayPanes.py
@@ -67,11 +67,4 @@ class KeyThread:
         for param in self.params.keys():
             if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False
-        self.log_text(text='\nResetting...')
-
-    def log_text(self, text):
-        # TODO: this should really be a method of TkGui instead
-        self.gui.logging_window.config(state='normal')
-        self.gui.logging_window.insert('end', text)
-        self.gui.logging_window.see("end")
-        self.gui.logging_window.config(state='disabled')
+        self.gui.log_text(text='\nResetting...')

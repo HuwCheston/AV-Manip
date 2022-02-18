@@ -125,9 +125,10 @@ class VariableDelay:
 
 
 class MovingDelay:
-    def __init__(self, params, root: tk.Tk, keythread):
+    def __init__(self, params, root: tk.Tk, keythread, gui):
         self.params = params
         self.root = root
+        self.gui = gui
         self.moving_delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
 
@@ -220,12 +221,12 @@ class MovingDelay:
 
         # We need to round the array as we can't use decimal ms values in Reaper/OpenCV
         self.dist = np.round(self.dist, 0).astype(np.int64)
-        self.keythread.log_text(f'\nNew array calculated!')
+        self.gui.log_text(f'\nNew array calculated!')
 
     def flip_delay_space(self):
         self.get_new_space()
         self.dist = np.flip(self.dist)
-        self.keythread.log_text(f'\nArray flipped!')
+        self.gui.log_text(f'\nArray flipped!')
 
     def plot_distribution(self,):
         x = np.linspace(start=0, stop=len(self.dist), num=len(self.dist), endpoint=True)
@@ -257,12 +258,12 @@ class MovingDelay:
 
         # Log completion time in the gui console (to check against length inputted by user)
         end = time.time()
-        self.keythread.log_text(f'\nMoving delay finished in {round(end-start, 2)} secs!')
+        self.gui.log_text(f'\nMoving delay finished in {round(end-start, 2)} secs!')
 
         # If the delay has climbed all the way down to 0, we can turn off the delay as it's now unnecessary
-        if self.params['*delay time'] == 0:
+        if self.params['*delay time'] <= 1:     # 1 used, as we may have substituted 1 for 0 when using np.log()
             self.keythread.reset_manips()
-            self.delay_time_entry.delete(0, 'end')  # Only delete the text if we're turning off the delay
+            self.delay_time_entry.delete(0, 'end')  # Only delete the text if we're also turning off the delay
 
         self.delay_time_entry.config(state='readonly')
 

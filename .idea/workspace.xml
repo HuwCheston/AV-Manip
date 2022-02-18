@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Implemented natural log (ln x) moving delay algorithm">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Implemented moving delay climbdown">
       <change beforePath="$PROJECT_DIR$/DelayPanes.py" beforeDir="false" afterPath="$PROJECT_DIR$/DelayPanes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +44,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="TODO_SCOPE" value="Project Scope" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/scratch.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/TkGui.py" />
     <property name="settings.editor.selected.configurable" value="preferences.updates" />
   </component>
   <component name="RecentsManager">
@@ -207,14 +207,7 @@
       <workItem from="1645035709119" duration="5971000" />
       <workItem from="1645091743100" duration="17441000" />
       <workItem from="1645121396044" duration="86000" />
-      <workItem from="1645176059907" duration="5581000" />
-    </task>
-    <task id="LOCAL-00015" summary="Implemented pattern matching in CamThread.py + general tidying.">
-      <created>1643124613732</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1643124613732</updated>
+      <workItem from="1645176059907" duration="6084000" />
     </task>
     <task id="LOCAL-00016" summary="Implemented resizing of Performer View for second monitor.">
       <created>1643128363115</created>
@@ -552,7 +545,14 @@
       <option name="project" value="LOCAL" />
       <updated>1645178569104</updated>
     </task>
-    <option name="localTasksCounter" value="64" />
+    <task id="LOCAL-00064" summary="Implemented moving delay climbdown">
+      <created>1645181705668</created>
+      <option name="number" value="00064" />
+      <option name="presentableId" value="LOCAL-00064" />
+      <option name="project" value="LOCAL" />
+      <updated>1645181705668</updated>
+    </task>
+    <option name="localTasksCounter" value="65" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -583,7 +583,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Some slight refactoring - should now be stable." />
     <MESSAGE value="Improved GUI with .grid()" />
     <MESSAGE value="Completely redisgned GUI" />
     <MESSAGE value="Refactored GUI organisation" />
@@ -608,7 +607,8 @@
     <MESSAGE value="Began implementing moving delay (linear/exponential)" />
     <MESSAGE value="Finished implementing moving delay. Fixed a lingering CamThread bug" />
     <MESSAGE value="Implemented natural log (ln x) moving delay algorithm" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented natural log (ln x) moving delay algorithm" />
+    <MESSAGE value="Implemented moving delay climbdown" />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented moving delay climbdown" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
