@@ -161,7 +161,7 @@ class VariableDelay:
         self.delay_time_entry.config(state='readonly')
 
 
-class MovingDelay:
+class IncrementalDelay:
     def __init__(self, params, root: tk.Tk, keythread, gui):
         self.params = params
         self.root = root
@@ -193,12 +193,12 @@ class MovingDelay:
                                             command=lambda:
                                             [self.keythread.enable_manip(manip='delayed',
                                                                          button=self.start_delay_button),
-                                             threading.Thread(target=self.get_moving_delay,
+                                             threading.Thread(target=self.get_incremental_delay,
                                                               daemon=True)
                                                       .start()],
                                             text='Start Delay')
 
-        self.tk_list = [tk.Label(self.delay_frame, text='Moving Delay'),
+        self.tk_list = [tk.Label(self.delay_frame, text='Incremental Delay'),
                         self.combo,
                         self.frame_1,
                         self.frame_2,
@@ -213,7 +213,7 @@ class MovingDelay:
 
     def get_tk_combo(self):
         combo = ttk.Combobox(self.delay_frame, state='readonly',
-                             values=self.params['*moving delay distributions'])
+                             values=self.params['*incremental delay distributions'])
         combo.set('Delay Space')
         return combo
 
@@ -243,12 +243,13 @@ class MovingDelay:
                                            endpoint=True))
 
             # Scale the array back to match.
-            self.dist *= end / self.dist.max()
+            # TODO: check this new maths works
+            self.dist = np.interp(self.dist, (self.dist.min(), self.dist.max()), (start, end))
 
         else:  # Breaks out in case of incorrect input
             return
 
-        # Save the distribution before rounding so we can use it later when plotting
+        # Save the distribution before rounding so we can use it later if we decide to plot the graph
         self.dist_unsmoothed = self.dist
         # Now we need to round the array as we can't use decimal ms values in Reaper/OpenCV
         self.dist = np.round(self.dist, 0).astype(np.int64)
@@ -257,17 +258,24 @@ class MovingDelay:
     def flip_delay_space(self):
         self.get_new_space()
         self.dist = np.flip(self.dist)
+        self.dist_unsmoothed = np.flip(self.dist_unsmoothed)
         self.gui.log_text(f'\nArray flipped!')
 
     def plot_distribution(self, ):
-        x = np.linspace(start=self.dist.min(), stop=self.dist.max(), num=len(self.dist), endpoint=True)
+        delay_length = try_get_entries([self.length_entry])[0]
+        x = np.linspace(start=0, stop=delay_length, num=len(self.dist), endpoint=True)  # We always have to start at 0ms
+
         y = self.dist_unsmoothed
         y2 = self.dist
 
         fig, ax = plt.subplots()
-        ax.set_xlabel('Delay Run Length (ms)')
+
+        ax.set_xlabel('Delay Running Length (ms)')
         ax.set_ylabel('Delay Time (ms)')
-        ax.set_title(f'Moving Delay: {self.combo.get()} space')
+        ax.set_title(f'Incremental Delay: {self.combo.get()} Interpolation')
+        ax.set_xlim(0, delay_length)
+        ax.set_ylim(self.dist.min(), self.dist.max())
+
         ax.plot(x, y, alpha=0.3)
         ax.scatter(x, y2, s=2, marker='.', alpha=1)
 
@@ -279,7 +287,7 @@ class MovingDelay:
 
         pack_distribution_display(fig)
 
-    def get_moving_delay(self):
+    def get_incremental_delay(self):
         self.delay_time_entry.config(state='normal')
         resample = try_get_entries([self.resample_entry])[0] / 1000
         start = time.time()
@@ -298,7 +306,7 @@ class MovingDelay:
 
         # Log completion time in the gui console (to check against length inputted by user)
         end = time.time()
-        self.gui.log_text(f'\nMoving delay finished in {round(end - start, 2)} secs!')
+        self.gui.log_text(f'\nIncremental delay finished in {round(end - start, 2)} secs!')
 
         # If the delay has climbed all the way down to 0, we can turn off the delay as it's now unnecessary
         if self.params['*delay time'] <= 1:  # 1 used, as we may have substituted 1 for 0 when using np.log()

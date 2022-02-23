@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-from DelayPanes import VariableDelay, MovingDelay, FixedDelay
+from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay
 import webbrowser
 
 
@@ -88,7 +88,7 @@ class TkGui:
         self.tk_list.append(variable_delay.start_delay_button)
 
     def moving_delay_pane(self, col_num):
-        moving_delay = MovingDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
+        moving_delay = IncrementalDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         moving_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
         self.tk_list.append(moving_delay.start_delay_button)

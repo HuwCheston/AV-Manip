@@ -32,7 +32,7 @@ user_params = {
             "function": "np.random.poisson",
         },  # Add more distributions here in the format above - they will be configured in the GUI automatically
     },
-    '*moving delay distributions': [
+    '*incremental delay distributions': [
         'Linear',
         'Exponential',
         'Natural Log'
