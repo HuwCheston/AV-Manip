@@ -52,5 +52,7 @@ class KeyThread:
         for param in self.params.keys():
             if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False
+        # TODO: check this doesn't break anything (should probably also be np.zeros)
+        self.gui.file_delay.file = None     # Clear out any saved array
 
         self.gui.log_text(text='done!')

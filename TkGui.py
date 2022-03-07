@@ -11,6 +11,7 @@ class TkGui:
         self.root.attributes('-topmost', 'true')
         self.root.iconbitmap("cms-logo.ico")
         self.logging_window = None
+        self.file_delay = None
 
         self.params = params
         self.keythread = keythread
@@ -83,9 +84,10 @@ class TkGui:
         self.tk_list.append(fixed_delay.start_delay_button)
 
     def delay_from_file_pane(self, col_num):
-        file_delay = DelayFromFile(params=self.params, root=self.root, keythread=self.keythread, gui=self)
-        file_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        organise_pane(tk_list=file_delay.tk_list, col_num=col_num)
+        self.file_delay = DelayFromFile(params=self.params, root=self.root, keythread=self.keythread, gui=self)
+        self.file_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+        organise_pane(tk_list=self.file_delay.tk_list, col_num=col_num)
+        self.tk_list.append(self.file_delay.start_delay_button)
 
     def variable_delay_pane(self, col_num):
         variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)

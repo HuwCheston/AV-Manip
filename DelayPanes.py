@@ -19,22 +19,35 @@ class DelayFromFile:
         self.gui = gui
         self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
-        self.file = np.zeros(shape=100, dtype=int)  # Used as placeholder until file loaded in
+        self.file = None  # Used as placeholder until file loaded in
 
         self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Time:', parent_frame=self.delay_frame)
         self.entry_1.insert(0, str(self.params['*delay time']))
         self.entry_1.config(state='readonly')   # We don't need to modify the delay time directly
         self.frame_2, self.entry_2, self.label_2 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
-        self.entry_2.insert(0, '0')
+        self.entry_2.insert(0, '1000')
 
         self.open_file_button = tk.Button(self.delay_frame,
                                           command=self.open_file,
                                           text='Open File')
+        self.start_delay_button = tk.Button(self.delay_frame,
+                                            command=lambda:
+                                            [self.keythread.enable_manip(manip='delayed',
+                                                                         button=self.start_delay_button),
+                                             threading.Thread(target=self.get_file_delay, daemon=True).start()],
+                                            text='Start Delay')
+        self.plot_prog_button = tk.Button(self.delay_frame, command=self.plot_delay_prog,
+                                          text='Plot Progression')
+        self.plot_hist_button = tk.Button(self.delay_frame, command=self.plot_delay_hist,
+                                          text='Plot Distribution')
 
         self.tk_list = [tk.Label(self.delay_frame, text='Delay from File'),
-                        self.open_file_button,
-                        self.frame_2,
                         self.frame_1,
+                        self.frame_2,
+                        self.open_file_button,
+                        self.start_delay_button,
+                        self.plot_prog_button,
+                        self.plot_hist_button
                         ]
 
     def open_file(self):
@@ -50,13 +63,45 @@ class DelayFromFile:
             filetypes=filetypes
         )
 
-        # TODO: Improve this error catching process... will do for now
+        # TODO: Improve this error catching process... will do for now. e.g. should make sure all elements are ints
         try:
             self.file = np.genfromtxt(filename, delimiter=',', dtype=int).astype(int)
         except TypeError:   # This will trigger if the user cancels out of the file select window
             self.gui.log_text("\nCouldn't convert file to array!")
         else:
             self.gui.log_text(f"\nNew array loaded from file: length {self.file.size}")
+
+    def get_file_delay(self):
+        self.entry_1.config(state='normal')
+        self.entry_2.config(state='readonly')
+        resample = try_get_entries([self.entry_2])[0]
+
+        # TODO: catch TypeError if file not loaded yet
+        while self.params['delayed']:
+            for i in self.file:
+                self.entry_1.delete(0, 'end')
+                self.entry_1.insert(0, str(round(i)))
+                set_delay_time(params=self.params, d_time=int(i))
+                time.sleep(int(resample / 1000))
+
+        self.entry_1.delete(0, 'end')
+        self.entry_1.config(state='readonly')
+
+    def plot_delay_prog(self):
+        fig, ax = plt.subplots()
+        ax.plot(range(len(self.file)), self.file)
+        ax.set_ylabel('Delay (ms)')
+        ax.set_xlabel('Value')
+        ax.set_title("Delay from File: progression")
+        pack_distribution_display(fig)
+
+    def plot_delay_hist(self):
+        fig, ax = plt.subplots()
+        ax.hist(self.file, rwidth=0.9)
+        ax.set_ylabel('Frequency')
+        ax.set_xlabel('Delay (ms)')
+        ax.set_title("Delay from File: distribution")
+        pack_distribution_display(fig)
 
 
 class FixedDelay:
