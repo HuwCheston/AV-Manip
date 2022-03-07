@@ -1,15 +1,62 @@
 import numpy as np
 import time
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, filedialog, messagebox
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.ticker import PercentFormatter
 import threading
 import scipy.stats as stats
 
 # TODO: all classes should have the option to delay audio and video seperately
 # TODO: set up all other delay panes to inherit shared methods from a single class
+
+
+class DelayFromFile:
+    def __init__(self, root: tk.Tk, params: dict, keythread, gui):
+        self.params = params
+        self.root = root
+        self.gui = gui
+        self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.keythread = keythread
+        self.file = np.zeros(shape=100, dtype=int)  # Used as placeholder until file loaded in
+
+        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Time:', parent_frame=self.delay_frame)
+        self.entry_1.insert(0, str(self.params['*delay time']))
+        self.entry_1.config(state='readonly')   # We don't need to modify the delay time directly
+        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
+        self.entry_2.insert(0, '0')
+
+        self.open_file_button = tk.Button(self.delay_frame,
+                                          command=self.open_file,
+                                          text='Open File')
+
+        self.tk_list = [tk.Label(self.delay_frame, text='Delay from File'),
+                        self.open_file_button,
+                        self.frame_2,
+                        self.frame_1,
+                        ]
+
+    def open_file(self):
+        filetypes = (
+            ('Text files', '*.txt'),
+            ('CSV files', '*.csv'),
+            ('All files', '*.*')
+        )
+
+        filename = tk.filedialog.askopenfile(
+            title='Open a file',
+            initialdir='./',
+            filetypes=filetypes
+        )
+
+        # TODO: Improve this error catching process... will do for now
+        try:
+            self.file = np.genfromtxt(filename, delimiter=',', dtype=int).astype(int)
+        except TypeError:   # This will trigger if the user cancels out of the file select window
+            self.gui.log_text("\nCouldn't convert file to array!")
+        else:
+            self.gui.log_text(f"\nNew array loaded from file: length {self.file.size}")
 
 
 class FixedDelay:
@@ -272,18 +319,17 @@ class IncrementalDelay:
 
         ax.set_xlabel('Delay Running Length (ms)')
         ax.set_ylabel('Delay Time (ms)')
-        ax.set_title(f'Incremental Delay: {self.combo.get()} Interpolation')
         ax.set_xlim(0, delay_length)
         ax.set_ylim(self.dist.min(), self.dist.max())
 
-        ax.plot(x, y, alpha=0.3)
-        ax.scatter(x, y2, s=2, marker='.', alpha=1)
+        ax.plot(x, y, alpha=0.3, label='Interpolated Array')
+        ax.scatter(x, y2, s=2, marker='.', alpha=1, label='Rounded Samples')
 
-        # TODO: align the ticks here!
         ax2 = ax.twiny()
-        ax2.set_xlim(0, len(self.dist))
+        ax2.set_xlim(0, len(self.dist))  # We always start with 0 cumulative resamples
         ax2.set_xlabel('Cumulative Resamples')
-        plt.legend(['Curve', 'Samples'])
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles, labels)
 
         pack_distribution_display(fig)
 
@@ -309,9 +355,10 @@ class IncrementalDelay:
         self.gui.log_text(f'\nIncremental delay finished in {round(end - start, 2)} secs!')
 
         # If the delay has climbed all the way down to 0, we can turn off the delay as it's now unnecessary
-        if self.params['*delay time'] <= 1:  # 1 used, as we may have substituted 1 for 0 when using np.log()
+        if self.params['*delay time'] <= 1:  # <=1 is used here as we may have substituted 1 for 0 when using np.log()
             self.keythread.reset_manips()
             self.delay_time_entry.delete(0, 'end')  # Only delete the text if we're also turning off the delay
+        # Otherwise, we still need to keep the delay on.
 
         self.delay_time_entry.config(state='readonly')
 

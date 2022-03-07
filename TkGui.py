@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay
+from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile
 import webbrowser
 
 
@@ -23,6 +23,7 @@ class TkGui:
             self.fixed_delay_pane,
             self.variable_delay_pane,
             self.moving_delay_pane,
+            self.delay_from_file_pane,
             self.loop_pane,
             self.pause_pane,
             self.blank_pane,
@@ -80,6 +81,11 @@ class TkGui:
         fixed_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=fixed_delay.tk_list, col_num=col_num)
         self.tk_list.append(fixed_delay.start_delay_button)
+
+    def delay_from_file_pane(self, col_num):
+        file_delay = DelayFromFile(params=self.params, root=self.root, keythread=self.keythread, gui=self)
+        file_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+        organise_pane(tk_list=file_delay.tk_list, col_num=col_num)
 
     def variable_delay_pane(self, col_num):
         variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)
