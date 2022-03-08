@@ -67,6 +67,7 @@ class DelayFromFile:
             self.frame_2,
             self.checkbutton,
             self.frame_3,
+            tk.Label(self.delay_frame, text='Multiplier'),
             self.slider,
             self.open_file_button,
             self.start_delay_button,
