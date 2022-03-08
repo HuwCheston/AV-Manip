@@ -12,6 +12,8 @@ import scipy.stats as stats
 # TODO: all classes should have the option to delay audio and video seperately
 # TODO: set up all other delay panes to inherit shared methods from a single class
 
+# TODO: fix resetting colours of buttons!
+# TODO: check scaling of delay from file array is working properly
 
 class DelayFromFile:
     def __init__(self, root: tk.Tk, params: dict, keythread, gui):
@@ -101,9 +103,10 @@ class DelayFromFile:
         except TypeError:  # This will trigger if the user cancels out of the file select window
             self.gui.log_text("\nCouldn't convert file to array!")
         else:
-            if self.checkbutton_var.get() == 0:
+            if self.checkbutton_var.get() == 1:
                 self.file = self.scale_array(array=self.file)
             self.gui.log_text(f"\nNew array loaded from file: length {self.file.size}")
+
 
     def get_file_delay(self):
         self.delay_time_entry.config(state='normal')

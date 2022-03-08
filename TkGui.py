@@ -16,14 +16,12 @@ class TkGui:
         self.params = params
         self.keythread = keythread
         self.tk_list = []
+        self.buttons_list = []
 
         self.panes = [
             self.info_pane,
             self.command_pane,
-            self.fixed_delay_pane,
-            self.variable_delay_pane,
-            self.moving_delay_pane,
-            self.delay_from_file_pane,
+            self.delay_choice_pane,
             self.loop_pane,
             self.pause_pane,
             self.blank_pane,
@@ -33,6 +31,9 @@ class TkGui:
 
     def tk_setup(self):
         # TODO: why does this need to be num+1?
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
         for num, pane in enumerate(self.panes):
             pane(col_num=num + 1)
 
@@ -76,30 +77,51 @@ class TkGui:
         organise_pane(tk_list=command_tk_list, col_num=col_num)
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
-    # TODO: collapse these into a single function - a combobox that displays whichever delay type when selected
+    def delay_choice_pane(self, col_num):
+        delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        choice_tk_list = [tk.Label(delay_frame, text='Delay Types'),
+                          tk.Button(delay_frame, text="Fixed Delay", command=lambda: self.radiobutton_func("1")),
+                          tk.Button(delay_frame, text="Delay from File", command=lambda: self.radiobutton_func("2")),
+                          tk.Button(delay_frame, text="Variable Delay", command=lambda: self.radiobutton_func("3")),
+                          tk.Button(delay_frame, text="Incremental Delay", command=lambda: self.radiobutton_func("4"))]
+        delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+        organise_pane(tk_list=choice_tk_list, col_num=col_num)
+
+    def radiobutton_func(self, value):
+        if value == "1":
+            self.panes.insert(3, self.fixed_delay_pane)
+        elif value == "2":
+            self.panes.insert(3, self.delay_from_file_pane)
+        elif value == "3":
+            self.panes.insert(3, self.variable_delay_pane)
+        elif value == "4":
+            self.panes.insert(3, self.moving_delay_pane)
+        del self.panes[4]
+        self.tk_setup()
+
     def fixed_delay_pane(self, col_num):
         fixed_delay = FixedDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         fixed_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=fixed_delay.tk_list, col_num=col_num)
-        self.tk_list.append(fixed_delay.start_delay_button)
+        self.buttons_list.append(fixed_delay.start_delay_button)
 
     def delay_from_file_pane(self, col_num):
         self.file_delay = DelayFromFile(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         self.file_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=self.file_delay.tk_list, col_num=col_num)
-        self.tk_list.append(self.file_delay.start_delay_button)
+        self.buttons_list.append(self.file_delay.start_delay_button)
 
     def variable_delay_pane(self, col_num):
         variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)
         variable_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
-        self.tk_list.append(variable_delay.start_delay_button)
+        self.buttons_list.append(variable_delay.start_delay_button)
 
     def moving_delay_pane(self, col_num):
         moving_delay = IncrementalDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         moving_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
-        self.tk_list.append(moving_delay.start_delay_button)
+        self.buttons_list.append(moving_delay.start_delay_button)
 
     def loop_pane(self, col_num):
         manip_str = 'loop'
@@ -129,6 +151,7 @@ class TkGui:
                 b = tk.Button(frame, text=k.title())
                 b.config(fg='black', command=lambda manip=k, button=b: self.keythread.enable_manip(manip, button))
                 tk_list.append(b)
+                self.buttons_list.append(b)
         organise_pane(tk_list=tk_list, col_num=col_num)
         frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.tk_list.extend(tk_list)

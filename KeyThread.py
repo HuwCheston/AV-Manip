@@ -46,13 +46,12 @@ class KeyThread:
         self.params['*reset video'] = True  # This param is reset to False by CamThread once resetting has completed
         self.params['*reset audio'] = True  # This param is reset to False by ReaThread once resetting has completed
 
-        for b in self.gui.tk_list:
-            if isinstance(b, Button):
-                b.config(bg="SystemButtonFace")
+        # for b in self.gui.buttons_list:
+        #     b.config(bg="SystemButtonFace")
         for param in self.params.keys():
             if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False
         # TODO: check this doesn't break anything (should probably also be np.zeros)
-        self.gui.file_delay.file = None     # Clear out any saved array
+        # self.gui.file_delay.file = None     # Clear out any saved array
 
         self.gui.log_text(text='done!')
