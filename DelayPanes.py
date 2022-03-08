@@ -1,12 +1,13 @@
 import numpy as np
 import time
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.ticker import PercentFormatter
 import threading
 import scipy.stats as stats
+
 
 # TODO: all classes should have the option to delay audio and video seperately
 # TODO: set up all other delay panes to inherit shared methods from a single class
@@ -21,11 +22,29 @@ class DelayFromFile:
         self.keythread = keythread
         self.file = None  # Used as placeholder until file loaded in
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Time:', parent_frame=self.delay_frame)
-        self.entry_1.insert(0, str(self.params['*delay time']))
-        self.entry_1.config(state='readonly')   # We don't need to modify the delay time directly
-        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
-        self.entry_2.insert(0, '1000')
+        self.frame_1, self.delay_time_entry, self.label_1 = get_tk_entry(text='Time:', parent_frame=self.delay_frame)
+        self.delay_time_entry.insert(0, str(self.params['*delay time']))
+        self.delay_time_entry.config(state='readonly')  # We don't need to modify the delay time directly
+        self.frame_2, self.resample_entry, self.label_2 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
+        self.resample_entry.insert(0, '1000')
+        self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(text='Baseline:', parent_frame=self.delay_frame)
+        self.baseline_entry.insert(0, '50')
+
+        # TODO: implement delay multiplier
+        self.multiplier = tk.DoubleVar()
+        self.slider = tk.Scale(
+            self.delay_frame,
+            from_=0,
+            to=3.0,
+            resolution=0.1,
+            orient='horizontal',
+            variable=self.multiplier
+        )
+
+        self.checkbutton_var = tk.IntVar()
+        self.checkbutton = ttk.Checkbutton(self.delay_frame, text='Scale Delay?', var=self.checkbutton_var,
+                                           command=self.checkbutton_func)
+        self.checkbutton_func()
 
         self.open_file_button = tk.Button(self.delay_frame,
                                           command=self.open_file,
@@ -41,14 +60,18 @@ class DelayFromFile:
         self.plot_hist_button = tk.Button(self.delay_frame, command=self.plot_delay_hist,
                                           text='Plot Distribution')
 
-        self.tk_list = [tk.Label(self.delay_frame, text='Delay from File'),
-                        self.frame_1,
-                        self.frame_2,
-                        self.open_file_button,
-                        self.start_delay_button,
-                        self.plot_prog_button,
-                        self.plot_hist_button
-                        ]
+        self.tk_list = [
+            tk.Label(self.delay_frame, text='Delay from File'),
+            self.frame_2,
+            self.checkbutton,
+            self.frame_3,
+            self.slider,
+            self.open_file_button,
+            self.start_delay_button,
+            self.plot_prog_button,
+            self.plot_hist_button,
+            self.frame_1,
+        ]
 
     def open_file(self):
         filetypes = (
@@ -62,30 +85,41 @@ class DelayFromFile:
             initialdir='./',
             filetypes=filetypes
         )
+        self.file_to_array(filename)
 
+    def scale_array(self, array):
+        baseline = try_get_entries([self.baseline_entry])[0]
+        multiplier = self.multiplier.get()
+        minimum = min(array)
+        func = lambda x: (x - minimum + baseline) * multiplier
+        return func(array).astype(int)
+
+    def file_to_array(self, filename):
         # TODO: Improve this error catching process... will do for now. e.g. should make sure all elements are ints
         try:
-            self.file = np.genfromtxt(filename, delimiter=',', dtype=int).astype(int)
-        except TypeError:   # This will trigger if the user cancels out of the file select window
+            self.file = np.genfromtxt(filename, delimiter=',', dtype=int)
+        except TypeError:  # This will trigger if the user cancels out of the file select window
             self.gui.log_text("\nCouldn't convert file to array!")
         else:
+            if self.checkbutton_var.get() == 0:
+                self.file = self.scale_array(array=self.file)
             self.gui.log_text(f"\nNew array loaded from file: length {self.file.size}")
 
     def get_file_delay(self):
-        self.entry_1.config(state='normal')
-        self.entry_2.config(state='readonly')
-        resample = try_get_entries([self.entry_2])[0]
+        self.delay_time_entry.config(state='normal')
+        self.resample_entry.config(state='readonly')
+        resample = try_get_entries([self.resample_entry])[0]
 
         # TODO: catch TypeError if file not loaded yet
         while self.params['delayed']:
             for i in self.file:
-                self.entry_1.delete(0, 'end')
-                self.entry_1.insert(0, str(round(i)))
+                self.delay_time_entry.delete(0, 'end')
+                self.delay_time_entry.insert(0, str(round(i)))
                 set_delay_time(params=self.params, d_time=int(i))
                 time.sleep(int(resample / 1000))
 
-        self.entry_1.delete(0, 'end')
-        self.entry_1.config(state='readonly')
+        self.delay_time_entry.delete(0, 'end')
+        self.delay_time_entry.config(state='readonly')
 
     def plot_delay_prog(self):
         fig, ax = plt.subplots()
@@ -103,10 +137,17 @@ class DelayFromFile:
         ax.set_title("Delay from File: distribution")
         pack_distribution_display(fig)
 
+    def checkbutton_func(self):
+        if self.checkbutton_var.get() == 0:
+            self.slider.config(state='disabled', takefocus=0)
+            self.baseline_entry['state'] = 'readonly'
+        else:
+            self.slider.config(state='normal', takefocus=0)
+            self.baseline_entry['state'] = 'normal'
+
 
 class FixedDelay:
     def __init__(self, root: tk.Tk, params: dict, keythread, gui):
-
         self.params = params
         self.root = root
         self.gui = gui
@@ -176,7 +217,8 @@ class VariableDelay:
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.get_random_delay, daemon=True).start()],
                                             text='Start Delay')
-        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(text='Delay Time:', parent_frame=self.delay_frame)
+        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(text='Delay Time:',
+                                                                                           parent_frame=self.delay_frame)
         self.delay_time_entry.config(state='readonly')
 
         self.tk_list = [tk.Label(self.delay_frame, text='Variable Delay'),
@@ -441,5 +483,5 @@ def pack_distribution_display(fig):
     canvas.get_tk_widget().pack()
 
 
-def set_delay_time(params, d_time: int,):
+def set_delay_time(params, d_time: int, ):
     params['*delay time'] = d_time if 0 <= d_time < params['*max delay time'] else 0

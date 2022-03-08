@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.46/win64" 1645027254
+<REAPER_PROJECT 0.1 "6.46/win64" 1645031202
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -113,12 +113,12 @@
     MAINSEND 1 0
     <FXCHAIN
       WNDRECT 1727 478 1899 580
-      SHOW 1
+      SHOW 0
       LASTSEL 0
       DOCKED 0
       BYPASS 1 0 0
       <JS midi/midi_delay ""
-        32 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        1000 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {54E25EC2-ADD8-4F9F-8B6E-938B5D7F5384}
@@ -176,6 +176,7 @@
         GUID {F16BAA0D-46C6-49E8-B73E-FDBF7DE9BC01}
         IGNTEMPO 0 120 4 4
         SRCCOLOR 141
+        VELLANE -1 100 0
       >
     >
   >

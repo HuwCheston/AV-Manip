@@ -17,8 +17,7 @@ class TkGui:
         self.keythread = keythread
         self.tk_list = []
 
-    def tk_setup(self):
-        panes = [
+        self.panes = [
             self.info_pane,
             self.command_pane,
             self.fixed_delay_pane,
@@ -32,8 +31,9 @@ class TkGui:
             self.flip_pane
         ]
 
+    def tk_setup(self):
         # TODO: why does this need to be num+1?
-        for num, pane in enumerate(panes):
+        for num, pane in enumerate(self.panes):
             pane(col_num=num + 1)
 
     def info_pane(self, col_num):
