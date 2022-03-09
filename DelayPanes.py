@@ -9,11 +9,10 @@ import threading
 import scipy.stats as stats
 
 
-# TODO: all classes should have the option to delay audio and video seperately
+# TODO: all classes should have the option to delay audio and video separately
 # TODO: set up all other delay panes to inherit shared methods from a single class
 
 # TODO: fix resetting colours of buttons!
-# TODO: check scaling of delay from file array is working properly
 
 class DelayFromFile:
     def __init__(self, root: tk.Tk, params: dict, keythread, gui):
@@ -24,12 +23,12 @@ class DelayFromFile:
         self.keythread = keythread
         self.file = None  # Used as placeholder until file loaded in
 
-        self.frame_1, self.delay_time_entry, self.label_1 = get_tk_entry(text='Time:', parent_frame=self.delay_frame)
+        self.frame_1, self.delay_time_entry, self.label_1 = get_tk_entry(text='Time:', frame=self.delay_frame)
         self.delay_time_entry.insert(0, str(self.params['*delay time']))
         self.delay_time_entry.config(state='readonly')  # We don't need to modify the delay time directly
-        self.frame_2, self.resample_entry, self.label_2 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
+        self.frame_2, self.resample_entry, self.label_2 = get_tk_entry(text='Resample:', frame=self.delay_frame)
         self.resample_entry.insert(0, '1000')
-        self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(text='Baseline:', parent_frame=self.delay_frame)
+        self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(text='Baseline:', frame=self.delay_frame)
         self.baseline_entry.insert(0, '50')
 
         # TODO: implement delay multiplier
@@ -78,9 +77,9 @@ class DelayFromFile:
 
     def open_file(self):
         filetypes = (
-            ('Text files', '*.txt'),
             ('CSV files', '*.csv'),
-            ('All files', '*.*')
+            ('Text files', '*.txt'),
+            ('All files', '*.*'),
         )
 
         filename = tk.filedialog.askopenfile(
@@ -91,11 +90,17 @@ class DelayFromFile:
         self.file_to_array(filename)
 
     def scale_array(self, array):
+        # Get the baseline and multiplier values given by the user
         baseline = try_get_entries([self.baseline_entry])[0]
         multiplier = self.multiplier.get()
-        minimum = min(array)
-        func = lambda x: (x - minimum + baseline) * multiplier
-        return func(array).astype(int)
+
+        # Transpose the array to match the baseline
+        func = lambda x: (x - array.min() + baseline)
+        array = func(array)
+
+        # Return an array scaled to the multiplier
+        # TODO: Raise exception if new max value is now below the baseline!
+        return np.interp(array, (array.min(), array.max()), (array.min(), array.max() * multiplier))
 
     def file_to_array(self, filename):
         # TODO: Improve this error catching process... will do for now. e.g. should make sure all elements are ints
@@ -107,7 +112,6 @@ class DelayFromFile:
             if self.checkbutton_var.get() == 1:
                 self.file = self.scale_array(array=self.file)
             self.gui.log_text(f"\nNew array loaded from file: length {self.file.size}")
-
 
     def get_file_delay(self):
         self.delay_time_entry.config(state='normal')
@@ -129,7 +133,7 @@ class DelayFromFile:
         fig, ax = plt.subplots()
         ax.plot(range(len(self.file)), self.file)
         ax.set_ylabel('Delay (ms)')
-        ax.set_xlabel('Value')
+        ax.set_xlabel('Delay Resample')
         ax.set_title("Delay from File: progression")
         pack_distribution_display(fig)
 
@@ -158,7 +162,7 @@ class FixedDelay:
         self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Time:', parent_frame=self.delay_frame)
+        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Time:', frame=self.delay_frame)
         self.entry_1.insert(0, str(self.params['*delay time']))
 
         self.combo = self.get_tk_combo()
@@ -203,9 +207,9 @@ class VariableDelay:
         self.delay_value = float
         self.delay_time = float
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Low:', parent_frame=self.delay_frame)
-        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(text='High:', parent_frame=self.delay_frame)
-        self.frame_3, self.entry_3, self.label_3 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
+        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Low:', frame=self.delay_frame)
+        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(text='High:', frame=self.delay_frame)
+        self.frame_3, self.entry_3, self.label_3 = get_tk_entry(text='Resample:', frame=self.delay_frame)
         self.checkbutton = ttk.Checkbutton(self.delay_frame, text='Use as Resample Rate',
                                            command=self.checkbutton_func)
 
@@ -222,7 +226,7 @@ class VariableDelay:
                                              threading.Thread(target=self.get_random_delay, daemon=True).start()],
                                             text='Start Delay')
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(text='Delay Time:',
-                                                                                           parent_frame=self.delay_frame)
+                                                                                           frame=self.delay_frame)
         self.delay_time_entry.config(state='readonly')
 
         self.tk_list = [tk.Label(self.delay_frame, text='Variable Delay'),
@@ -312,13 +316,13 @@ class IncrementalDelay:
         self.delay_value = float
 
         self.combo = self.get_tk_combo()
-        self.frame_1, self.start_entry, self.label_1 = get_tk_entry(text='Start:', parent_frame=self.delay_frame)
-        self.frame_2, self.finish_entry, self.label_2 = get_tk_entry(text='Finish:', parent_frame=self.delay_frame)
-        self.frame_3, self.length_entry, self.label_3 = get_tk_entry(text='Length:', parent_frame=self.delay_frame)
-        self.frame_4, self.resample_entry, self.label_4 = get_tk_entry(text='Resample:', parent_frame=self.delay_frame)
+        self.frame_1, self.start_entry, self.label_1 = get_tk_entry(text='Start:', frame=self.delay_frame)
+        self.frame_2, self.finish_entry, self.label_2 = get_tk_entry(text='Finish:', frame=self.delay_frame)
+        self.frame_3, self.length_entry, self.label_3 = get_tk_entry(text='Length:', frame=self.delay_frame)
+        self.frame_4, self.resample_entry, self.label_4 = get_tk_entry(text='Resample:', frame=self.delay_frame)
 
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(text='Delay Time:',
-                                                                                           parent_frame=self.delay_frame)
+                                                                                           frame=self.delay_frame)
         self.delay_time_entry.config(state='readonly')
 
         self.get_new_space_button = tk.Button(self.delay_frame, command=self.get_new_space,
@@ -454,8 +458,8 @@ class IncrementalDelay:
         self.delay_time_entry.config(state='readonly')
 
 
-def get_tk_entry(parent_frame, text):
-    frame = tk.Frame(parent_frame)
+def get_tk_entry(frame, text):
+    frame = tk.Frame(frame)
     label = tk.Label(frame, text=text)
     entry = tk.Entry(frame, width=5)
     ms = tk.Label(frame, text='ms')
@@ -466,15 +470,14 @@ def get_tk_entry(parent_frame, text):
 
 
 def try_get_entries(entries: list):
+    # TODO: fix error catching here...
     try:
-        ints = (int(val.get()) for val in entries)
+        return tuple(int(val.get()) for val in entries)
     except ValueError:
         for entry in entries:
             entry.delete(0, 'end')
             entry.insert(0, 'NaN')
-        return
-    else:
-        return tuple(ints)
+        return None
 
 
 def pack_distribution_display(fig):
