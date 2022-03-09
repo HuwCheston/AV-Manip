@@ -88,6 +88,7 @@ class TkGui:
         organise_pane(tk_list=choice_tk_list, col_num=col_num)
 
     def radiobutton_func(self, value):
+        self.keythread.reset_manips()
         if value == "1":
             self.panes.insert(3, self.fixed_delay_pane)
         elif value == "2":

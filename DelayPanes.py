@@ -12,7 +12,6 @@ import scipy.stats as stats
 # TODO: all classes should have the option to delay audio and video separately
 # TODO: set up all other delay panes to inherit shared methods from a single class
 
-# TODO: fix resetting colours of buttons!
 
 class DelayFromFile:
     def __init__(self, root: tk.Tk, params: dict, keythread, gui):
@@ -31,7 +30,6 @@ class DelayFromFile:
         self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(text='Baseline:', frame=self.delay_frame)
         self.baseline_entry.insert(0, '50')
 
-        # TODO: implement delay multiplier
         self.multiplier = tk.DoubleVar()
         self.slider = tk.Scale(
             self.delay_frame,
