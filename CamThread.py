@@ -29,7 +29,8 @@ class CamThread:
         # Initialise child classes - needs to be done in __init__ so they can be called in KeyThread
         self.cam_read = CamRead(source=self.source, perfor_q=self.performer_cam_queue,
                                 resear_q=self.researcher_cam_queue, params=self.params)
-        self.researcher_cam_view = ResearcherCamView(source=self.source, queue=self.researcher_cam_queue)
+        self.researcher_cam_view = ResearcherCamView(source=self.source, queue=self.researcher_cam_queue,
+                                                     params=self.params)
         self.performer_cam_view = PerformerCamView(source=self.source, queue=self.performer_cam_queue,
                                                    params=self.params)
         self.cam_write = CamWrite(source=self.source,)
@@ -93,9 +94,10 @@ class CamRead:
 
 
 class ResearcherCamView:
-    def __init__(self, source: int, queue: Queue):
+    def __init__(self, source: int, queue: Queue, params: dict):
         self.name = f"Cam {source + 1} Rec"
         self.queue = queue
+        self.params = params
 
     def start_cam(self, global_barrier, stop_event):
         initialise_camera(n=self.name, q=self.queue)
@@ -111,6 +113,12 @@ class ResearcherCamView:
         while not stop_event.is_set():
             # Acquire frame from queue
             frame = self.queue.get()
+
+            # Modify frame
+            match self.params:
+                case {'*recording': True}:
+                    frame = cv2.putText(frame, "Recording...", (20, 40), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
+
             cv2.imshow(self.name, frame)
             cv2.waitKey(1)
 

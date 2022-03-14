@@ -68,6 +68,7 @@ sys_params = {
 
     '*reset audio': False,  # Resets audio back to normal (i.e. no manipulations)
     '*reset video': False,  # Resets video back to normal (i.e. no manipulations)
+    '*recording': False,
     '*quit': False,     # Quits the program
 }
 
