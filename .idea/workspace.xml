@@ -5,14 +5,11 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Updated gitignore again">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Added lots of functionality to ReaThread">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CamThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/CamThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DelayPanes.py" beforeDir="false" afterPath="$PROJECT_DIR$/DelayPanes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ReaThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/ReaThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserParams.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserParams.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp-bak" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp-bak" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -227,14 +224,7 @@
       <workItem from="1646735465609" duration="1634000" />
       <workItem from="1646749938003" duration="10700000" />
       <workItem from="1646819360268" duration="9627000" />
-      <workItem from="1647248810643" duration="22732000" />
-    </task>
-    <task id="LOCAL-00032" summary="Improved facial detection">
-      <created>1643737980757</created>
-      <option name="number" value="00032" />
-      <option name="presentableId" value="LOCAL-00032" />
-      <option name="project" value="LOCAL" />
-      <updated>1643737980757</updated>
+      <workItem from="1647248810643" duration="25016000" />
     </task>
     <task id="LOCAL-00033" summary="Began refactoring manips (params -&gt; dicts, methods -&gt; funcs)">
       <created>1643797419661</created>
@@ -572,7 +562,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647263470487</updated>
     </task>
-    <option name="localTasksCounter" value="81" />
+    <task id="LOCAL-00081" summary="Added lots of functionality to ReaThread">
+      <created>1647278975391</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1647278975391</updated>
+    </task>
+    <option name="localTasksCounter" value="82" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -603,7 +600,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Implemented variable delay resample rate" />
     <MESSAGE value="Began implementing a logging window (finish this tomorrow)" />
     <MESSAGE value="More work on logging window" />
     <MESSAGE value="Began implementing moving delay (linear/exponential)" />
@@ -628,7 +624,8 @@
     <MESSAGE value="Added start/stop recording functionality to GUI" />
     <MESSAGE value="Updated gitignore" />
     <MESSAGE value="Updated gitignore again" />
-    <option name="LAST_COMMIT_MESSAGE" value="Updated gitignore again" />
+    <MESSAGE value="Added lots of functionality to ReaThread" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added lots of functionality to ReaThread" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -649,7 +646,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1646681514593" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647278314729" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647280801290" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

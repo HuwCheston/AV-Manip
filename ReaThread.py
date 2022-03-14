@@ -14,21 +14,22 @@ import time
 
 class ReaTrack:
     def __init__(self, project: reapy.Project, track_name: str, track_index: int, vst: str):
-        self.project = project
-        self.track = self.project.tracks[track_index]
+        # Set the track name and arm it for recording
+        self.track = project.tracks[track_index]
         self.track.name = track_name
         self.track.set_info_value('I_RECARM', 1)
 
+        # If any of these FX don't exist, these lines will add them in.
         # These FX are used to trigger manipulations.
-        # If these FX don't exist, these lines will add them in. Otherwise, they will return the existing FX.
         self.delay_fx = self.track.add_fx(name='midi_delay', input_fx=False, even_if_exists=False)
         self.manip_fx = [
             self.delay_fx,
-            # More FX should be added here as and when they are required
+            # More FX should be added here as and when they are required.
+            # Adding FXs into this list makes it easy to turn them all off when reset_manips() is called.
         ]
 
         # This FX should not normally be touched, as it's used to convert the MIDI into audio
-        self.vst = self.track.add_fx(name=vst, input_fx=False, even_if_exists=False)
+        self.vsti = self.track.add_fx(name=vst, input_fx=False, even_if_exists=False)
 
 
 class ReaThread:
@@ -91,10 +92,14 @@ class ReaThread:
             time.sleep(0.1)
 
     def reset_manips(self):
-        self.project.unmute_all_tracks()    # This is here in case the 'pause audio/both' manipulation has been used
-        for track in self.project.tracks:
-            for num in range(track.n_fxs - 1):
-                track.fxs[num].disable()
+        # This is here in case the 'pause audio/both' manipulation has been used
+        self.project.unmute_all_tracks()
+
+        # Iterate through all the participants and turn off the FX used in manipulations (not the VSTi)
+        for participant in self.participants:
+            for fx in participant.manip_fx:
+                fx.disable()
+
         self.params['*reset audio'] = False
 
     def exit_loop(self):

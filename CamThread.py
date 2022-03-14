@@ -209,7 +209,7 @@ class PerformerCamView:
                     self._manip_detect_blanked_region(frame, params=blank_params['eye'])
 
                 case {'*reset video': True}:
-                    self._reset_manips(loop_params, blank_params)
+                    self.reset_manips(loop_params, blank_params)
 
             # cv2.moveWindow(self.name, -1500, 0)   # Comment this out to display on 2nd monitor
             frame = cv2.resize(frame, (0, 0), fx=self.params['*scaling'], fy=self.params['*scaling'])
@@ -253,7 +253,7 @@ class PerformerCamView:
             cv2.rectangle(frame, (x - params["dimensions"], y - params["dimensions"]),
                           (x + w + params["dimensions"], y + h + params["dimensions"]), (0, 0, 0), -1)
 
-    def _reset_manips(self, loop_params, blank_params):
+    def reset_manips(self, loop_params, blank_params):
         # TODO: this could look a bit nicer i'm sure
         loop_params["var"] = 0
         loop_params["has_loop"] = True

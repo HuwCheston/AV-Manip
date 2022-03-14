@@ -114,7 +114,7 @@ class DelayFromFile:
     def get_file_delay(self):
         self.delay_time_entry.config(state='normal')
         self.resample_entry.config(state='readonly')
-        resample = try_get_entries([self.resample_entry])[0]
+        resample = try_get_entries([self.resample_entry])[0] / 1000
 
         # TODO: catch TypeError if file not loaded yet
         while self.params['delayed']:
@@ -122,7 +122,7 @@ class DelayFromFile:
                 self.delay_time_entry.delete(0, 'end')
                 self.delay_time_entry.insert(0, str(round(i)))
                 set_delay_time(params=self.params, d_time=int(i))
-                time.sleep(int(resample / 1000))
+                time.sleep(resample)
 
         self.delay_time_entry.delete(0, 'end')
         self.delay_time_entry.config(state='readonly')
@@ -207,7 +207,7 @@ class VariableDelay:
 
         self.frame_1, self.entry_1, self.label_1 = get_tk_entry(text='Low:', frame=self.delay_frame)
         self.frame_2, self.entry_2, self.label_2 = get_tk_entry(text='High:', frame=self.delay_frame)
-        self.frame_3, self.entry_3, self.label_3 = get_tk_entry(text='Resample:', frame=self.delay_frame)
+        self.frame_3, self.resample_entry, self.label_3 = get_tk_entry(text='Resample:', frame=self.delay_frame)
         self.checkbutton = ttk.Checkbutton(self.delay_frame, text='Use as Resample Rate',
                                            command=self.checkbutton_func)
 
@@ -240,7 +240,7 @@ class VariableDelay:
                         ]
 
     def checkbutton_func(self):
-        self.entry_3['state'] = 'readonly' if self.entry_3['state'] == 'normal' else 'normal'
+        self.resample_entry['state'] = 'readonly' if self.resample_entry['state'] == 'normal' else 'normal'
 
     def get_tk_combo(self):
         # TODO: check Poisson distribution is working
@@ -288,15 +288,15 @@ class VariableDelay:
     def get_random_delay(self):
         # TODO: check the readonly/normal state behaviour here
         # TODO: fix the occasional valueerror arising here
+        resample = try_get_entries([self.resample_entry])[0] / 1000
         self.delay_time_entry.config(state='normal')
-        self.entry_3.config(state='readonly')
+        self.resample_entry.config(state='readonly')
         while self.params['delayed']:
             self.delay_value = abs(np.random.choice(self.dist))
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, str(round(self.delay_value)))
             set_delay_time(params=self.params, d_time=self.delay_value)
-            time.sleep(int(self.delay_time_entry.get()) / 1000 if 'selected' in self.checkbutton.state() else int(
-                self.entry_3.get()) / 1000)
+            time.sleep(int(self.delay_time_entry.get()) / 1000 if 'selected' in self.checkbutton.state() else resample)
         self.delay_time_entry.delete(0, 'end')
         self.delay_time_entry.config(state='readonly')
 
