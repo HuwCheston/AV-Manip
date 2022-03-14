@@ -4,6 +4,26 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/output/audio" />
+      <excludeFolder url="file://$MODULE_DIR$/output/video" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/ColorThemes" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/Cursors" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/Data" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/Docs" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/Effects" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/FXChains" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/KeyMaps" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/LangPack" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/MetadataCaches" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/MIDINoteNames" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/MouseMaps" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/OSC" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/Plugins" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/presets" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/ProjectTemplates" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/Scripts" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/TrackTemplates" />
+      <excludeFolder url="file://$MODULE_DIR$/Reaper/UserPlugins" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
