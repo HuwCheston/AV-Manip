@@ -65,6 +65,7 @@ class TkGui:
         command_tk_list = [
             tk.Label(command_tk_frame, text='Commands'),
             tk.Button(command_tk_frame, text='Start Recording', command=self.keythread.start_recording),
+            tk.Button(command_tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
             tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
             tk.Button(command_tk_frame, text='Info',
                       command=lambda:
@@ -160,7 +161,7 @@ class TkGui:
 
     def log_text(self, text):
         self.logging_window.config(state='normal')
-        self.logging_window.insert('end', text)
+        self.logging_window.insert('end', '\n' + text)
         self.logging_window.see("end")
         self.logging_window.config(state='disabled')
 

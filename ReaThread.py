@@ -1,6 +1,6 @@
 import reapy
-import time
 import threading
+import time
 
 # On certain machines (or a portable Reaper install), you may need to repeat the process of configuring Reapy every
 # time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
@@ -25,35 +25,34 @@ class ReaTrack:
 
 
 class ReaThread:
-    def __init__(self, global_barrier: threading.Barrier, stop_event: threading.Event, params: dict):
+    def __init__(self, stop_event: threading.Event, params: dict):
         self.project = reapy.Project()  # Initialise the Reaper project in Python
         self.params = params
         self.name = 'Reaper Manager'
+        self.stop_event = stop_event
 
         self.participants = [ReaTrack(project=self.project, track_name='Keys', track_index=0, vst='CollaB3 (Collab)',),
                              ReaTrack(project=self.project, track_name='Drums', track_index=1, vst='MT-PowerDrumKit',)]
 
-        reaper_thread = threading.Thread(target=self.start_reaper, args=(global_barrier, stop_event))
+        reaper_thread = threading.Thread(target=self.start_reaper,)
         reaper_thread.start()
 
-    def start_reaper(self, global_barrier, stop_event):
+    def start_reaper(self,):
         self.reset_manips()
-        self.wait(global_barrier)
-        self.main_loop(stop_event)
+        self.main_loop()
         self.exit_loop()
-
-    # TODO: i'm still not sure on the use of the staticmethod decorator here...
-    def wait(self, global_barrier):
-        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
-        global_barrier.wait()
 
     def start_recording(self):
         if not self.project.is_recording:
             self.project.record()
 
+    def stop_recording(self):
+        if self.project.is_recording:
+            self.project.stop()
+
     # TODO: implement reaper context manager here - should lead to performance increase!
-    def main_loop(self, stop_event):
-        while not stop_event.is_set():  # stop_event is triggered by KeyThread
+    def main_loop(self,):
+        while not self.stop_event.is_set():  # stop_event is triggered by KeyThread
             match self.params:
 
                 case {'delayed': True}:
@@ -72,9 +71,7 @@ class ReaThread:
 
                 case {'*reset audio': True}:
                     self.reset_manips()
-
-            # TODO: investigate if this is what is causing slow resampling
-            time.sleep(0.1)  # Improves performance in main_loop
+            time.sleep(0.1)
 
     def reset_manips(self):
         self.project.unmute_all_tracks()

@@ -6,7 +6,7 @@ from ReaEdit import edit_reaper_fx
 from UserParams import params
 
 STOPPER = Event()   # Used to interrupt main_loop for all objects (set by KeyThread)
-BARRIER = Barrier((4 * params['*participants']) + 1 + 1)  # ReaThread & KeyThread use 1 thread, each CamThread uses 4 threads
+BARRIER = Barrier((3 * params['*participants']))  # Each CamThread uses 3 threads
 
 if __name__ == "__main__":
     # Runs a checks to make sure Reaper JSFX params are equal to those defined in UserParams
@@ -17,5 +17,5 @@ if __name__ == "__main__":
          for num in range(params['*participants'])]
 
     # Creates single ReaThread and KeyThread objects
-    r = ReaThread(stop_event=STOPPER, global_barrier=BARRIER, params=params)
-    k = KeyThread(params=params, stop_event=STOPPER, global_barrier=BARRIER, reathread=r)
+    r = ReaThread(stop_event=STOPPER, params=params)
+    k = KeyThread(params=params, stop_event=STOPPER, reathread=r, camthread=c)

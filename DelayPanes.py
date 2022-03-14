@@ -105,11 +105,11 @@ class DelayFromFile:
         try:
             self.file = np.genfromtxt(filename, delimiter=',', dtype=int)
         except TypeError:  # This will trigger if the user cancels out of the file select window
-            self.gui.log_text("\nCouldn't convert file to array!")
+            self.gui.log_text("Couldn't convert file to array!")
         else:
             if self.checkbutton_var.get() == 1:
                 self.file = self.scale_array(array=self.file)
-            self.gui.log_text(f"\nNew array loaded from file: length {self.file.size}")
+            self.gui.log_text(f"New array loaded from file: length {self.file.size}")
 
     def get_file_delay(self):
         self.delay_time_entry.config(state='normal')
@@ -392,13 +392,13 @@ class IncrementalDelay:
         self.dist_unsmoothed = self.dist
         # Now we need to round the array as we can't use decimal ms values in Reaper/OpenCV
         self.dist = np.round(self.dist, 0).astype(np.int64)
-        self.gui.log_text(f'\nNew array calculated!')
+        self.gui.log_text(f'New array calculated!')
 
     def flip_delay_space(self):
         self.get_new_space()
         self.dist = np.flip(self.dist)
         self.dist_unsmoothed = np.flip(self.dist_unsmoothed)
-        self.gui.log_text(f'\nArray flipped!')
+        self.gui.log_text(f'Array flipped!')
 
     def plot_distribution(self, ):
         delay_length = try_get_entries([self.length_entry])[0]
@@ -444,7 +444,7 @@ class IncrementalDelay:
 
         # Log completion time in the gui console (to check against length inputted by user)
         end = time.time()
-        self.gui.log_text(f'\nIncremental delay finished in {round(end - start, 2)} secs!')
+        self.gui.log_text(f'Incremental delay finished in {round(end - start, 2)} secs!')
 
         # If the delay has climbed all the way down to 0, we can turn off the delay as it's now unnecessary
         if self.params['*delay time'] <= 1:  # <=1 is used here as we may have substituted 1 for 0 when using np.log()

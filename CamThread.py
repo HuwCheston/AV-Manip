@@ -16,28 +16,28 @@ class CamThread:
     def __init__(self, source: int, stop_event: threading.Event, global_barrier: threading.Barrier, params: dict):
         self.source = source
         self.params = params
+
+        # Initialise flow control
+        self.global_barrier = global_barrier
+        self.stop_event = stop_event
+
+        # Initialise queues
         self.queue_length = 64  # This can be changed to save memory if required
         self.researcher_cam_queue = Queue(maxsize=self.queue_length)
         self.performer_cam_queue = Queue(maxsize=self.queue_length)
-        self.global_barrier = global_barrier
-        self.stop_event = stop_event
-        self.start_threads(self.thread_init())
 
-    def thread_init(self):
-        # Define threads and thread arguments
-        classes = [CamRead(source=self.source, perfor_q=self.performer_cam_queue,
-                           resear_q=self.researcher_cam_queue, params=self.params),
-                   ResearcherCamView(source=self.source, queue=self.researcher_cam_queue),
-                   PerformerCamView(source=self.source, queue=self.performer_cam_queue, params=self.params),
-                   CamWrite(source=self.source)]
+        # Initialise child classes - needs to be done in __init__ so they can be called in KeyThread
+        self.cam_read = CamRead(source=self.source, perfor_q=self.performer_cam_queue,
+                                resear_q=self.researcher_cam_queue, params=self.params)
+        self.researcher_cam_view = ResearcherCamView(source=self.source, queue=self.researcher_cam_queue)
+        self.performer_cam_view = PerformerCamView(source=self.source, queue=self.performer_cam_queue,
+                                                   params=self.params)
+        self.cam_write = CamWrite(source=self.source,)
+
+        # Start threads
+        classes = [self.cam_read, self.researcher_cam_view, self.performer_cam_view]
         args = (self.global_barrier, self.stop_event)
-        threads = [threading.Thread(target=cl.start_cam, args=args) for cl in classes]
-        return threads
-
-    @staticmethod
-    def start_threads(thread_list):
-        for thread in thread_list:
-            thread.start()
+        _ = [threading.Thread(target=cl.start_cam, args=args).start() for cl in classes]
 
 
 class CamRead:
@@ -104,7 +104,7 @@ class ResearcherCamView:
         self.exit_loop()
 
     def wait(self, global_barrier):
-        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
+        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
         global_barrier.wait()
 
     def main_loop(self, stop_event):
@@ -132,7 +132,7 @@ class PerformerCamView:
         self.exit_loop()
 
     def wait(self, global_barrier):
-        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
+        print(f"{self.name} currently waiting. Waiting threads = {global_barrier.n_waiting + 1}")
         global_barrier.wait()
 
     def main_loop(self, stop_event):
@@ -262,36 +262,27 @@ class CamWrite:
     def __init__(self, source: int):
         self.source = source
         self.window_name = f"Cam {self.source + 1} Rec"
-        self.filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
+        self.process = None
 
-    def start_cam(self, global_barrier, stop_event):
-        # On high-resolution monitors, gdigrab may not display black padding around the captured video. I'd suggest
-        # changing your monitor display resolution if this is an issue, as I can't find a workaround in ffmpeg.
-
-        self.wait(global_barrier)
-        # TODO: fix ffmpeg flags to ensure highest quality of output
-        process = (
+    def start_recording(self):
+        # On high-resolution monitors, gdigrab may display black padding around the captured video. I'd suggest
+        # changing your monitor display resolution/scaling if this is an issue, as I can't find a workaround in ffmpeg.
+        filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
+        p = (
             ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={self.window_name}", loglevel='warning',
-                         probesize='500M').output(filename=self.filename, pix_fmt='yuv420p', video_size='1920x1080'))
-        self.main_loop(stop_event, process)
-        self.exit_loop()
+                         probesize='500M').output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080')
+        )
+        self.process = p.run_async(pipe_stdin=True)
 
-    def wait(self, global_barrier):
-        print(f"Cam {self.source + 1} Writer currently waiting. Waiting threads = {global_barrier.n_waiting + 1}\n")
-        global_barrier.wait()
-
-    @staticmethod
-    def main_loop(stop_event, process):
-        running_process = process.run_async(pipe_stdin=True)
-        while not stop_event.is_set():
-            time.sleep(0.1)  # running this (rather than pass) in the loop improves performance
-        running_process.communicate(str.encode("q"))  # Send quit command to ffmpeg process
-        running_process.terminate()
-
-    def exit_loop(self):
-        # Print stats about the video file
-        # TODO: implement this function (as a separate file?)
-        get_video_stats(self.filename)
+    def stop_recording(self):
+        try:
+            # Send quit command to ffmpeg process
+            self.process.communicate(str.encode("q"))
+        except (ValueError, AttributeError, TypeError):
+            pass
+        else:
+            # Close ffmpeg process
+            self.process.terminate()
 
 
 def initialise_camera(n: str, q: Queue) -> None:
