@@ -18,4 +18,4 @@ if __name__ == "__main__":
 
     # Creates single ReaThread and KeyThread objects
     r = ReaThread(stop_event=STOPPER, global_barrier=BARRIER, params=params)
-    k = KeyThread(params=params, stop_event=STOPPER, global_barrier=BARRIER)
+    k = KeyThread(params=params, stop_event=STOPPER, global_barrier=BARRIER, reathread=r)

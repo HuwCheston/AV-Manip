@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.46/win64" 1646757963
+<REAPER_PROJECT 0.1 "6.46/win64" 1646842204
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -15,7 +15,7 @@
   VIDEO_CONFIG 0 0 256
   PANMODE 3
   CURSOR 0
-  ZOOM 10.8747162548625 0 0
+  ZOOM 10.8747162548625 4256 0
   VZOOMEX 0 0
   USE_REC_CFG 0
   RECMODE 1
@@ -101,7 +101,7 @@
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
     SEL 1
-    REC 1 4096 1 0 0 0 0
+    REC 1 5056 1 0 0 0 0
     VU 2
     TRACKHEIGHT 210 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
@@ -118,12 +118,12 @@
       DOCKED 0
       BYPASS 1 0 0
       <JS midi/midi_delay ""
-        200 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        203 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {54E25EC2-ADD8-4F9F-8B6E-938B5D7F5384}
       WAK 0 0
-      BYPASS 1 0 0
+      BYPASS 0 0 0
       <VST "VSTi: CollaB3 (Collab)" "CollaB3 x64.dll" 0 "" 1215131242<565354486D6E6A636F6C6C6162330000> ""
         am5tSO5e7f4AAAAAAgAAAAEAAAAAAAAAAgAAAAAAAADzBAAAAQAAAAAAEAA=
         Q29udHJvbERhdGEAAQRNaWRpQ2hhbm5lbEZpbHRlckRhdGEAAQUBAQAAAFByb2dyYW0AAQUBAAAAAEhvc3RUZW1wbwABCQQAAAAAAADwv1VzZXJQcmVzZXQAAQIFAAED
@@ -162,7 +162,7 @@
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
     SEL 1
-    REC 1 0 0 0 0 0 0
+    REC 1 5056 0 0 0 0 0
     VU 2
     TRACKHEIGHT 208 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100

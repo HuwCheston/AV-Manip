@@ -64,6 +64,7 @@ class TkGui:
         command_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         command_tk_list = [
             tk.Label(command_tk_frame, text='Commands'),
+            tk.Button(command_tk_frame, text='Start Recording', command=self.keythread.start_recording),
             tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
             tk.Button(command_tk_frame, text='Info',
                       command=lambda:

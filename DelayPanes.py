@@ -383,7 +383,6 @@ class IncrementalDelay:
                                            endpoint=True))
 
             # Scale the array back to match.
-            # TODO: check this new maths works
             self.dist = np.interp(self.dist, (self.dist.min(), self.dist.max()), (start, end))
 
         else:  # Breaks out in case of incorrect input

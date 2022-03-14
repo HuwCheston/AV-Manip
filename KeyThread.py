@@ -6,11 +6,12 @@ from TkGui import TkGui
 
 
 class KeyThread:
-    def __init__(self, params: dict, stop_event: threading.Event, global_barrier: threading.Barrier):
+    def __init__(self, params: dict, stop_event: threading.Event, global_barrier: threading.Barrier, reathread):
         self.name = 'Keypress Manager'
         self.stop_event = stop_event
         self.params = params
         self.gui = TkGui(params=self.params, keythread=self)
+        self.reathread = reathread
         self.start_keymanager(global_barrier)
 
     def start_keymanager(self, global_barrier):
@@ -61,3 +62,6 @@ class KeyThread:
         # self.gui.file_delay.file = None     # Clear out any saved array
 
         self.gui.log_text(text='done!')
+
+    def start_recording(self):
+        self.reathread.start_recording()
