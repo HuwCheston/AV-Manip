@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile
+from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile, get_tk_entry, try_get_entry
 import webbrowser
 
 
@@ -47,7 +47,7 @@ class TkGui:
             tk.Label(info_frame, text='© Huw Cheston, 2022'): lambda e: webbrowser.open_new(
                 'https://github.com/HuwCheston/'),
         }
-        for (label, func) in labels.items():
+        for label, func in labels.items():
             label.bind('<Button-1>', func)
             if label['text'] == 'CMS logo':
                 label.image = tk.PhotoImage(file="cms-logo.gif")
@@ -60,13 +60,27 @@ class TkGui:
         info_frame.grid(row=1, column=col_num)
 
     def command_pane(self, col_num):
-        p_res = 'x'.join([str(round(int(i) * self.params['*scaling'])) for i in self.params['*resolution'].split('x')])
+        # Master frame for this pane (all other widgets should use this as their root)
         command_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        # These frames and entries are used to enter desired BPM and number of bars to count-in by
+        bpm_frame, bpm_entry, _ = get_tk_entry(frame=command_tk_frame, t1='Tempo:', t2='BPM')
+        bpm_entry.insert('end', self.params['*default bpm'])
+
+        # This is used by the info pop-up to display the resolution of the webcams properly
+        p_res = 'x'.join([str(round(int(i) * self.params['*scaling'])) for i in self.params['*resolution'].split('x')])
+        # All the widgets inserted here will be inserted into the command_tk_frame grid
         command_tk_list = [
             tk.Label(command_tk_frame, text='Commands'),
-            tk.Button(command_tk_frame, text='Start Recording', command=self.keythread.start_recording),
+            # Starts recording in ReaThread and CamThread, via KeyThread. Also try to get user's BPM/count-in values
+            tk.Button(command_tk_frame, text='Start Recording',
+                      command=lambda: self.keythread.start_recording(bpm=try_get_entry(bpm_entry))),
+            # Stops recording in ReaThread/CamThread
             tk.Button(command_tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
+            # Both frames allow input of BPM/Count-in bars
+            bpm_frame,
+            # Resets all CamThread/ReaThread manipulations, via KeyThread
             tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
+            # Creates a pop-up window showing info about current state
             tk.Button(command_tk_frame, text='Info',
                       command=lambda:
                       tk.messagebox.showinfo(title='Info',
@@ -74,9 +88,12 @@ class TkGui:
                                                      f'Camera FPS: {str(self.params["*fps"])}\n'
                                                      f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
                                                      f'Performer Camera Resolution: {p_res}')),
+            # Quits the program
             tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
+        # Grids the widget list
         organise_pane(tk_list=command_tk_list, col_num=col_num)
+        # Grids the master frame within the GUI root
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
 
     def delay_choice_pane(self, col_num):

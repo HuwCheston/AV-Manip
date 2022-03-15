@@ -58,17 +58,14 @@ class KeyThread:
             if isinstance(self.params[param], bool) and not param.startswith('*'):
                 self.params[param] = False
 
-        # TODO: check this doesn't break anything (should probably also be np.zeros)
-        # self.gui.file_delay.file = None     # Clear out any saved array
-
         self.gui.log_text(text='done!')
 
-    def start_recording(self):
+    def start_recording(self, bpm):
         # Must reset manipulations before starting recording, or get loads of errors
         # self.reset_manips()
 
         # Start the recording in both reathread and for all of our camthreads
-        self.reathread.start_recording()
+        self.reathread.start_recording(bpm)
         _ = [threading.Thread(target=cam.cam_write.start_recording).start() for cam in self.camthread]
 
         self.params['*recording'] = True    # This parameter is used to add text onto the researcher camera view

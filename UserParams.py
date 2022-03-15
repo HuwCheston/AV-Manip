@@ -7,6 +7,8 @@ user_params = {
     '*resolution': '640x480',   # Camera resolution (for researcher view and recording)
     '*scaling': 2.0,     # Amount to scale up the performer camera view by
     '*exit time': 3,    # Number of seconds to wait before exiting the program
+    '*default bpm': 120,    # The default BPM to use in Reaper: can be overridden in the GUI
+    '*default count-in': 4,     # The default number of count-in bars to use in Reaper: can be overridden in the GUI
 
     '*delay time': 1000,    # The default delay time (<= max delay time: can be changed when program is running)
     '*max delay time': 10000,   # The maximum amount of time available for delay (will configure Reaper JSFX if needed)

@@ -51,9 +51,12 @@ class ReaThread:
         self.main_loop()
         self.exit_loop()
 
-    def start_recording(self):
+    def start_recording(self, bpm):
         # Including this for safety
         self.reset_manips()
+
+        # Sets the project BPM to value inputted by user (or to default provided in UserParams, if none provided in GUI)
+        self.project.bpm = bpm if bpm is not None else self.params['*default bpm']
 
         # Sets the playback cursor to the position of the first marker, the start of the count-in
         self.project.cursor_position = self.project.markers[0].position

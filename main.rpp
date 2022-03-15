@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.46/win64" 1647276857
+<REAPER_PROJECT 0.1 "6.46/win64" 1647281701
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -14,9 +14,9 @@
   TIMEMODE 1 5 -1 30 0 0 -1
   VIDEO_CONFIG 0 0 256
   PANMODE 3
-  CURSOR 11.5
-  ZOOM 82.6626447801426 0 0
-  VZOOMEX 5 0
+  CURSOR 0
+  ZOOM 37.22985501184638 0 0
+  VZOOMEX 6 0
   USE_REC_CFG 0
   RECMODE 1
   SMPTESYNC 0 30 100 40 1000 300 0 0 1 0 0
@@ -118,13 +118,13 @@
     MIDIOUT -1
     MAINSEND 1 0
     <FXCHAIN
-      WNDRECT 1615 1127 1899 580
+      WNDRECT 1090 1000 1899 580
       SHOW 0
       LASTSEL 0
       DOCKED 0
       BYPASS 1 0 0
       <JS midi_delay ""
-        200 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        56 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {3D841A4D-E13A-43E4-92B0-0C58C2473BA9}
@@ -152,34 +152,6 @@
       FXID {04E8D6CD-E060-4780-B09F-108BC94B923E}
       WAK 0 0
     >
-    <ITEM
-      POSITION 8
-      SNAPOFFS 0
-      LENGTH 15.5043537414966
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0
-      FADEOUT 1 0 0 1 0 0 0
-      MUTE 0 0
-      SEL 1
-      IGUID {D146199B-416A-47F3-9419-5F2F7624AB21}
-      IID 100
-      NAME 01-Keys-220314_1653.mid
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {BC338BA9-F0AF-426E-A11F-CAD76E7E5778}
-      RECPASS 50
-      <SOURCE MIDI
-        FILE "output\audio\01-Keys-220314_1653.mid" QN
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {75C3352F-E542-47BC-841A-B89F0699EAFD}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 209
-      >
-    >
   >
   <TRACK {D63DD6FE-741A-4DB0-ACE0-F09EADBFC0DB}
     NAME Drums
@@ -194,7 +166,7 @@
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
-    SEL 0
+    SEL 1
     REC 1 0 1 0 0 0 0
     VU 2
     TRACKHEIGHT 0 0 0 0 0 0
@@ -212,7 +184,7 @@
       DOCKED 0
       BYPASS 1 0 0
       <JS midi_delay ""
-        200 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        56 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {F1EBFF71-B0DA-43D3-AF6C-9FCD34E19808}
@@ -237,34 +209,11 @@
     <ITEM
       POSITION 8
       SNAPOFFS 0
-      LENGTH 15.49777777777778
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {D71F4CB6-DED7-4573-9A60-AFA35913EE60}
-      IID 101
-      NAME 02-Drums-220314_1653.wav
-      VOLPAN 1 0 1 -1
-      SOFFS 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {198D31A3-1A27-4448-BACF-03A5F53F0B2C}
-      RECPASS 50
-      <SOURCE WAVE
-        FILE "output\audio\02-Drums-220314_1653.wav"
-      >
-    >
-    <ITEM
-      POSITION 8
-      SNAPOFFS 0
       LENGTH -0.02473922902494
       LOOP 1
       ALLTAKES 0
-      FADEIN 1 0.01 0 1 0 0 0
-      FADEOUT 1 0.01 0 1 0 0 0
+      FADEIN 1 -0.024739 0 1 0 0 0
+      FADEOUT 1 -0.024739 0 1 0 0 0
       MUTE 0 0
       SEL 0
       IGUID {5731FFA3-E479-4C53-9B9F-5A9A48657592}
@@ -279,6 +228,7 @@
       <SOURCE WAVE
         FILE "output\audio\02-Drums-220314_1627.wav"
       >
+      TAKE NULL
     >
   >
   <TRACK {A54E3491-CB97-4FC4-9254-30E465DCE7D6}
