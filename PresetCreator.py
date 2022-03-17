@@ -43,12 +43,23 @@ def keep_focus(func):
 
 
 class PresetCreator:
-    def __init__(self, root):
+    def __init__(self, root: tk.Tk):
+        """A class that enables the user to create .JSON files that can be loaded to preset manipulation parameters."""
         # Initialise basic class parameters
         self.root = root
         self.manip_list = manip_names
         self.filename = ''
         self.default_path = './input/'
+
+        # Initialise these as None so they can be altered later
+        self.creator_window = None
+        self.creator_frame = None
+        self.manip_options = None
+
+    def create_window(self):
+        """Initialise a new preset creator window"""
+        # Destroy any existing toplevel windows
+        self.clear_out_windows()
 
         # Initialise new top level window with required attributes
         self.creator_window = tk.Toplevel(self.root)
@@ -57,7 +68,7 @@ class PresetCreator:
         self.creator_window.attributes('-topmost', 'true')
         self.creator_window.iconbitmap("cms-logo.ico")
 
-        # Widgets created here will not be cleared whenever a new manipulation is selected - e.g. combobox, file name...
+        # Widgets created here will not be cleared whenever a new manipulation is selected - e.g. combobox
         self.creator_frame = tk.Frame(self.creator_window, borderwidth=2, relief="groove")
         _ = tk.Label(self.creator_frame, text='Preset Creator').pack()
         _ = tk.Label(self.creator_frame,
@@ -66,15 +77,20 @@ class PresetCreator:
 
         # Widgets created here will be cleared whenever a new manipulation is selected - these are the parameters
         self.manip_options = tk.Frame(self.creator_frame)
+        self.choose_manip()
 
     def choose_manip(self):
+        """Display a combobox to allow the user to choose a manipulation"""
+        # Fill the combobox options with the possible manipulations
         combo = ttk.Combobox(self.creator_frame, state='readonly',
                              values=[k for k in self.manip_list.keys()])
         combo.set('Choose a Manipulation')
+        # Create the necessary labels/entries whenever a new manipulation is selected
         combo.bind("<<ComboboxSelected>>", lambda e: self.manip_selected(combo.get()))
-        combo.pack(padx=1, pady=3, anchor='center')
+        combo.pack(padx=1, pady=1, anchor='center')
 
     def manip_selected(self, manip):
+        """Display the parameters of the selected manipulation for the user to enter info"""
         self.clear_out_widgets()
         d = self.manip_list[manip]
         # Create frames (according to number of parameters)
@@ -89,18 +105,20 @@ class PresetCreator:
         submit = tk.Button(self.manip_options,
                            command=lambda: self.submit_preset(labels, entries, manip),
                            text='Save Preset as .JSON')
-        submit.pack(padx=1, pady=3, anchor='center')
+        submit.pack(padx=1, pady=1, anchor='center')
 
     @staticmethod
     def preset_labels(d: dict, frames: list) -> list:
+        """Add the correct text labels for the parameters of the selected manipulation"""
         labels = []
         for num, lab in enumerate(d.keys()):
             w = tk.Label(frames[num], text=lab + ': ')
             labels.append(w)
-            w.grid(column=1, row=1, sticky="n", padx=1, pady=3)
+            w.grid(column=1, row=1, sticky="n", padx=1, pady=1)
         return labels
 
     def preset_entries(self, d: dict, frames: list) -> list:
+        """Add the correct entry widgets for the parameters of the selected manipulation"""
         entries = []
         for num, ty in enumerate(d.values()):
             # If the parameter is a boolean, create a checkbutton
@@ -117,7 +135,7 @@ class PresetCreator:
                 # This command prevents us from inserting anything other than numbers
                 w['validatecommand'] = (w.register(self.validate_int), '%P', '%d')
                 # Create a label after the entry indicating the unit
-                _ = tk.Label(frames[num], text='ms').grid(row=1, column=3, sticky="n", padx=1, pady=3)
+                _ = tk.Label(frames[num], text='ms').grid(row=1, column=3, sticky="n", padx=1, pady=1)
             # If the parameter is a float, create a slider
             elif ty == 'float':
                 var = tk.DoubleVar()
@@ -132,12 +150,14 @@ class PresetCreator:
                 w = tk.Entry(frames[num], width=5)
                 w.insert('end', 'String')
             # Pack the entry window and append to the list
-            w.grid(column=2, row=1, sticky="n", padx=1, pady=3)
+            w.grid(column=2, row=1, sticky="n", padx=1, pady=1)
             entries.append(w)
         return entries
 
     @keep_focus
     def open_file(self):
+        """Open a file and store its location."""
+        # Open the file
         f = tk.filedialog.askopenfile(
             title='Open a file',
             initialdir='./input/',
@@ -153,21 +173,15 @@ class PresetCreator:
 
     @staticmethod
     def validate_int(s, acttyp) -> bool:
+        """Used to ensure the user can only enter numbers into tk.Entry windows where integers are required"""
         if acttyp == '1':  # insert
             if not s.isdigit():
                 return False
         return True
 
-    @staticmethod
-    def validate_float(s, acttyp) -> bool:
-        if acttyp == '1':  # insert
-            print(s)
-            if s not in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '.']:
-                return False
-        return True
-
     @keep_focus
     def submit_preset(self, labels: list, entries: list, manip: str):
+        """Creates .JSON file with parameters entered by user, prompts for a location to save, and saves the file."""
         # Create the JSON, including the manipulation string we are using
         data = {'Manipulation': manip, **self.add_to_json(entries_labels=zip(labels, entries))}
         # Get the location to save the file
@@ -177,17 +191,17 @@ class PresetCreator:
             f.write(json.dumps(data))
 
     def file_save(self):
-        # Ask for where to save the JSON
+        """Ask for where to save the JSON"""
         path_to_pref = filedialog.asksaveasfilename(
             defaultextension='.json', filetypes=[("json files", '*.json')],
             initialdir=self.default_path,
             title="Choose filename")
         if path_to_pref is None:    # asksaveasfile returns None if dialog closed with cancel
-            return self.default_path
+            return self.default_path + '.json'
         return path_to_pref
 
     def add_to_json(self, entries_labels: zip) -> dict:
-        # Iterate through our labels/entries and add to the JSON file
+        """Iterate through our labels/entries and add user information to the JSON file"""
         d = {}
         for (l, e) in entries_labels:
             # Get the text from the label and remove any trailing characters
@@ -211,7 +225,15 @@ class PresetCreator:
                 d[key] = self.filename
         return d
 
+    def clear_out_windows(self):
+        """Destroy any open toplevel windows (i.e. existing preset creation windows, graph windows...)"""
+        for widget in self.root.winfo_children():
+            if isinstance(widget, tk.Toplevel):
+                widget.destroy()
+
     def clear_out_widgets(self):
+        """Clear out the widgets relating to any previously-selected manipulation"""
         self.manip_options.pack()
         for item in self.manip_options.winfo_children():
             item.pack_forget()
+        self.filename = None

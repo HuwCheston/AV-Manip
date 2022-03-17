@@ -101,7 +101,7 @@ class TkGui:
 
     def open_preset_creator(self):
         pc = PresetCreator(root=self.root)
-        pc.choose_manip()
+        pc.create_window()
 
     def delay_choice_pane(self, col_num):
         delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
