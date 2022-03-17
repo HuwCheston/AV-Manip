@@ -140,19 +140,13 @@ class DelayFromFile:
         self.resample_entry.config(state='readonly')
         self.delay_time_entry.config(state='normal')
 
-        # while True:
-        #     if self.keythread.reathread.project.play_position < self.keythread.reathread.project.markers[1].position:
-        #         print('before countin')
-        #     else:
-        #         print('after countin')
-
-
         loop_var = 0
         while self.params['delayed']:
-            # If we haven't passed the count-in yet, we don't want to start delaying
+            # If the count-in hasn't finished, we don't want to start delaying yet
             if self.keythread.reathread.project.play_position < self.keythread.reathread.project.markers[1].position:
                 self.gui.log_text(text='Waiting for end of count-in to start delay...')
                 set_delay_time(params=self.params, d_time=0, reathread=self.keythread.reathread)
+                self.delay_time_entry.delete(0, 'end')
                 loop_var = 0
                 time.sleep(1)
             else:
@@ -215,24 +209,22 @@ class FixedDelay:
         self.entry_1.insert(0, str(self.params['*delay time']))
 
         self.combo = self.get_tk_combo()
-
-        self.set_delay_button = tk.Button(self.delay_frame,
-                                          command=lambda: set_delay_time(d_time=try_get_entry(self.entry_1),
-                                                                         params=self.params,
-                                                                         reathread=self.keythread.reathread),
-                                          text='Set Delay')
         self.start_delay_button = tk.Button(self.delay_frame,
-                                            command=lambda:
-                                            [self.keythread.enable_manip(manip='delayed',
-                                                                         button=self.start_delay_button)],
+                                            command=lambda: [
+                                                self.keythread.enable_manip(manip='delayed',
+                                                                            button=self.start_delay_button),
+                                                set_delay_time(d_time=try_get_entry(self.entry_1),
+                                                               params=self.params,
+                                                               reathread=self.keythread.reathread)
+                                            ],
                                             text='Start Delay')
 
-        self.tk_list = [tk.Label(self.delay_frame, text='Fixed Delay'),
-                        self.frame_1,
-                        self.combo,
-                        self.set_delay_button,
-                        self.start_delay_button,
-                        ]
+        self.tk_list = [
+            tk.Label(self.delay_frame, text='Fixed Delay'),
+            self.frame_1,
+            self.combo,
+            self.start_delay_button,
+        ]
 
     def get_tk_combo(self):
         preset_list = [v for (k, v) in self.params["*delay time presets"].items()]
@@ -241,9 +233,7 @@ class FixedDelay:
         combo.set('Delay Time Presets')
         combo.bind("<<ComboboxSelected>>",
                    lambda e: [self.entry_1.delete(0, 'end'),
-                              self.entry_1.insert(0, str(preset_list[combo.current()])),
-                              set_delay_time(d_time=try_get_entry(self.entry_1),
-                                             params=self.params, reathread=self.keythread.reathread)])
+                              self.entry_1.insert(0, str(preset_list[combo.current()]))])
         return combo
 
 
@@ -575,4 +565,4 @@ def pack_distribution_display(fig):
 def set_delay_time(params, d_time: int, reathread=None):
     params['*delay time'] = d_time if 0 <= d_time < params['*max delay time'] else 0
     if reathread is not None:
-        reathread.set_delay()
+        reathread.delayed_manip()

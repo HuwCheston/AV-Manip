@@ -1,7 +1,4 @@
 import reapy
-from reapy import reascript_api as RPR
-import threading
-import time
 
 # On certain machines (or a portable Reaper install), you may need to repeat the process of configuring Reapy every
 # time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
@@ -34,28 +31,16 @@ class ReaTrack:
 
 
 class ReaThread:
-    def __init__(self, stop_event: threading.Event, params: dict):
+    def __init__(self, params: dict):
         # Initialise basic attributes
         self.project = reapy.Project()  # Initialise the Reaper project in Python
         self.params = params
-        self.stop_event = stop_event
 
         self.participants = [ReaTrack(project=self.project, track_name='Keys', track_index=0, vst='CollaB3 (Collab)',),
                              ReaTrack(project=self.project, track_name='Drums', track_index=1, vst='MT-PowerDrumKit',)]
         self.countin = self.project.tracks[self.project.n_tracks-1]
 
-        # reaper_thread = threading.Thread(target=self.start_reaper,)
-        # reaper_thread.start()
-
-    def start_reaper(self,):
-        self.reset_manips()
-        self.main_loop()
-        self.exit_loop()
-
     def start_recording(self, bpm):
-        # Including this for safety
-        self.reset_manips()
-
         # Sets the project BPM to value inputted by user (or to default provided in UserParams, if none provided in GUI)
         self.project.bpm = bpm if bpm is not None else self.params['*default bpm']
 
@@ -66,41 +51,12 @@ class ReaThread:
         if not self.project.is_recording:
             self.project.record()
 
-        # while True:
-        #     if self.project.play_position < self.project.markers[1].position:
-        #         print('before countin')
-        #     else:
-        #         print('after countin')
-
     def stop_recording(self):
-        # Including this for safety
-        self.reset_manips()
-
         # Stop if currently recording
         if self.project.is_recording:
             self.project.stop()
-
-    def main_loop(self,):
-        while not self.stop_event.is_set():  # stop_event is triggered by KeyThread
-
-            match self.params:
-                case {'delayed': True}:
-                    # Iterate through all the participants
-                    for participant in self.participants:
-                        # Turn on the delay FX if it isn't turned on
-                        if not participant.delay_fx.is_enabled:
-                            participant.delay_fx.enable()
-                        # Set the delay time to equal the time set in the GUI
-                        participant.delay_fx.params[0] = self.params['*delay time']
-
-                case {'pause audio': True} | {'pause both': True}:
-                    self.project.mute_all_tracks()
-
-                case {'*reset audio': True}:
-                    self.reset_manips()
-
-            time.sleep(0.1)
-
+        # Sets the playback cursor to the position of the first marker, the start of the count-in
+        self.project.cursor_position = self.project.markers[0].position
 
     def reset_manips(self):
         # This is here in case the 'pause audio/both' manipulation has been used
@@ -111,16 +67,17 @@ class ReaThread:
             for fx in participant.manip_fx:
                 fx.disable()
 
-        self.params['*reset audio'] = False
-
     def exit_loop(self):
         self.project.stop()
         self.reset_manips()
 
-    def set_delay(self):
+    def delayed_manip(self):
         for participant in self.participants:
             # Turn on the delay FX if it isn't turned on
             if not participant.delay_fx.is_enabled:
                 participant.delay_fx.enable()
             # Set the delay time to equal the time set in the GUI
             participant.delay_fx.params[0] = self.params['*delay time']
+
+    def pause_manip(self):
+        self.project.mute_all_tracks()

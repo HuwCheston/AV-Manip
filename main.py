@@ -17,5 +17,5 @@ if __name__ == "__main__":
          for num in range(params['*participants'])]
 
     # Creates single ReaThread and KeyThread objects
-    r = ReaThread(stop_event=STOPPER, params=params)
+    r = ReaThread(params=params)
     k = KeyThread(params=params, stop_event=STOPPER, reathread=r, camthread=c)

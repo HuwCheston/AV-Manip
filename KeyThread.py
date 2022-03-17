@@ -46,7 +46,7 @@ class KeyThread:
     def reset_manips(self):
         self.gui.log_text(text='Resetting...')
         self.params['*reset video'] = True  # This param is reset to False by CamThread once resetting has completed
-        self.params['*reset audio'] = True  # This param is reset to False by ReaThread once resetting has completed
+        self.reathread.reset_manips()
 
         for b in self.gui.buttons_list:
             try:
@@ -61,23 +61,17 @@ class KeyThread:
         self.gui.log_text(text='done!')
 
     def start_recording(self, bpm):
-        # Must reset manipulations before starting recording, or get loads of errors
-        # self.reset_manips()
-
         # Start the recording in both reathread and for all of our camthreads
         self.reathread.start_recording(bpm)
         _ = [threading.Thread(target=cam.cam_write.start_recording).start() for cam in self.camthread]
 
-        self.params['*recording'] = True    # This parameter is used to add text onto the researcher camera view
+        self.params['*recording'] = True    # This parameter is used to add text onto the camera view
         self.gui.log_text(text=f'Started recording at {datetime.datetime.now().strftime("%H:%M:%S")}')
 
     def stop_recording(self):
-        # Must reset manipulations before stopping recording, or get loads of errors
-        # self.reset_manips()
-
         self.reathread.stop_recording()
         for cam in self.camthread:
             cam.cam_write.stop_recording()
 
-        self.params['*recording'] = False
+        self.params['*recording'] = False    # This parameter is used to remove text from the camera view
         self.gui.log_text(text=f'Finished recording at {datetime.datetime.now().strftime("%H:%M:%S")}')

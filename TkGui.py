@@ -152,8 +152,30 @@ class TkGui:
         self.populate_tk_list(manip_str, col_num=col_num)
 
     def pause_pane(self, col_num):
-        manip_str = 'pause'
-        self.populate_tk_list(manip_str, col_num=col_num)
+        frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        pause_audio = tk.Button(frame, text='Pause Audio', fg='black',
+                                command=lambda: [self.keythread.enable_manip('pause audio', pause_audio),
+                                                 self.keythread.reathread.pause_manip()])
+        self.buttons_list.append(pause_audio)
+
+        pause_video = tk.Button(frame, text='Pause Video', fg='black')
+        pause_video.config(command=lambda: self.keythread.enable_manip('pause video', pause_video))
+        self.buttons_list.append(pause_video)
+
+        pause_both = tk.Button(frame, text='Pause Both', fg='black')
+        pause_both.config(command=lambda: [self.keythread.enable_manip('pause video', pause_both),
+                                           self.keythread.reathread.pause_manip()])
+        self.buttons_list.append(pause_both)
+
+        tk_list = [
+            tk.Label(frame, text='Pause'),
+            pause_audio,
+            pause_video,
+            pause_both
+        ]
+        frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+        organise_pane(tk_list=tk_list, col_num=col_num)
+        self.tk_list.extend(tk_list)
 
     def control_pane(self, col_num):
         manip_str = 'control'
@@ -163,13 +185,14 @@ class TkGui:
         manip_str = 'flip'
         self.populate_tk_list(manip_str, col_num=col_num)
 
-    def populate_tk_list(self, manip_str, col_num):
+    def populate_tk_list(self, manip_str, col_num, arg=None):
         frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         tk_list = [tk.Label(frame, text=manip_str.title())]
         for k in self.params.keys():
             if k.startswith(manip_str):
                 b = tk.Button(frame, text=k.title())
-                b.config(fg='black', command=lambda manip=k, button=b: self.keythread.enable_manip(manip, button))
+                b.config(fg='black', command=lambda manip=k, button=b: [self.keythread.enable_manip(manip, button),
+                                                                        arg()])
                 tk_list.append(b)
                 self.buttons_list.append(b)
         organise_pane(tk_list=tk_list, col_num=col_num)
