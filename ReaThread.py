@@ -1,4 +1,5 @@
 import reapy
+import time
 
 # On certain machines (or a portable Reaper install), you may need to repeat the process of configuring Reapy every
 # time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
@@ -35,7 +36,6 @@ class ReaThread:
         # Initialise basic attributes
         self.project = reapy.Project()  # Initialise the Reaper project in Python
         self.params = params
-
         self.participants = [ReaTrack(project=self.project, track_name='Keys', track_index=0, vst='CollaB3 (Collab)',),
                              ReaTrack(project=self.project, track_name='Drums', track_index=1, vst='MT-PowerDrumKit',)]
         self.countin = self.project.tracks[self.project.n_tracks-1]
@@ -43,10 +43,8 @@ class ReaThread:
     def start_recording(self, bpm):
         # Sets the project BPM to value inputted by user (or to default provided in UserParams, if none provided in GUI)
         self.project.bpm = bpm if bpm is not None else self.params['*default bpm']
-
         # Sets the playback cursor to the position of the first marker, the start of the count-in
         self.project.cursor_position = self.project.markers[0].position
-
         # Start recording if not already
         if not self.project.is_recording:
             self.project.record()
@@ -59,13 +57,13 @@ class ReaThread:
         self.project.cursor_position = self.project.markers[0].position
 
     def reset_manips(self):
-        # This is here in case the 'pause audio/both' manipulation has been used
-        self.project.unmute_all_tracks()
-
+        # This is necessary to avoid the Reapy socket closing unexpectedly
+        time.sleep(0.5)
         # Iterate through all the participants and turn off the FX used in manipulations (not the VSTi)
         for participant in self.participants:
             for fx in participant.manip_fx:
                 fx.disable()
+        self.project.unmute_all_tracks()
 
     def exit_loop(self):
         self.project.stop()

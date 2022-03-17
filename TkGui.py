@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox, scrolledtext
+from tkinter import messagebox, scrolledtext, ttk
 from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile, get_tk_entry, try_get_entry
 from PresetCreator import PresetCreator
 import webbrowser
@@ -19,23 +19,29 @@ class TkGui:
         self.tk_list = []
         self.buttons_list = []
 
-        self.panes = [
+        self.default_panes = [
             self.info_pane,
             self.command_pane,
-            self.delay_choice_pane,
-            self.loop_pane,
-            self.pause_pane,
-            self.blank_pane,
-            self.control_pane,
-            self.flip_pane
+            self.manip_choice_pane,
         ]
+
+        self.manip_panes = {
+            'Fixed Delay': self.fixed_delay_pane,
+            'Delay from File': self.delay_from_file_pane,
+            'Variable Delay': self.variable_delay_pane,
+            'Incremental Delay': self.moving_delay_pane,
+            'Loop Audio/Video': self.loop_pane,
+            'Pause Audio/Video': self.pause_pane,
+            'Blank Video': self.blank_pane,
+            'Control Audio': self.control_pane,
+            'Flip Video': self.flip_pane
+        }
 
     def tk_setup(self):
         # TODO: why does this need to be num+1?
         for widget in self.root.winfo_children():
             widget.destroy()
-
-        for num, pane in enumerate(self.panes):
+        for (num, pane) in enumerate(self.default_panes):
             pane(col_num=num + 1)
 
     def info_pane(self, col_num):
@@ -77,7 +83,7 @@ class TkGui:
                       command=lambda: self.keythread.start_recording(bpm=try_get_entry(bpm_entry))),
             # Stops recording in ReaThread/CamThread
             tk.Button(command_tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
-            # Both frames allow input of BPM/Count-in bars
+            # Allows input of BPM
             bpm_frame,
             # Resets all CamThread/ReaThread manipulations, via KeyThread
             tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
@@ -103,27 +109,27 @@ class TkGui:
         pc = PresetCreator(root=self.root)
         pc.create_window()
 
-    def delay_choice_pane(self, col_num):
-        delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        choice_tk_list = [tk.Label(delay_frame, text='Delay Types'),
-                          tk.Button(delay_frame, text="Fixed Delay", command=lambda: self.radiobutton_func("1")),
-                          tk.Button(delay_frame, text="Delay from File", command=lambda: self.radiobutton_func("2")),
-                          tk.Button(delay_frame, text="Variable Delay", command=lambda: self.radiobutton_func("3")),
-                          tk.Button(delay_frame, text="Incremental Delay", command=lambda: self.radiobutton_func("4"))]
-        delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+    def manip_choice_pane(self, col_num):
+        choice_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+
+        # Fill the combobox options with the possible manipulations
+        combo = ttk.Combobox(choice_frame, state='readonly', values=[k for k in self.manip_panes.keys()])
+        combo.set('Choose a Manipulation')
+        # Create the necessary pane whenever a new manipulation is selected
+        combo.bind("<<ComboboxSelected>>", lambda e: self.insert_new_pane(self.manip_panes[combo.get()]))
+
+        choice_tk_list = [tk.Label(choice_frame, text='Manipulations'), combo]
+        choice_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=choice_tk_list, col_num=col_num)
 
-    def radiobutton_func(self, value):
+    def insert_new_pane(self, pane):
+        # TODO: this function should allow any pane to open - should clear the decks a bit!
         self.keythread.reset_manips()
-        if value == "1":
-            self.panes.insert(3, self.fixed_delay_pane)
-        elif value == "2":
-            self.panes.insert(3, self.delay_from_file_pane)
-        elif value == "3":
-            self.panes.insert(3, self.variable_delay_pane)
-        elif value == "4":
-            self.panes.insert(3, self.moving_delay_pane)
-        del self.panes[4]
+        try:
+            del self.default_panes[3]
+        except IndexError:
+            pass
+        self.default_panes.append(pane)
         self.tk_setup()
 
     def fixed_delay_pane(self, col_num):

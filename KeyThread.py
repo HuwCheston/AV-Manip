@@ -44,34 +44,33 @@ class KeyThread:
         self.gui.log_text(text=f'{manip} now active.')
 
     def reset_manips(self):
+        self.reathread.reset_manips()
         self.gui.log_text(text='Resetting...')
         self.params['*reset video'] = True  # This param is reset to False by CamThread once resetting has completed
-        self.reathread.reset_manips()
-
+        for param in self.params.keys():
+            if isinstance(self.params[param], bool) and not param.startswith('*'):
+                self.params[param] = False
         for b in self.gui.buttons_list:
             try:
                 b.config(bg="SystemButtonFace")
             except tkinter.TclError:
                 pass
-
-        for param in self.params.keys():
-            if isinstance(self.params[param], bool) and not param.startswith('*'):
-                self.params[param] = False
-
         self.gui.log_text(text='done!')
 
     def start_recording(self, bpm):
+        # We need to reset all of our manips before starting the recording (can turn them on after)
+        self.reset_manips()
         # Start the recording in both reathread and for all of our camthreads
         self.reathread.start_recording(bpm)
         _ = [threading.Thread(target=cam.cam_write.start_recording).start() for cam in self.camthread]
-
         self.params['*recording'] = True    # This parameter is used to add text onto the camera view
         self.gui.log_text(text=f'Started recording at {datetime.datetime.now().strftime("%H:%M:%S")}')
 
     def stop_recording(self):
+        # We need to reset all of our manips before stopping the recording (can turn them on after)
+        self.reset_manips()
         self.reathread.stop_recording()
         for cam in self.camthread:
             cam.cam_write.stop_recording()
-
         self.params['*recording'] = False    # This parameter is used to remove text from the camera view
         self.gui.log_text(text=f'Finished recording at {datetime.datetime.now().strftime("%H:%M:%S")}')

@@ -5,9 +5,10 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Implemented preset .json creation tool">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Further work on PresetCreator.py">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PresetCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/PresetCreator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ReaThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/ReaThread.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -226,14 +227,7 @@
       <workItem from="1647248810643" duration="25384000" />
       <workItem from="1647338828096" duration="9624000" />
       <workItem from="1647431345466" duration="1258000" />
-      <workItem from="1647508632685" duration="21594000" />
-    </task>
-    <task id="LOCAL-00038" summary="Eye tracking improvements (revert to this one for one eye error-correction)">
-      <created>1643884161809</created>
-      <option name="number" value="00038" />
-      <option name="presentableId" value="LOCAL-00038" />
-      <option name="project" value="LOCAL" />
-      <updated>1643884161810</updated>
+      <workItem from="1647508632685" duration="25943000" />
     </task>
     <task id="LOCAL-00039" summary="Reverted to previous eye tracking error correction method">
       <created>1643886062979</created>
@@ -571,7 +565,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647530775941</updated>
     </task>
-    <option name="localTasksCounter" value="87" />
+    <task id="LOCAL-00087" summary="Further work on PresetCreator.py">
+      <created>1647532787186</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1647532787187</updated>
+    </task>
+    <option name="localTasksCounter" value="88" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -602,7 +603,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Implemented moving delay climbdown" />
     <MESSAGE value="Refactored log_text to TkGui.py" />
     <MESSAGE value="Refactored fixed delay as seperate class in DelayPanes.py" />
     <MESSAGE value="Refactored set delay time function into DelayPanes.py" />
@@ -627,7 +627,8 @@
     <MESSAGE value="Commit before restructuring ReaThread cals" />
     <MESSAGE value="Implemented delay blocking for Delay From File" />
     <MESSAGE value="Implemented preset .json creation tool" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented preset .json creation tool" />
+    <MESSAGE value="Further work on PresetCreator.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="Further work on PresetCreator.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -648,7 +649,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1647528755889" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647532047350" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647539750273" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
