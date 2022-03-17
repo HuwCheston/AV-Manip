@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile, get_tk_entry, try_get_entry
+from PresetCreator import PresetCreator
 import webbrowser
 
 
@@ -88,6 +89,8 @@ class TkGui:
                                                      f'Camera FPS: {str(self.params["*fps"])}\n'
                                                      f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
                                                      f'Performer Camera Resolution: {p_res}')),
+            # Opens up the preset creator
+            tk.Button(command_tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
             # Quits the program
             tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
@@ -95,6 +98,10 @@ class TkGui:
         organise_pane(tk_list=command_tk_list, col_num=col_num)
         # Grids the master frame within the GUI root
         command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
+
+    def open_preset_creator(self):
+        pc = PresetCreator(root=self.root)
+        pc.choose_manip()
 
     def delay_choice_pane(self, col_num):
         delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
