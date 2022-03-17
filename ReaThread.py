@@ -1,4 +1,5 @@
 import reapy
+from reapy import reascript_api as RPR
 import threading
 import time
 
@@ -43,8 +44,8 @@ class ReaThread:
                              ReaTrack(project=self.project, track_name='Drums', track_index=1, vst='MT-PowerDrumKit',)]
         self.countin = self.project.tracks[self.project.n_tracks-1]
 
-        reaper_thread = threading.Thread(target=self.start_reaper,)
-        reaper_thread.start()
+        # reaper_thread = threading.Thread(target=self.start_reaper,)
+        # reaper_thread.start()
 
     def start_reaper(self,):
         self.reset_manips()
@@ -64,6 +65,12 @@ class ReaThread:
         # Start recording if not already
         if not self.project.is_recording:
             self.project.record()
+
+        # while True:
+        #     if self.project.play_position < self.project.markers[1].position:
+        #         print('before countin')
+        #     else:
+        #         print('after countin')
 
     def stop_recording(self):
         # Including this for safety
@@ -94,6 +101,7 @@ class ReaThread:
 
             time.sleep(0.1)
 
+
     def reset_manips(self):
         # This is here in case the 'pause audio/both' manipulation has been used
         self.project.unmute_all_tracks()
@@ -108,3 +116,11 @@ class ReaThread:
     def exit_loop(self):
         self.project.stop()
         self.reset_manips()
+
+    def set_delay(self):
+        for participant in self.participants:
+            # Turn on the delay FX if it isn't turned on
+            if not participant.delay_fx.is_enabled:
+                participant.delay_fx.enable()
+            # Set the delay time to equal the time set in the GUI
+            participant.delay_fx.params[0] = self.params['*delay time']

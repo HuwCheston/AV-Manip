@@ -132,7 +132,7 @@ class TkGui:
         self.buttons_list.append(self.file_delay.start_delay_button)
 
     def variable_delay_pane(self, col_num):
-        variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread)
+        variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
         variable_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
         self.buttons_list.append(variable_delay.start_delay_button)

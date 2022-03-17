@@ -140,22 +140,36 @@ class DelayFromFile:
         self.resample_entry.config(state='readonly')
         self.delay_time_entry.config(state='normal')
 
+        # while True:
+        #     if self.keythread.reathread.project.play_position < self.keythread.reathread.project.markers[1].position:
+        #         print('before countin')
+        #     else:
+        #         print('after countin')
+
+
         loop_var = 0
         while self.params['delayed']:
-            # Get next value from array
-            i = self.file[loop_var]
-            # Set the delay time to the value from the array
-            set_delay_time(params=self.params, d_time=int(i))
-            # Insert the delay value into the GUI
-            self.delay_time_entry.delete(0, 'end')
-            self.delay_time_entry.insert(0, str(round(i)))
-            # Increment the loop variable, and if we've reached the end of the array, reset to the start and log in GUI
-            loop_var += 1
-            if loop_var == len(self.file):
-                self.gui.log_text(text='Reached the end of array, looping back to start.')
+            # If we haven't passed the count-in yet, we don't want to start delaying
+            if self.keythread.reathread.project.play_position < self.keythread.reathread.project.markers[1].position:
+                self.gui.log_text(text='Waiting for end of count-in to start delay...')
+                set_delay_time(params=self.params, d_time=0, reathread=self.keythread.reathread)
                 loop_var = 0
-            # Wait for the resample length before continuing
-            time.sleep(resample)
+                time.sleep(1)
+            else:
+                # Get next value from array
+                i = self.file[loop_var]
+                # Set the delay time to the value from the array
+                set_delay_time(params=self.params, d_time=int(i), reathread=self.keythread.reathread)
+                # Insert the delay value into the GUI
+                self.delay_time_entry.delete(0, 'end')
+                self.delay_time_entry.insert(0, str(round(i)))
+                # Increment the loop variable, and if we've reached the end of the array, reset to the start and log
+                loop_var += 1
+                if loop_var == len(self.file):
+                    self.gui.log_text(text='Reached the end of array, looping back to start.')
+                    loop_var = 0
+                # Wait for the resample length before continuing
+                time.sleep(resample)
 
         # Once delaying has finished, delete anything in the delay time entry and reset states
         self.delay_time_entry.delete(0, 'end')
@@ -204,7 +218,8 @@ class FixedDelay:
 
         self.set_delay_button = tk.Button(self.delay_frame,
                                           command=lambda: set_delay_time(d_time=try_get_entry(self.entry_1),
-                                                                         params=self.params),
+                                                                         params=self.params,
+                                                                         reathread=self.keythread.reathread),
                                           text='Set Delay')
         self.start_delay_button = tk.Button(self.delay_frame,
                                             command=lambda:
@@ -227,7 +242,8 @@ class FixedDelay:
         combo.bind("<<ComboboxSelected>>",
                    lambda e: [self.entry_1.delete(0, 'end'),
                               self.entry_1.insert(0, str(preset_list[combo.current()])),
-                              set_delay_time(d_time=try_get_entry(self.entry_1), params=self.params)])
+                              set_delay_time(d_time=try_get_entry(self.entry_1),
+                                             params=self.params, reathread=self.keythread.reathread)])
         return combo
 
 
@@ -259,7 +275,7 @@ class VariableDelay:
                                             command=lambda:
                                             [self.keythread.enable_manip(manip='delayed',
                                                                          button=self.start_delay_button),
-                                             threading.Thread(target=self.get_random_delay, daemon=True).start()],
+                                             threading.Thread(target=self.start_variable_delay, daemon=True).start()],
                                             text='Start Delay')
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(t1='Delay Time:',
                                                                                            frame=self.delay_frame)
@@ -292,7 +308,10 @@ class VariableDelay:
         return combo
 
     def get_new_distribution(self, ):
-        (val1, val2) = (try_get_entry(entry) for entry in [self.entry_1, self.entry_2])
+        val1, val2 = (try_get_entry(entry) for entry in [self.entry_1, self.entry_2])
+        if [x for x in (val1, val2) if x is None]:
+            self.gui.log_text(text='Non-integer distribution values inserted.')
+            return
         func = eval(self.params['*var delay distributions'][self.combo.get()]['function'])
         self.dist = func(val1, val2, self.params['*var delay samples'])
         self.delay_value = np.random.choice(self.dist)
@@ -322,20 +341,41 @@ class VariableDelay:
         y = stats.norm.pdf(x, mean, std)
         return x, y
 
-    def get_random_delay(self):
-        # TODO: check the readonly/normal state behaviour here
+    def start_variable_delay(self):
         # TODO: fix the occasional valueerror arising here
-        resample = try_get_entry(self.resample_entry) / 1000
+        resample = try_get_entry(self.resample_entry)
+        # If we gave a non-integer resample value, quit the function, reset all the manipulations, and print to the GUI
+        if resample is None:
+            self.gui.log_text(text='Non-integer resample value inserted: delay aborted.')
+            self.keythread.reset_manips()
+            return
+        # Convert resample rate to seconds
+        resample /= 1000
+
+        # Check if a distribution has been created: if not, print to the GUI and quit the function
+        try:
+            _ = self.dist[0]
+        except TypeError:
+            self.gui.log_text(text='No distribution created: delay aborted.')
+            self.keythread.reset_manips()
+            return
+
+        # Set states of entry windows
         self.delay_time_entry.config(state='normal')
         self.resample_entry.config(state='readonly')
+
         while self.params['delayed']:
             self.delay_value = abs(np.random.choice(self.dist))
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, str(round(self.delay_value)))
-            set_delay_time(params=self.params, d_time=self.delay_value)
+            set_delay_time(params=self.params, d_time=self.delay_value, reathread=self.keythread.reathread)
             time.sleep(int(self.delay_time_entry.get()) / 1000 if 'selected' in self.checkbutton.state() else resample)
+
+        # Reset states of entry windows
         self.delay_time_entry.delete(0, 'end')
         self.delay_time_entry.config(state='readonly')
+        self.resample_entry.config(state='normal')
+        return
 
 
 class IncrementalDelay:
@@ -471,7 +511,7 @@ class IncrementalDelay:
         for num in self.dist:
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, num)
-            set_delay_time(params=self.params, d_time=int(num))
+            set_delay_time(params=self.params, d_time=int(num), reathread=self.keythread.reathread)
 
             # If we're still delaying, wait for the resample rate
             if self.params['delayed']:
@@ -532,5 +572,7 @@ def pack_distribution_display(fig):
     canvas.get_tk_widget().pack()
 
 
-def set_delay_time(params, d_time: int, ):
+def set_delay_time(params, d_time: int, reathread=None):
     params['*delay time'] = d_time if 0 <= d_time < params['*max delay time'] else 0
+    if reathread is not None:
+        reathread.set_delay()
