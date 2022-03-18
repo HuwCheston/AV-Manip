@@ -28,9 +28,9 @@ class KeyThread:
 
     def exit_loop(self):
         self.reset_manips()
-        for num in range(self.params['*exit time'], 0, -1):
-            # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
-            time.sleep(1)
+        # for num in range(self.params['*exit time'], 0, -1):
+        #     # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
+        #     time.sleep(1)
         self.stop_recording()
         self.stop_event.set()
         self.gui.root.destroy()
@@ -55,7 +55,7 @@ class KeyThread:
 
         # Allows time for all threads relying on params being true to finish. This helps avoid the reaper socket closing
         # unexpectedly if it tries to execute two commands simultaneously (e.g. setting delay time, turning off fx)
-        time.sleep(1)
+        time.sleep(0.3)
         self.reathread.reset_manips()
         self.gui.log_text(text='done!')
 

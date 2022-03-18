@@ -1,8 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
 from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile, get_tk_entry, try_get_entry
-from PresetCreator import PresetCreator, PresetPane
+from PresetCreator import PresetPane
 import webbrowser
+import itertools
 
 
 class TkGui:
@@ -45,73 +46,19 @@ class TkGui:
         for (num, pane) in enumerate(self.active_panes):
             pane(col_num=num + 1)
 
-    def info_pane(self, col_num):
-        info_frame = tk.Frame(self.root, padx=10, pady=1)
-        labels = {
-            tk.Label(info_frame, text='CMS logo'): lambda e: webbrowser.open_new(
-                "https://cms.mus.cam.ac.uk/"),
-            tk.Label(info_frame, text='AV-Manip (v.0.1)'): lambda e: webbrowser.open_new(
-                'https://github.com/HuwCheston/AV-Manip/'),
-            tk.Label(info_frame, text='© Huw Cheston, 2022'): lambda e: webbrowser.open_new(
-                'https://github.com/HuwCheston/'),
-        }
-        for label, func in labels.items():
-            label.bind('<Button-1>', func)
-            if label['text'] == 'CMS logo':
-                label.image = tk.PhotoImage(file="cms-logo.gif")
-                label['image'] = label.image
-        self.logging_window = tk.scrolledtext.ScrolledText(info_frame, height=5, width=20, state='disabled',
-                                                           wrap='word', font='TkDefaultFont')
-        self.logging_window.insert('end', 'Started')
-        labels[self.logging_window] = None
-        organise_pane(tk_list=labels, col_num=col_num, px=0, py=0)
-        info_frame.grid(row=1, column=col_num)
-
     def command_pane(self, col_num):
-        # Master frame for this pane (all other widgets should use this as their root)
-        command_tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        # These frames and entries are used to enter desired BPM and number of bars to count-in by
-        bpm_frame, bpm_entry, _ = get_tk_entry(frame=command_tk_frame, t1='Tempo:', t2='BPM')
-        bpm_entry.insert('end', self.params['*default bpm'])
+        command_pane = CommandPane(root=self.root, col_num=col_num, keythread=self.keythread, params=self.params)
+        command_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
 
-        # This is used by the info pop-up to display the resolution of the webcams properly
-        p_res = 'x'.join([str(round(int(i) * self.params['*scaling'])) for i in self.params['*resolution'].split('x')])
-        # All the widgets inserted here will be inserted into the command_tk_frame grid
-        command_tk_list = [
-            tk.Label(command_tk_frame, text='Commands'),
-            # Starts recording in ReaThread and CamThread, via KeyThread. Also try to get user's BPM/count-in values
-            tk.Button(command_tk_frame, text='Start Recording',
-                      command=lambda: self.keythread.start_recording(bpm=try_get_entry(bpm_entry))),
-            # Stops recording in ReaThread/CamThread
-            tk.Button(command_tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
-            # Allows input of BPM
-            bpm_frame,
-            # Resets all CamThread/ReaThread manipulations, via KeyThread
-            tk.Button(command_tk_frame, text="Reset", command=self.keythread.reset_manips),
-            # Creates a pop-up window showing info about current state
-            tk.Button(command_tk_frame, text='Info',
-                      command=lambda:
-                      tk.messagebox.showinfo(title='Info',
-                                             message=f'Active cameras: {str(self.params["*participants"])}\n'
-                                                     f'Camera FPS: {str(self.params["*fps"])}\n'
-                                                     f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
-                                                     f'Performer Camera Resolution: {p_res}')),
-            # Quits the program
-            tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
-        ]
-        # Grids the widget list
-        organise_pane(tk_list=command_tk_list, col_num=col_num)
-        # Grids the master frame within the GUI root
-        command_tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+    def info_pane(self, col_num):
+        info_pane = InfoPane(root=self.root, col_num=col_num)
+        self.logging_window = info_pane.logging_window
+        info_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
 
     def preset_pane(self, col_num):
         preset_pane = PresetPane(root=self.root)
         organise_pane(tk_list=preset_pane.tk_list, col_num=col_num)
         preset_pane.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-
-    def open_preset_creator(self):
-        pc = PresetCreator(root=self.root)
-        pc.create_window()
 
     def manip_choice_pane(self, col_num):
         choice_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
@@ -227,33 +174,78 @@ class InfoPane:
     def __init__(self, root, col_num):
         self.root = root
         self.tk_frame = tk.Frame(self.root, padx=10, pady=1)
-        self.tk_list = [label for label in self.init_labels()]
         self.logging_window = self.init_logging_window()
-        self.tk_list.append(self.logging_window)
+        self.tk_list = [i for sublist in [self.init_labels(), [self.logging_window]] for i in sublist]
         organise_pane(tk_list=self.tk_list, col_num=col_num, px=0, py=0)
 
     def init_labels(self):
-        labels = {
-            tk.Label(self.tk_frame, text=''): "https://cms.mus.cam.ac.uk/",
-            tk.Label(self.tk_frame, text='AV-Manip (v.0.1)'): 'https://github.com/HuwCheston/AV-Manip/',
-            tk.Label(self.tk_frame, text='© Huw Cheston, 2022'): 'https://github.com/HuwCheston/',
-        }
-        labels = self.bind_func_to_labels(labels=labels)
-        return labels.keys()
+        labels = [
+            '',
+            'AV-Manip (v.0.1)',
+            '© Huw Cheston, 2022'
+        ]
+        urls = [
+            "https://cms.mus.cam.ac.uk/",
+            'https://github.com/HuwCheston/AV-Manip/',
+            'https://github.com/HuwCheston/',
+        ]
 
-    def bind_func_to_labels(self, labels):
-        for (label, url) in labels.items():
-            label.bind('<Button-1>', lambda e: webbrowser.open_new(url=url))
-            if label['text'] == '':
-                label.image = tk.PhotoImage(file="cms-logo.gif")
-                label['image'] = label.image
-        return labels
+        lablist = []
+        for (label, url) in zip(labels, urls):
+            lab = tk.Label(self.tk_frame, text=label)
+            lab.bind('<Button-1>', lambda e, u=url: webbrowser.open_new(u))
+            if lab['text'] == '':
+                lab.image = tk.PhotoImage(file="cms-logo.gif")
+                lab['image'] = lab.image
+            lablist.append(lab)
+        return lablist
 
     def init_logging_window(self):
         log = tk.scrolledtext.ScrolledText(self.tk_frame, height=5, width=20,
                                            state='disabled', wrap='word', font='TkDefaultFont')
         log.insert('end', 'Started')
         return log
+
+
+class CommandPane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, padx=10, pady=1)
+        self.params = params
+        self.keythread = keythread
+
+        # Master frame for this pane (all other widgets should use this as their root)
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        # These frames and entries are used to enter desired BPM and number of bars to count-in by
+        bpm_frame, bpm_entry = self.init_bpm_entry()
+
+        self.tk_list = [
+            tk.Label(self.tk_frame, text='Commands'),
+            tk.Button(self.tk_frame, text='Start Recording',
+                      command=lambda: self.keythread.start_recording(bpm=try_get_entry(bpm_entry))),
+            tk.Button(self.tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
+            bpm_frame,
+            tk.Button(self.tk_frame, text="Reset", command=self.keythread.reset_manips),
+            tk.Button(self.tk_frame, text='Info', command=self.init_info_popup),
+            tk.Button(self.tk_frame, text="Quit", command=self.keythread.exit_loop),
+        ]
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+    def init_info_popup(self):
+        # Format the screen resolution by getting info from the params file
+        p_res = 'x'.join([str(round(int(i) * self.params['*scaling'])) for i in self.params['*resolution'].split('x')])
+        # Create the messagebox
+        message = tk.messagebox.showinfo(title='Info',
+                                         message=f'Active cameras: {str(self.params["*participants"])}\n'
+                                                 f'Camera FPS: {str(self.params["*fps"])}\n'
+                                                 f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
+                                                 f'Performer Camera Resolution: {p_res}')
+        return message
+
+    def init_bpm_entry(self):
+        bpm_frame, bpm_entry, _ = get_tk_entry(frame=self.tk_frame, t1='Tempo:', t2='BPM')
+        bpm_entry.insert('end', self.params['*default bpm'])
+        return bpm_frame, bpm_entry
 
 
 def organise_pane(tk_list, col_num, px=10, py=1):
