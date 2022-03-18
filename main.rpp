@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.46/win64" 1647281701
+<REAPER_PROJECT 0.1 "6.46/win64" 1647540156
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -14,7 +14,7 @@
   TIMEMODE 1 5 -1 30 0 0 -1
   VIDEO_CONFIG 0 0 256
   PANMODE 3
-  CURSOR 0
+  CURSOR 8
   ZOOM 37.22985501184638 0 0
   VZOOMEX 6 0
   USE_REC_CFG 0
@@ -118,13 +118,13 @@
     MIDIOUT -1
     MAINSEND 1 0
     <FXCHAIN
-      WNDRECT 1090 1000 1899 580
+      WNDRECT -75 48 1899 580
       SHOW 0
       LASTSEL 0
       DOCKED 0
       BYPASS 1 0 0
       <JS midi_delay ""
-        56 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        187 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {3D841A4D-E13A-43E4-92B0-0C58C2473BA9}
@@ -146,8 +146,9 @@
         AQ4FU2NyaXB0U2xpZGVyAGlkAAEOBUtub2JEcmF3YmFyNwB2YWx1ZQABCQQAAAAAAAAgQABDb250cm9sAAEDdHlwZQABDgVTY3JpcHRTbGlkZXIAaWQAAQ4FS25vYkRy
         YXdiYXI4AHZhbHVlAAEJBAAAAAAAACBAAENvbnRyb2wAAQN0eXBlAAEOBVNjcmlwdFNsaWRlcgBpZAABDgVLbm9iRHJhd2JhcjkAdmFsdWUAAQkEAAAAAAAAIEAATVBF
         RGF0YQABAUVuYWJsZWQAAQEDAA==
-        AAAQAAAA
+        AERlZmF1bHQAEAAAAA==
       >
+      PRESETNAME Default
       FLOATPOS 0 0 0 0
       FXID {04E8D6CD-E060-4780-B09F-108BC94B923E}
       WAK 0 0
@@ -178,13 +179,13 @@
     MIDIOUT -1
     MAINSEND 1 0
     <FXCHAIN
-      WNDRECT 425 956 1899 580
+      WNDRECT 571 84 1899 580
       SHOW 0
       LASTSEL 0
       DOCKED 0
       BYPASS 1 0 0
       <JS midi_delay ""
-        56 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        187 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {F1EBFF71-B0DA-43D3-AF6C-9FCD34E19808}
@@ -200,8 +201,9 @@
         AAC8PgAABD8AAMQ+AAC4PgAAqD4AANA+AADYPgAAyD4AAOg+AADsPgAA1D4AAOA+AACIPgAAoD4AAAAAAAD8PgAA+D4AAPQ+AAAAAAAAzD4AAMA+AACwPgAAAAAAAAAA
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAJA+AACkPgAAAAAAAAA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/
         AACAPAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
-        AAAQAAAA
+        AE1ULVBvd2VyRHJ1bUtpdAAQAAAA
       >
+      PRESETNAME MT-PowerDrumKit
       FLOATPOS 0 0 0 0
       FXID {788334A2-F563-458F-9761-E6C0D1A9CED0}
       WAK 0 0
@@ -264,8 +266,9 @@
       <VST "VSTi: ReaSynth (Cockos)" reasynth.dll 0 "" 1919251321<5653547265737972656173796E746800> ""
         eXNlcu9e7f4AAAAAAgAAAAEAAAAAAAAAAgAAAAAAAABEAAAAAAAAAAAAEAA=
         776t3g3wrd77/k07YtRGOgAAAAAAAAAAAAAAAAAAgD88fuI7AAAAABfZDj8AAIA/AAAAAAAAgD8AAIA/AAAAAAAAAAA=
-        AAAQAAAA
+        AFByb2dyYW0gMQAQAAAA
       >
+      PRESETNAME "Program 1"
       FLOATPOS 0 0 0 0
       FXID {47945959-CB87-42FA-9B18-D6D62593A176}
       WAK 0 0

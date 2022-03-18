@@ -57,8 +57,6 @@ class ReaThread:
         self.project.cursor_position = self.project.markers[0].position
 
     def reset_manips(self):
-        # This is necessary to avoid the Reapy socket closing unexpectedly
-        time.sleep(0.5)
         # Iterate through all the participants and turn off the FX used in manipulations (not the VSTi)
         for participant in self.participants:
             for fx in participant.manip_fx:

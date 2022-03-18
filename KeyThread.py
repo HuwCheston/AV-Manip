@@ -44,7 +44,6 @@ class KeyThread:
         self.gui.log_text(text=f'{manip} now active.')
 
     def reset_manips(self):
-        self.reathread.reset_manips()
         self.gui.log_text(text='Resetting...')
         self.params['*reset video'] = True  # This param is reset to False by CamThread once resetting has completed
         for param in self.params.keys():
@@ -55,6 +54,11 @@ class KeyThread:
                 b.config(bg="SystemButtonFace")
             except tkinter.TclError:
                 pass
+
+        # Allows time for all threads relying on params being true to finish. This helps avoid the reaper socket closing
+        # unexpectedly if it tries to execute two commands simultaneously (e.g. setting delay time, turning off fx)
+        time.sleep(1)
+        self.reathread.reset_manips()
         self.gui.log_text(text='done!')
 
     def start_recording(self, bpm):
@@ -69,6 +73,7 @@ class KeyThread:
     def stop_recording(self):
         # We need to reset all of our manips before stopping the recording (can turn them on after)
         self.reset_manips()
+        # Stop the recording in both reathread and for all our camthreads
         self.reathread.stop_recording()
         for cam in self.camthread:
             cam.cam_write.stop_recording()
