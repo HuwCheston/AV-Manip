@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, ttk
 from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile, get_tk_entry, try_get_entry
-from PresetCreator import PresetCreator
+from PresetCreator import PresetCreator, PresetPane
 import webbrowser
 
 
@@ -19,9 +19,10 @@ class TkGui:
         self.tk_list = []
         self.buttons_list = []
 
-        self.default_panes = [
+        self.active_panes = [
             self.info_pane,
             self.command_pane,
+            self.preset_pane,
             self.manip_choice_pane,
         ]
 
@@ -41,7 +42,7 @@ class TkGui:
         # TODO: why does this need to be num+1?
         for widget in self.root.winfo_children():
             widget.destroy()
-        for (num, pane) in enumerate(self.default_panes):
+        for (num, pane) in enumerate(self.active_panes):
             pane(col_num=num + 1)
 
     def info_pane(self, col_num):
@@ -95,15 +96,18 @@ class TkGui:
                                                      f'Camera FPS: {str(self.params["*fps"])}\n'
                                                      f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
                                                      f'Performer Camera Resolution: {p_res}')),
-            # Opens up the preset creator
-            tk.Button(command_tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
             # Quits the program
             tk.Button(command_tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
         # Grids the widget list
         organise_pane(tk_list=command_tk_list, col_num=col_num)
         # Grids the master frame within the GUI root
-        command_tk_frame.grid(column=2, row=1, sticky="n", padx=10, pady=10)
+        command_tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
+
+    def preset_pane(self, col_num):
+        preset_pane = PresetPane(root=self.root)
+        organise_pane(tk_list=preset_pane.tk_list, col_num=col_num)
+        preset_pane.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
 
     def open_preset_creator(self):
         pc = PresetCreator(root=self.root)
@@ -126,10 +130,10 @@ class TkGui:
         # TODO: this function should allow any pane to open - should clear the decks a bit!
         self.keythread.reset_manips()
         try:
-            del self.default_panes[3]
+            del self.active_panes[4]
         except IndexError:
             pass
-        self.default_panes.append(pane)
+        self.active_panes.append(pane)
         self.tk_setup()
 
     def fixed_delay_pane(self, col_num):
@@ -217,6 +221,39 @@ class TkGui:
         self.logging_window.insert('end', '\n' + text)
         self.logging_window.see("end")
         self.logging_window.config(state='disabled')
+
+
+class InfoPane:
+    def __init__(self, root, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, padx=10, pady=1)
+        self.tk_list = [label for label in self.init_labels()]
+        self.logging_window = self.init_logging_window()
+        self.tk_list.append(self.logging_window)
+        organise_pane(tk_list=self.tk_list, col_num=col_num, px=0, py=0)
+
+    def init_labels(self):
+        labels = {
+            tk.Label(self.tk_frame, text=''): "https://cms.mus.cam.ac.uk/",
+            tk.Label(self.tk_frame, text='AV-Manip (v.0.1)'): 'https://github.com/HuwCheston/AV-Manip/',
+            tk.Label(self.tk_frame, text='© Huw Cheston, 2022'): 'https://github.com/HuwCheston/',
+        }
+        labels = self.bind_func_to_labels(labels=labels)
+        return labels.keys()
+
+    def bind_func_to_labels(self, labels):
+        for (label, url) in labels.items():
+            label.bind('<Button-1>', lambda e: webbrowser.open_new(url=url))
+            if label['text'] == '':
+                label.image = tk.PhotoImage(file="cms-logo.gif")
+                label['image'] = label.image
+        return labels
+
+    def init_logging_window(self):
+        log = tk.scrolledtext.ScrolledText(self.tk_frame, height=5, width=20,
+                                           state='disabled', wrap='word', font='TkDefaultFont')
+        log.insert('end', 'Started')
+        return log
 
 
 def organise_pane(tk_list, col_num, px=10, py=1):

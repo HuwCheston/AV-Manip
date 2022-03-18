@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 import json
+import os
 
 
 manip_names = {
@@ -40,6 +41,101 @@ def keep_focus(func):
         func(self, *args, **kwargs)
         self.creator_window.attributes('-topmost', 1)
     return _decorator
+
+
+class PresetPane:
+    def __init__(self, root: tk.Tk):
+        """This class creates a pane in TkGui that enables the user to load and create manipulation presets"""
+        # Initialise basic parameters
+        self.root = root
+        self.presets_dir = './input/'
+        self.presets_list = []
+        # All widgets should go into this tk_pane, which should be accessed in TkGui and packed
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        # Initialise the preset selector combobox with default functionality (i.e. no presets loaded)
+        self.presets_combo = ttk.Combobox(self.tk_frame, state='readonly',)
+        self.reset_preset_combo()
+        # These widgets should be packed in TkGui
+        self.tk_list = [
+            tk.Label(self.tk_frame, text='Presets'),
+            tk.Button(self.tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
+            tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
+            self.presets_combo
+        ]
+
+    def open_preset_folder(self):
+        """Prompts for the user to select a directory to search for valid preset files in"""
+        # Open the directory
+        f = tk.filedialog.askdirectory(title='Open presets folder', initialdir=self.presets_dir,)
+        # Tk askdirectory returns None if dialog closed with cancel
+        if f == '':
+            return
+        # If a valid directory has been selected, try and get jsons from it
+        else:
+            self.presets_dir = f
+            self.get_jsons_from_dir()
+
+    def get_jsons_from_dir(self):
+        """Searches through a directory for preset files and adds them to a list if they're valid"""
+        # Reset the combobox to neutral
+        self.reset_preset_combo()
+        # Get all the json files in our directory
+        jsons = [f for f in os.listdir(self.presets_dir) if f.endswith('.json')]
+        # Iterate through our json files and add those that are valid to our preset list
+        for js in jsons:
+            f = json.loads(open(self.presets_dir + '/' + js, 'r').read())
+            if self.check_json(js=f):
+                self.presets_list.append(f)
+        # We only want to update the functionality of our combobox if valid presets have been loaded
+        if len(self.presets_list) > 0:
+            self.populate_preset_combo()
+
+    @staticmethod
+    def check_json(js: dict):
+        """Checks if a particular json file contains valid information for the application"""
+        # This key should always be present in any valid .JSON made for use with this software
+        if 'Manipulation' not in js:
+            return False
+        # TODO: check that this works in cases where a checkbutton is used
+        # If the user entered nothing in a field, discard the JSON
+        elif any(v == '' for v in js.values()):
+            return False
+        # If the json passes the above checks, it is valid
+        else:
+            return True
+
+    def populate_preset_combo(self):
+        """Populates the preset combobox with valid preset files"""
+        # Format the string to display in the combobox, including the manipulation name & preset number
+        presets = [f'Preset {num + 1}: {k["Manipulation"]}' for (num, k) in enumerate(self.presets_list)]
+        # Update the combobox values and default text
+        self.presets_combo.config(values=presets)
+        self.presets_combo.set('Select Preset')
+        # Enable the combobox functionality
+        self.presets_combo.bind("<<ComboboxSelected>>", lambda x: self.preset_combo_func())
+
+    def preset_combo_func(self):
+        """Sends the preset selected in the combobox to TkGui"""
+        # Look through the list of combobox values, and get the index of the one selected.
+        combo_ind = self.presets_combo['values'].index(self.presets_combo.get())
+        # The combobox doesn't display the full preset, so get this from the JSON list using the index
+        selected_preset = self.presets_list[combo_ind]
+        # Send this information to TkGui to create the correct pane and fill in the values
+        print(selected_preset)
+
+    def reset_preset_combo(self):
+        """Resets the functionality and appearance of the preset combobox"""
+        # Clear out any previously saved presets from the list
+        self.presets_list.clear()
+        # Reset the functionality of the combobox, the values displayed within it, and the default text
+        self.presets_combo.bind("<<ComboboxSelected>>", '')
+        self.presets_combo.configure(values=[])
+        self.presets_combo.set('No Presets Loaded!')
+
+    def open_preset_creator(self):
+        """Creates a new toplevel window to allow the user to create preset files"""
+        pc = PresetCreator(root=self.root)
+        pc.create_window()
 
 
 class PresetCreator:
@@ -129,7 +225,9 @@ class PresetCreator:
                 w.val = var
             # If the parameter is an int, create an entry frame that can only have numbers inserted into it
             elif ty == 'file':
-                w = tk.Button(frames[num], command=self.open_file, text='Open File')
+                file_open = tk.Button(frames[num], text='Open File')
+                file_open.config(command=lambda: self.open_file(file_open)),
+                w = file_open
             elif ty == 'int':
                 w = tk.Entry(frames[num], validate="key", width=5)
                 # This command prevents us from inserting anything other than numbers
@@ -155,21 +253,25 @@ class PresetCreator:
         return entries
 
     @keep_focus
-    def open_file(self):
+    def open_file(self, button):
         """Open a file and store its location."""
-        # Open the file
-        f = tk.filedialog.askopenfile(
-            title='Open a file',
-            initialdir='./input/',
-            filetypes=(
-                ('CSV files', '*.csv'),
-                ('Text files', '*.txt'),
-                ('All files', '*.*'),
-            )
+        filetypes = (
+            ('CSV files', '*.csv'),
+            ('Text files', '*.txt'),
         )
-        if f is None:   # askopenfile returns None if dialog closed with cancel
+        # Open the file
+        f = tk.filedialog.askopenfile(title='Open a file', initialdir='./input/', filetypes=filetypes)
+
+        # Tk askopenfile returns None if dialog closed with cancel
+        if f is None:
             return
-        self.filename = f.name
+        # Only allow the user to open accepted filetypes
+        elif f.name.endswith(tuple(ty[1].strip('*') for ty in filetypes)):
+            button.config(bg='green', text='File loaded')
+            self.filename = f.name
+        # Block the user from opening files of invalid type
+        else:
+            button.config(bg='red', text='Invalid file')
 
     @staticmethod
     def validate_int(s, acttyp) -> bool:

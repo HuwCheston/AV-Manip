@@ -28,11 +28,9 @@ class KeyThread:
 
     def exit_loop(self):
         self.reset_manips()
-
         for num in range(self.params['*exit time'], 0, -1):
             # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
             time.sleep(1)
-
         self.stop_recording()
         self.stop_event.set()
         self.gui.root.destroy()

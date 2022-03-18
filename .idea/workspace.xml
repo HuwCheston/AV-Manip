@@ -5,12 +5,11 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Fixed reapy socket closing unexpectedly (hopefully!)">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="More work on fixing unexpected socket closing (hopefully got it this time)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ReaThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/ReaThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp-bak" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp-bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PresetCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/PresetCreator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +137,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Python Projects\AV-Manip\PresetCreator.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scratch.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -229,14 +228,7 @@
       <workItem from="1647338828096" duration="9624000" />
       <workItem from="1647431345466" duration="1258000" />
       <workItem from="1647508632685" duration="26338000" />
-      <workItem from="1647594865021" duration="3299000" />
-    </task>
-    <task id="LOCAL-00040" summary="Some slight refactoring - should now be stable.">
-      <created>1643890408936</created>
-      <option name="number" value="00040" />
-      <option name="presentableId" value="LOCAL-00040" />
-      <option name="project" value="LOCAL" />
-      <updated>1643890408936</updated>
+      <workItem from="1647594865021" duration="18655000" />
     </task>
     <task id="LOCAL-00041" summary="Improved GUI with .grid()">
       <created>1643897838784</created>
@@ -574,7 +566,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647540042811</updated>
     </task>
-    <option name="localTasksCounter" value="89" />
+    <task id="LOCAL-00089" summary="More work on fixing unexpected socket closing (hopefully got it this time)">
+      <created>1647598869051</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1647598869051</updated>
+    </task>
+    <option name="localTasksCounter" value="90" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -605,7 +604,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Refactored fixed delay as seperate class in DelayPanes.py" />
     <MESSAGE value="Refactored set delay time function into DelayPanes.py" />
     <MESSAGE value="Simplified set_delay_time function in DelayPanes.py" />
     <MESSAGE value="General refactoring and work on plt integration in DelayPanes.py" />
@@ -630,7 +628,8 @@
     <MESSAGE value="Implemented preset .json creation tool" />
     <MESSAGE value="Further work on PresetCreator.py" />
     <MESSAGE value="Fixed reapy socket closing unexpectedly (hopefully!)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed reapy socket closing unexpectedly (hopefully!)" />
+    <MESSAGE value="More work on fixing unexpected socket closing (hopefully got it this time)" />
+    <option name="LAST_COMMIT_MESSAGE" value="More work on fixing unexpected socket closing (hopefully got it this time)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -650,8 +649,8 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1647528755889" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647598351106" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1647614170414" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647615338825" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
