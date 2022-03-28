@@ -8,31 +8,30 @@ from matplotlib.ticker import PercentFormatter
 import threading
 import scipy.stats as stats
 
-
 # TODO: all classes should have the option to delay audio and video separately
 # TODO: set up all other delay panes to inherit shared methods from a single class
 
 
 class DelayFromFile:
-    def __init__(self, root: tk.Tk, params: dict, keythread, gui):
+    def __init__(self, root: tk.Tk, params: dict, keythread, gui, col_num):
         self.params = params
         self.root = root
         self.gui = gui
-        self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
         self.file = None  # Used as placeholder until file loaded in
 
-        self.frame_1, self.delay_time_entry, self.label_1 = get_tk_entry(t1='Time:', frame=self.delay_frame)
+        self.frame_1, self.delay_time_entry, self.label_1 = get_tk_entry(t1='Time:', frame=self.tk_frame)
         self.delay_time_entry.insert(0, str(self.params['*delay time']))
         self.delay_time_entry.config(state='readonly')  # We don't need to modify the delay time directly
-        self.frame_2, self.resample_entry, self.label_2 = get_tk_entry(t1='Resample:', frame=self.delay_frame)
+        self.frame_2, self.resample_entry, self.label_2 = get_tk_entry(t1='Resample:', frame=self.tk_frame)
         self.resample_entry.insert(0, '1000')
-        self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(t1='Baseline:', frame=self.delay_frame)
+        self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(t1='Baseline:', frame=self.tk_frame)
         self.baseline_entry.insert(0, '50')
 
         self.multiplier = tk.DoubleVar()
         self.slider = tk.Scale(
-            self.delay_frame,
+            self.tk_frame,
             from_=0,
             to=3.0,
             resolution=0.1,
@@ -41,30 +40,30 @@ class DelayFromFile:
         )
 
         self.checkbutton_var = tk.IntVar()
-        self.checkbutton = ttk.Checkbutton(self.delay_frame, text='Scale Delay?', var=self.checkbutton_var,
+        self.checkbutton = ttk.Checkbutton(self.tk_frame, text='Scale Delay?', var=self.checkbutton_var,
                                            command=self.checkbutton_func)
         self.checkbutton_func()
 
-        self.open_file_button = tk.Button(self.delay_frame,
+        self.open_file_button = tk.Button(self.tk_frame,
                                           command=self.open_file,
                                           text='Open File')
-        self.start_delay_button = tk.Button(self.delay_frame,
+        self.start_delay_button = tk.Button(self.tk_frame,
                                             command=lambda:
                                             [self.keythread.enable_manip(manip='delayed',
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.start_file_delay, daemon=True).start()],
                                             text='Start Delay')
-        self.plot_prog_button = tk.Button(self.delay_frame, command=self.plot_delay_prog,
+        self.plot_prog_button = tk.Button(self.tk_frame, command=self.plot_delay_prog,
                                           text='Plot Progression')
-        self.plot_hist_button = tk.Button(self.delay_frame, command=self.plot_delay_hist,
+        self.plot_hist_button = tk.Button(self.tk_frame, command=self.plot_delay_hist,
                                           text='Plot Distribution')
 
         self.tk_list = [
-            tk.Label(self.delay_frame, text='Delay from File'),
+            tk.Label(self.tk_frame, text='Delay from File'),
             self.frame_2,
             self.checkbutton,
             self.frame_3,
-            tk.Label(self.delay_frame, text='Multiplier'),
+            tk.Label(self.tk_frame, text='Multiplier'),
             self.slider,
             self.open_file_button,
             self.start_delay_button,
@@ -72,6 +71,7 @@ class DelayFromFile:
             self.plot_hist_button,
             self.frame_1,
         ]
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
 
     def open_file(self):
         filetypes = (
@@ -198,18 +198,18 @@ class DelayFromFile:
 
 
 class FixedDelay:
-    def __init__(self, root: tk.Tk, params: dict, keythread, gui):
+    def __init__(self, root: tk.Tk, params: dict, keythread, gui, col_num):
         self.params = params
         self.root = root
         self.gui = gui
-        self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(t1='Time:', frame=self.delay_frame)
+        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(t1='Time:', frame=self.tk_frame)
         self.entry_1.insert(0, str(self.params['*delay time']))
 
         self.combo = self.get_tk_combo()
-        self.start_delay_button = tk.Button(self.delay_frame,
+        self.start_delay_button = tk.Button(self.tk_frame,
                                             command=lambda: [
                                                 self.keythread.enable_manip(manip='delayed',
                                                                             button=self.start_delay_button),
@@ -220,15 +220,16 @@ class FixedDelay:
                                             text='Start Delay')
 
         self.tk_list = [
-            tk.Label(self.delay_frame, text='Fixed Delay'),
+            tk.Label(self.tk_frame, text='Fixed Delay'),
             self.frame_1,
             self.combo,
             self.start_delay_button,
         ]
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
 
     def get_tk_combo(self):
         preset_list = [v for (k, v) in self.params["*delay time presets"].items()]
-        combo = ttk.Combobox(self.delay_frame, state='readonly',
+        combo = ttk.Combobox(self.tk_frame, state='readonly',
                              values=[f'{k} - {v} msec' for (k, v) in self.params["*delay time presets"].items()])
         combo.set('Delay Time Presets')
         combo.bind("<<ComboboxSelected>>",
@@ -238,10 +239,10 @@ class FixedDelay:
 
 
 class VariableDelay:
-    def __init__(self, params, root: tk.Tk, keythread, gui):
+    def __init__(self, params, root: tk.Tk, keythread, gui, col_num):
         self.params = params
         self.root = root
-        self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
         self.gui = gui
 
@@ -249,29 +250,29 @@ class VariableDelay:
         self.delay_value = float
         self.delay_time = float
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(t1='Low:', frame=self.delay_frame)
-        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(t1='High:', frame=self.delay_frame)
-        self.frame_3, self.resample_entry, self.label_3 = get_tk_entry(t1='Resample:', frame=self.delay_frame)
-        self.checkbutton = ttk.Checkbutton(self.delay_frame, text='Use as Resample Rate',
+        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(t1='Low:', frame=self.tk_frame)
+        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(t1='High:', frame=self.tk_frame)
+        self.frame_3, self.resample_entry, self.label_3 = get_tk_entry(t1='Resample:', frame=self.tk_frame)
+        self.checkbutton = ttk.Checkbutton(self.tk_frame, text='Use as Resample Rate',
                                            command=self.checkbutton_func)
 
         self.combo = self.get_tk_combo()
 
-        self.get_new_dist = tk.Button(self.delay_frame, command=self.get_new_distribution,
+        self.get_new_dist = tk.Button(self.tk_frame, command=self.get_new_distribution,
                                       text='Get Distribution')
-        self.plot_dist_button = tk.Button(self.delay_frame, command=self.plot_distribution,
+        self.plot_dist_button = tk.Button(self.tk_frame, command=self.plot_distribution,
                                           text='Plot Distribution')
-        self.start_delay_button = tk.Button(self.delay_frame,
+        self.start_delay_button = tk.Button(self.tk_frame,
                                             command=lambda:
                                             [self.keythread.enable_manip(manip='delayed',
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.start_variable_delay, daemon=True).start()],
                                             text='Start Delay')
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(t1='Delay Time:',
-                                                                                           frame=self.delay_frame)
+                                                                                           frame=self.tk_frame)
         self.delay_time_entry.config(state='readonly')
 
-        self.tk_list = [tk.Label(self.delay_frame, text='Variable Delay'),
+        self.tk_list = [tk.Label(self.tk_frame, text='Variable Delay'),
                         self.combo,
                         self.frame_1,
                         self.frame_2,
@@ -282,13 +283,14 @@ class VariableDelay:
                         self.delay_time_frame,
                         self.checkbutton
                         ]
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
 
     def checkbutton_func(self):
         self.resample_entry['state'] = 'readonly' if self.resample_entry['state'] == 'normal' else 'normal'
 
     def get_tk_combo(self):
         # TODO: check Poisson distribution is working
-        combo = ttk.Combobox(self.delay_frame, state='readonly',
+        combo = ttk.Combobox(self.tk_frame, state='readonly',
                              values=[k for (k, _) in self.params['*var delay distributions'].items()])
         combo.set('Delay Distribution')
         combo.bind('<<ComboboxSelected>>', lambda e: [self.label_1
@@ -369,11 +371,11 @@ class VariableDelay:
 
 
 class IncrementalDelay:
-    def __init__(self, params, root: tk.Tk, keythread, gui):
+    def __init__(self, params, root: tk.Tk, keythread, gui, col_num):
         self.params = params
         self.root = root
         self.gui = gui
-        self.delay_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.keythread = keythread
 
         self.dist = None
@@ -381,31 +383,31 @@ class IncrementalDelay:
         self.delay_value = float
 
         self.combo = self.get_tk_combo()
-        self.frame_1, self.start_entry, self.label_1 = get_tk_entry(t1='Start:', frame=self.delay_frame)
-        self.frame_2, self.finish_entry, self.label_2 = get_tk_entry(t1='Finish:', frame=self.delay_frame)
-        self.frame_3, self.length_entry, self.label_3 = get_tk_entry(t1='Length:', frame=self.delay_frame)
-        self.frame_4, self.resample_entry, self.label_4 = get_tk_entry(t1='Resample:', frame=self.delay_frame)
+        self.frame_1, self.start_entry, self.label_1 = get_tk_entry(t1='Start:', frame=self.tk_frame)
+        self.frame_2, self.finish_entry, self.label_2 = get_tk_entry(t1='Finish:', frame=self.tk_frame)
+        self.frame_3, self.length_entry, self.label_3 = get_tk_entry(t1='Length:', frame=self.tk_frame)
+        self.frame_4, self.resample_entry, self.label_4 = get_tk_entry(t1='Resample:', frame=self.tk_frame)
 
         self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(t1='Delay Time:',
-                                                                                           frame=self.delay_frame)
+                                                                                           frame=self.tk_frame)
         self.delay_time_entry.config(state='readonly')
 
-        self.get_new_space_button = tk.Button(self.delay_frame, command=self.get_new_space,
+        self.get_new_space_button = tk.Button(self.tk_frame, command=self.get_new_space,
                                               text='Get Space')
-        self.flip_delay_button = tk.Button(self.delay_frame, command=self.flip_delay_space,
+        self.flip_delay_button = tk.Button(self.tk_frame, command=self.flip_delay_space,
                                            text='Flip Delay')
-        self.plot_dist_button = tk.Button(self.delay_frame, command=self.plot_distribution,
+        self.plot_dist_button = tk.Button(self.tk_frame, command=self.plot_distribution,
                                           text='Plot Space')
-        self.start_delay_button = tk.Button(self.delay_frame,
+        self.start_delay_button = tk.Button(self.tk_frame,
                                             command=lambda:
                                             [self.keythread.enable_manip(manip='delayed',
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.get_incremental_delay,
                                                               daemon=True)
-                                                      .start()],
+                                            .start()],
                                             text='Start Delay')
 
-        self.tk_list = [tk.Label(self.delay_frame, text='Incremental Delay'),
+        self.tk_list = [tk.Label(self.tk_frame, text='Incremental Delay'),
                         self.combo,
                         self.frame_1,
                         self.frame_2,
@@ -417,9 +419,10 @@ class IncrementalDelay:
                         self.start_delay_button,
                         self.delay_time_frame,
                         ]
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
 
     def get_tk_combo(self):
-        combo = ttk.Combobox(self.delay_frame, state='readonly',
+        combo = ttk.Combobox(self.tk_frame, state='readonly',
                              values=self.params['*incremental delay distributions'])
         combo.set('Delay Space')
         return combo
@@ -566,3 +569,7 @@ def set_delay_time(params, d_time: int, reathread=None):
     params['*delay time'] = d_time if 0 <= d_time < params['*max delay time'] else 0
     if reathread is not None:
         reathread.delayed_manip()
+
+def organise_pane(tk_list, col_num, px=10, py=1):
+    for row_num, b in enumerate(tk_list):
+        b.grid(row=row_num, column=col_num, padx=px, pady=py)

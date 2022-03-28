@@ -3,7 +3,6 @@ from tkinter import messagebox, scrolledtext, ttk
 from DelayPanes import VariableDelay, IncrementalDelay, FixedDelay, DelayFromFile, get_tk_entry, try_get_entry
 from PresetCreator import PresetPane
 import webbrowser
-import itertools
 
 
 class TkGui:
@@ -57,7 +56,6 @@ class TkGui:
 
     def preset_pane(self, col_num):
         preset_pane = PresetPane(root=self.root)
-        organise_pane(tk_list=preset_pane.tk_list, col_num=col_num)
         preset_pane.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
 
     def manip_choice_pane(self, col_num):
@@ -84,84 +82,45 @@ class TkGui:
         self.tk_setup()
 
     def fixed_delay_pane(self, col_num):
-        fixed_delay = FixedDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
-        fixed_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        organise_pane(tk_list=fixed_delay.tk_list, col_num=col_num)
+        fixed_delay = FixedDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self, col_num=col_num)
+        fixed_delay.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.buttons_list.append(fixed_delay.start_delay_button)
 
     def delay_from_file_pane(self, col_num):
-        self.file_delay = DelayFromFile(params=self.params, root=self.root, keythread=self.keythread, gui=self)
-        self.file_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        organise_pane(tk_list=self.file_delay.tk_list, col_num=col_num)
+        self.file_delay = DelayFromFile(params=self.params, root=self.root, keythread=self.keythread, gui=self, col_num=col_num)
+        self.file_delay.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.buttons_list.append(self.file_delay.start_delay_button)
 
     def variable_delay_pane(self, col_num):
-        variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
-        variable_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        organise_pane(tk_list=variable_delay.tk_list, col_num=col_num)
+        variable_delay = VariableDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self, col_num=col_num)
+        variable_delay.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.buttons_list.append(variable_delay.start_delay_button)
 
     def moving_delay_pane(self, col_num):
-        moving_delay = IncrementalDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self)
-        moving_delay.delay_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        organise_pane(tk_list=moving_delay.tk_list, col_num=col_num)
+        moving_delay = IncrementalDelay(params=self.params, root=self.root, keythread=self.keythread, gui=self, col_num=col_num)
+        moving_delay.tk_frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
         self.buttons_list.append(moving_delay.start_delay_button)
 
     def loop_pane(self, col_num):
-        manip_str = 'loop'
-        self.populate_tk_list(manip_str, col_num=col_num)
+        loop_pane = LoopPane(root=self.root, col_num=col_num, keythread=self.keythread, params=self.params)
+        loop_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
 
     def blank_pane(self, col_num):
-        manip_str = 'blank'
-        self.populate_tk_list(manip_str, col_num=col_num)
+        blank_pane = BlankPane(root=self.root, col_num=col_num, keythread=self.keythread, params=self.params)
+        blank_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
 
     def pause_pane(self, col_num):
-        frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        pause_audio = tk.Button(frame, text='Pause Audio', fg='black',
-                                command=lambda: [self.keythread.enable_manip('pause audio', pause_audio),
-                                                 self.keythread.reathread.pause_manip()])
-        self.buttons_list.append(pause_audio)
-
-        pause_video = tk.Button(frame, text='Pause Video', fg='black')
-        pause_video.config(command=lambda: self.keythread.enable_manip('pause video', pause_video))
-        self.buttons_list.append(pause_video)
-
-        pause_both = tk.Button(frame, text='Pause Both', fg='black')
-        pause_both.config(command=lambda: [self.keythread.enable_manip('pause video', pause_both),
-                                           self.keythread.reathread.pause_manip()])
-        self.buttons_list.append(pause_both)
-
-        tk_list = [
-            tk.Label(frame, text='Pause'),
-            pause_audio,
-            pause_video,
-            pause_both
-        ]
-        frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        organise_pane(tk_list=tk_list, col_num=col_num)
-        self.tk_list.extend(tk_list)
+        pause_pane = PausePane(root=self.root, col_num=col_num, keythread=self.keythread, params=self.params)
+        pause_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
+        # TODO: ensure that these buttons can be properly reset
 
     def control_pane(self, col_num):
-        manip_str = 'control'
-        self.populate_tk_list(manip_str, col_num=col_num)
+        control_pane = ControlPane(root=self.root, col_num=col_num, keythread=self.keythread, params=self.params)
+        control_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
 
     def flip_pane(self, col_num):
-        manip_str = 'flip'
-        self.populate_tk_list(manip_str, col_num=col_num)
-
-    def populate_tk_list(self, manip_str, col_num, arg=None):
-        frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        tk_list = [tk.Label(frame, text=manip_str.title())]
-        for k in self.params.keys():
-            if k.startswith(manip_str):
-                b = tk.Button(frame, text=k.title())
-                b.config(fg='black', command=lambda manip=k, button=b: [self.keythread.enable_manip(manip, button),
-                                                                        arg()])
-                tk_list.append(b)
-                self.buttons_list.append(b)
-        organise_pane(tk_list=tk_list, col_num=col_num)
-        frame.grid(column=col_num, row=1, sticky="n", padx=10, pady=10)
-        self.tk_list.extend(tk_list)
+        flip_pane = FlipPane(root=self.root, col_num=col_num, keythread=self.keythread, params=self.params)
+        flip_pane.tk_frame.grid(column=col_num, row=1, sticky='n', padx=10, pady=10)
 
     def log_text(self, text):
         self.logging_window.config(state='normal')
@@ -219,6 +178,7 @@ class CommandPane:
         # These frames and entries are used to enter desired BPM and number of bars to count-in by
         bpm_frame, bpm_entry = self.init_bpm_entry()
 
+        # Store all widgets in a list
         self.tk_list = [
             tk.Label(self.tk_frame, text='Commands'),
             tk.Button(self.tk_frame, text='Start Recording',
@@ -229,6 +189,7 @@ class CommandPane:
             tk.Button(self.tk_frame, text='Info', command=self.init_info_popup),
             tk.Button(self.tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
+        # Pack all the widgets in our list into the frame
         organise_pane(tk_list=self.tk_list, col_num=col_num)
 
     def init_info_popup(self):
@@ -248,6 +209,157 @@ class CommandPane:
         return bpm_frame, bpm_entry
 
 
+class ManipChoicePane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.params = params
+        self.keythread = keythread
+
+        self.tk_list = [tk.Label(self.tk_frame, text='Manipulations'), self.init_combo()]
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+    def init_combo(self):
+        # Fill the combobox options with the possible manipulations
+        combo = ttk.Combobox(self.tk_frame, state='readonly', values=[k for k in self.manip_panes.keys()])
+        combo.set('Choose a Manipulation')
+        # Create the necessary pane whenever a new manipulation is selected
+        combo.bind("<<ComboboxSelected>>", lambda e: self.insert_new_pane(self.manip_panes[combo.get()]))
+        return combo
+
+    def insert_new_pane(self, pane):
+        # TODO: this function should allow any pane to open - should clear the decks a bit!
+        self.keythread.reset_manips()
+        try:
+            del self.active_panes[4]
+        except IndexError:
+            pass
+        self.active_panes.append(pane)
+        self.tk_setup()
+
+
+class PausePane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, padx=10, pady=1)
+        self.params = params
+        self.keythread = keythread
+
+        # Master frame for this pane (all other widgets should use this as their root)
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+
+        # Store all widgets in a list
+        self.tk_list = [
+            tk.Label(self.tk_frame, text='Pause'),
+            # We need to call these as functions so we can pass them back into themselves
+            self.init_pause_audio(),
+            self.init_pause_video(),
+            self.init_pause_both(),
+        ]
+        # Pack all the widgets in our list into the frame
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+    def init_pause_audio(self):
+        b = tk.Button(
+            self.tk_frame, text='Pause Audio', fg='black', command=lambda: [
+                self.keythread.enable_manip('pause audio', b),
+                self.keythread.reathread.pause_manip()
+            ]
+        )
+        return b
+
+    def init_pause_video(self):
+        b = tk.Button(
+            self.tk_frame, text='Pause Video', fg='black', command=lambda: [
+                self.keythread.enable_manip('pause video', b)
+            ]
+        )
+        return b
+
+    def init_pause_both(self):
+        b = tk.Button(
+            self.tk_frame, text='Pause Both', fg='black', command=lambda: [
+                self.keythread.enable_manip('pause video', b),
+                self.keythread.reathread.pause_manip()
+            ]
+        )
+        return b
+
+
+class LoopPane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.params = params
+        self.keythread = keythread
+
+        # Store all widgets in a list
+        b_list = populate_class(manip_str='loop', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Looper')], b_list] for i in sublist]
+
+        # Pack all the widgets in our list into the frame
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+
+class BlankPane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.params = params
+        self.keythread = keythread
+
+        # Store all widgets in a list
+        b_list = populate_class(manip_str='blank', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
+
+        # Pack all the widgets in our list into the frame
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+
+# TODO: these generic classes should all inherit from another class
+class ControlPane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.params = params
+        self.keythread = keythread
+
+        # Store all widgets in a list
+        b_list = populate_class(manip_str='control', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
+
+        # Pack all the widgets in our list into the frame
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+
+class FlipPane:
+    def __init__(self, root, params, keythread, col_num):
+        self.root = root
+        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+        self.params = params
+        self.keythread = keythread
+
+        # Store all widgets in a list
+        b_list = populate_class(manip_str='flip', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
+
+        # Pack all the widgets in our list into the frame
+        organise_pane(tk_list=self.tk_list, col_num=col_num)
+
+
 def organise_pane(tk_list, col_num, px=10, py=1):
     for row_num, b in enumerate(tk_list):
         b.grid(row=row_num, column=col_num, padx=px, pady=py)
+
+
+def populate_class(manip_str, frame, params, keythread, arg=None,):
+    lis = []
+    for k in params.keys():
+        if k.startswith(manip_str):
+            b = tk.Button(frame, text=k.title())
+            if arg is not None:
+                b.config(fg='black', command=lambda manip=k, button=b: [keythread.enable_manip(manip, button), arg()])
+            else:
+                b.config(fg='black', command=lambda manip=k, button=b: [keythread.enable_manip(manip, button)])
+            lis.append(b)
+    return lis

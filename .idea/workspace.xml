@@ -5,9 +5,10 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Implemented preset pane to load jsons">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Started moving TkGui panes to seperate classes - continue when back">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DelayPanes.py" beforeDir="false" afterPath="$PROJECT_DIR$/DelayPanes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PresetCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/PresetCreator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -227,14 +228,8 @@
       <workItem from="1647338828096" duration="9624000" />
       <workItem from="1647431345466" duration="1258000" />
       <workItem from="1647508632685" duration="26338000" />
-      <workItem from="1647594865021" duration="24457000" />
-    </task>
-    <task id="LOCAL-00042" summary="Completely redisgned GUI">
-      <created>1643904820665</created>
-      <option name="number" value="00042" />
-      <option name="presentableId" value="LOCAL-00042" />
-      <option name="project" value="LOCAL" />
-      <updated>1643904820665</updated>
+      <workItem from="1647594865021" duration="24503000" />
+      <workItem from="1648472466138" duration="8049000" />
     </task>
     <task id="LOCAL-00043" summary="Refactored GUI organisation">
       <created>1644068943085</created>
@@ -572,7 +567,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647616427569</updated>
     </task>
-    <option name="localTasksCounter" value="91" />
+    <task id="LOCAL-00091" summary="Started moving TkGui panes to seperate classes - continue when back">
+      <created>1647622069872</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1647622069872</updated>
+    </task>
+    <option name="localTasksCounter" value="92" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -603,7 +605,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Simplified set_delay_time function in DelayPanes.py" />
     <MESSAGE value="General refactoring and work on plt integration in DelayPanes.py" />
     <MESSAGE value="Fixed a few plotting bugs and implemented a new way of calculating natural log interpolation (wasn't working for start values greater than 0)" />
     <MESSAGE value="Fixed a few plotting bugs and implemented a new way of calculating log interpolations (wasn't working for starting values greater than 0)" />
@@ -628,7 +629,8 @@
     <MESSAGE value="Fixed reapy socket closing unexpectedly (hopefully!)" />
     <MESSAGE value="More work on fixing unexpected socket closing (hopefully got it this time)" />
     <MESSAGE value="Implemented preset pane to load jsons" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implemented preset pane to load jsons" />
+    <MESSAGE value="Started moving TkGui panes to seperate classes - continue when back" />
+    <option name="LAST_COMMIT_MESSAGE" value="Started moving TkGui panes to seperate classes - continue when back" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -649,7 +651,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1647614170414" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1647621495369" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1648498764373" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

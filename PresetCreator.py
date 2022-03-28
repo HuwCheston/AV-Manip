@@ -62,6 +62,7 @@ class PresetPane:
             tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
             self.presets_combo
         ]
+        organise_pane(tk_list=self.tk_list)
 
     def open_preset_folder(self):
         """Prompts for the user to select a directory to search for valid preset files in"""
@@ -339,3 +340,8 @@ class PresetCreator:
         for item in self.manip_options.winfo_children():
             item.pack_forget()
         self.filename = None
+
+
+def organise_pane(tk_list, col_num=1, px=10, py=1):
+    for row_num, b in enumerate(tk_list):
+        b.grid(row=row_num, column=col_num, padx=px, pady=py)
