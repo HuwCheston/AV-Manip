@@ -10,24 +10,20 @@ import threading
 import scipy.stats as stats
 
 # TODO: all classes should have the option to delay audio and video separately
-# TODO: set up all other delay panes to inherit shared methods from a single class
 
 
-class DelayFromFile:
-    def __init__(self, root: tk.Tk, params: dict, keythread, gui,):
-        self.params = params
-        self.root = root
-        self.gui = gui
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.keythread = keythread
+class DelayFromFile(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         self.file = None  # Used as placeholder until file loaded in
 
-        self.frame_1, self.delay_time_entry, self.label_1 = get_tk_entry(t1='Time:', frame=self.tk_frame)
+        self.frame_1, self.delay_time_entry, self.label_1 = self.get_tk_entry(t1='Time:')
         self.delay_time_entry.insert(0, str(self.params['*delay time']))
         self.delay_time_entry.config(state='readonly')  # We don't need to modify the delay time directly
-        self.frame_2, self.resample_entry, self.label_2 = get_tk_entry(t1='Resample:', frame=self.tk_frame)
+        self.frame_2, self.resample_entry, self.label_2 = self.get_tk_entry(t1='Resample:')
         self.resample_entry.insert(0, '1000')
-        self.frame_3, self.baseline_entry, self.label_2 = get_tk_entry(t1='Baseline:', frame=self.tk_frame)
+        self.frame_3, self.baseline_entry, self.label_2 = self.get_tk_entry(t1='Baseline:')
         self.baseline_entry.insert(0, '50')
 
         self.multiplier = tk.DoubleVar()
@@ -72,7 +68,7 @@ class DelayFromFile:
             self.plot_hist_button,
             self.frame_1,
         ]
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
     def open_file(self):
         filetypes = (
@@ -90,7 +86,7 @@ class DelayFromFile:
 
     def scale_array(self, array):
         # Get the baseline and multiplier values given by the user
-        baseline = try_get_entry(entry=self.baseline_entry)
+        baseline = self.try_get_entry(entry=self.baseline_entry)
         multiplier = self.multiplier.get()
 
         # If we inserted a non-integer value into the baseline entry, return the array and print a warning to the GUI
@@ -120,7 +116,7 @@ class DelayFromFile:
 
     def start_file_delay(self):
         # Try and get the resample rate given by the user
-        resample = try_get_entry(self.resample_entry)
+        resample = self.try_get_entry(self.resample_entry)
         # If we gave a non-integer resample value, quit the function, reset all the manipulations, and print to the GUI
         if resample is None:
             self.gui.log_text(text='Non-integer resample value inserted: delay aborted.')
@@ -198,15 +194,12 @@ class DelayFromFile:
             self.baseline_entry['state'] = 'normal'
 
 
-class FixedDelay:
-    def __init__(self, root: tk.Tk, params: dict, keythread, gui):
-        self.params = params
-        self.root = root
-        self.gui = gui
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.keythread = keythread
+class FixedDelay(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(t1='Time:', frame=self.tk_frame)
+        self.frame_1, self.entry_1, self.label_1 = self.get_tk_entry(t1='Time:',)
         self.entry_1.insert(0, str(self.params['*delay time']))
 
         self.combo = self.get_tk_combo()
@@ -214,7 +207,7 @@ class FixedDelay:
                                             command=lambda: [
                                                 self.keythread.enable_manip(manip='delayed',
                                                                             button=self.start_delay_button),
-                                                set_delay_time(d_time=try_get_entry(self.entry_1),
+                                                set_delay_time(d_time=self.try_get_entry(self.entry_1),
                                                                params=self.params,
                                                                reathread=self.keythread.reathread)
                                             ],
@@ -226,7 +219,7 @@ class FixedDelay:
             self.combo,
             self.start_delay_button,
         ]
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
     def get_tk_combo(self):
         preset_list = [v for (k, v) in self.params["*delay time presets"].items()]
@@ -239,21 +232,18 @@ class FixedDelay:
         return combo
 
 
-class VariableDelay:
-    def __init__(self, params, root: tk.Tk, keythread, gui,):
-        self.params = params
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.keythread = keythread
-        self.gui = gui
+class VariableDelay(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
 
         self.dist = None
         self.delay_value = float
         self.delay_time = float
 
-        self.frame_1, self.entry_1, self.label_1 = get_tk_entry(t1='Low:', frame=self.tk_frame)
-        self.frame_2, self.entry_2, self.label_2 = get_tk_entry(t1='High:', frame=self.tk_frame)
-        self.frame_3, self.resample_entry, self.label_3 = get_tk_entry(t1='Resample:', frame=self.tk_frame)
+        self.frame_1, self.entry_1, self.label_1 = self.get_tk_entry(t1='Low:',)
+        self.frame_2, self.entry_2, self.label_2 = self.get_tk_entry(t1='High:',)
+        self.frame_3, self.resample_entry, self.label_3 = self.get_tk_entry(t1='Resample:',)
         self.checkbutton = ttk.Checkbutton(self.tk_frame, text='Use as Resample Rate',
                                            command=self.checkbutton_func)
 
@@ -269,8 +259,7 @@ class VariableDelay:
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.start_variable_delay, daemon=True).start()],
                                             text='Start Delay')
-        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(t1='Delay Time:',
-                                                                                           frame=self.tk_frame)
+        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = self.get_tk_entry(t1='Delay Time:')
         self.delay_time_entry.config(state='readonly')
 
         self.tk_list = [tk.Label(self.tk_frame, text='Variable Delay'),
@@ -284,7 +273,7 @@ class VariableDelay:
                         self.delay_time_frame,
                         self.checkbutton
                         ]
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
     def checkbutton_func(self):
         self.resample_entry['state'] = 'readonly' if self.resample_entry['state'] == 'normal' else 'normal'
@@ -294,14 +283,17 @@ class VariableDelay:
         combo = ttk.Combobox(self.tk_frame, state='readonly',
                              values=[k for (k, _) in self.params['*var delay distributions'].items()])
         combo.set('Delay Distribution')
-        combo.bind('<<ComboboxSelected>>', lambda e: [self.label_1
-                   .configure(text=self.params['*var delay distributions'][combo.get()]['text'][0]),
-                                                      self.label_2
-                   .configure(text=self.params['*var delay distributions'][combo.get()]['text'][1])])
+        combo.bind(
+            '<<ComboboxSelected>>',
+            lambda e: [
+                self.label_1.configure(text=self.params['*var delay distributions'][combo.get()]['text'][0]),
+                self.label_2.configure(text=self.params['*var delay distributions'][combo.get()]['text'][1])
+            ]
+        )
         return combo
 
     def get_new_distribution(self, ):
-        val1, val2 = (try_get_entry(entry) for entry in [self.entry_1, self.entry_2])
+        val1, val2 = (self.try_get_entry(entry) for entry in [self.entry_1, self.entry_2])
         if [x for x in (val1, val2) if x is None]:
             self.gui.log_text(text='Non-integer distribution values inserted.')
             return
@@ -336,7 +328,7 @@ class VariableDelay:
 
     def start_variable_delay(self):
         # TODO: fix the occasional valueerror arising here
-        resample = try_get_entry(self.resample_entry)
+        resample = self.try_get_entry(self.resample_entry)
         # If we gave a non-integer resample value, quit the function, reset all the manipulations, and print to the GUI
         if resample is None:
             self.gui.log_text(text='Non-integer resample value inserted: delay aborted.')
@@ -371,26 +363,22 @@ class VariableDelay:
         return
 
 
-class IncrementalDelay:
-    def __init__(self, params, root: tk.Tk, keythread, gui,):
-        self.params = params
-        self.root = root
-        self.gui = gui
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.keythread = keythread
+class IncrementalDelay(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
 
         self.dist = None
         self.dist_unsmoothed = None
         self.delay_value = float
 
         self.combo = self.get_tk_combo()
-        self.frame_1, self.start_entry, self.label_1 = get_tk_entry(t1='Start:', frame=self.tk_frame)
-        self.frame_2, self.finish_entry, self.label_2 = get_tk_entry(t1='Finish:', frame=self.tk_frame)
-        self.frame_3, self.length_entry, self.label_3 = get_tk_entry(t1='Length:', frame=self.tk_frame)
-        self.frame_4, self.resample_entry, self.label_4 = get_tk_entry(t1='Resample:', frame=self.tk_frame)
+        self.frame_1, self.start_entry, self.label_1 = self.get_tk_entry(t1='Start:',)
+        self.frame_2, self.finish_entry, self.label_2 = self.get_tk_entry(t1='Finish:',)
+        self.frame_3, self.length_entry, self.label_3 = self.get_tk_entry(t1='Length:',)
+        self.frame_4, self.resample_entry, self.label_4 = self.get_tk_entry(t1='Resample:',)
 
-        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = get_tk_entry(t1='Delay Time:',
-                                                                                           frame=self.tk_frame)
+        self.delay_time_frame, self.delay_time_entry, self.delay_time_label = self.get_tk_entry(t1='Delay Time:',)
         self.delay_time_entry.config(state='readonly')
 
         self.get_new_space_button = tk.Button(self.tk_frame, command=self.get_new_space,
@@ -405,7 +393,7 @@ class IncrementalDelay:
                                                                          button=self.start_delay_button),
                                              threading.Thread(target=self.get_incremental_delay,
                                                               daemon=True)
-                                            .start()],
+                                                      .start()],
                                             text='Start Delay')
 
         self.tk_list = [tk.Label(self.tk_frame, text='Incremental Delay'),
@@ -420,7 +408,7 @@ class IncrementalDelay:
                         self.start_delay_button,
                         self.delay_time_frame,
                         ]
-        organise_pane(tk_list=self.tk_list)
+        self.organise_pane()
 
     def get_tk_combo(self):
         combo = ttk.Combobox(self.tk_frame, state='readonly',
@@ -430,7 +418,7 @@ class IncrementalDelay:
 
     def get_new_space(self):
         entries = [self.start_entry, self.finish_entry, self.length_entry, self.resample_entry]
-        (start, end, length, resample) = (try_get_entry(entry) for entry in entries)
+        (start, end, length, resample) = (self.try_get_entry(entry) for entry in entries)
 
         if str(self.combo.get()) == 'Linear':
             self.dist = np.linspace(start=start,
@@ -472,7 +460,7 @@ class IncrementalDelay:
         self.gui.log_text(f'Array flipped!')
 
     def plot_distribution(self, ):
-        delay_length = try_get_entry(self.length_entry)
+        delay_length = self.try_get_entry(self.length_entry)
         x = np.linspace(start=0, stop=delay_length, num=len(self.dist), endpoint=True)  # We always have to start at 0ms
 
         y = self.dist_unsmoothed
@@ -498,7 +486,7 @@ class IncrementalDelay:
 
     def get_incremental_delay(self):
         self.delay_time_entry.config(state='normal')
-        resample = try_get_entry(self.resample_entry) / 1000
+        resample = self.try_get_entry(self.resample_entry) / 1000
         start = time.time()
 
         # Iterate through our delay array
@@ -526,36 +514,6 @@ class IncrementalDelay:
         self.delay_time_entry.config(state='readonly')
 
 
-def get_tk_entry(frame, t1, t2='ms'):
-    frame = tk.Frame(frame)
-    label = tk.Label(frame, text=t1)
-    entry = tk.Entry(frame, width=5)
-    ms = tk.Label(frame, text=t2)
-    label.grid(row=1, column=1)
-    entry.grid(row=1, column=2)
-    ms.grid(row=1, column=3)
-    return frame, entry, label
-
-
-def try_get_entry(entry: tk.Entry):
-    """
-    This function takes a single tk entry and tries to get an integer value from it. If an integer value can be
-    obtained, it is returned. Otherwise, any value in the entry is deleted and replaced with NaN, and the function
-    returns None.
-    :param entry:
-    :return:
-    """
-
-    # Can get an integer value, so return it
-    try:
-        return int(entry.get())
-    # Can't get an integer value, so replace anything in the entry with NaN and return None
-    except ValueError:
-        entry.delete(0, 'end')
-        entry.insert(0, 'NaN')
-        return None
-
-
 def pack_distribution_display(fig):
     newwindow = tk.Toplevel()
     canvas = FigureCanvasTkAgg(fig, master=newwindow)
@@ -570,7 +528,3 @@ def set_delay_time(params, d_time: int, reathread=None):
     params['*delay time'] = d_time if 0 <= d_time < params['*max delay time'] else 0
     if reathread is not None:
         reathread.delayed_manip()
-
-def organise_pane(tk_list, col_num=1, px=10, py=1):
-    for row_num, b in enumerate(tk_list):
-        b.grid(row=row_num, column=col_num, padx=px, pady=py)

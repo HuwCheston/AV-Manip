@@ -53,7 +53,6 @@ class KeyThread:
                 b.config(bg="SystemButtonFace")
             except tkinter.TclError:
                 pass
-
         # Allows time for all threads relying on params being true to finish. This helps avoid the reaper socket closing
         # unexpectedly if it tries to execute two commands simultaneously (e.g. setting delay time, turning off fx)
         time.sleep(0.3)

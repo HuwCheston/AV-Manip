@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 import json
-import os
 
 
 manip_names = {

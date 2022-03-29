@@ -5,9 +5,10 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Gui panes now inherit from base class">
-      <change afterPath="$PROJECT_DIR$/GuiPanes.py" afterDir="false" />
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Moved Gui panes to separate file">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DelayPanes.py" beforeDir="false" afterPath="$PROJECT_DIR$/DelayPanes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PresetCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/PresetCreator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TkGui.py" beforeDir="false" afterPath="$PROJECT_DIR$/TkGui.py" afterDir="false" />
     </list>
@@ -230,14 +231,7 @@
       <workItem from="1647508632685" duration="26338000" />
       <workItem from="1647594865021" duration="24503000" />
       <workItem from="1648472466138" duration="8133000" />
-      <workItem from="1648541688259" duration="10758000" />
-    </task>
-    <task id="LOCAL-00046" summary="Refactored gui into a seperate TkGui class">
-      <created>1644079351229</created>
-      <option name="number" value="00046" />
-      <option name="presentableId" value="LOCAL-00046" />
-      <option name="project" value="LOCAL" />
-      <updated>1644079351229</updated>
+      <workItem from="1648541688259" duration="12833000" />
     </task>
     <task id="LOCAL-00047" summary="More work on TkGui.py">
       <created>1644081328599</created>
@@ -575,7 +569,14 @@
       <option name="project" value="LOCAL" />
       <updated>1648551537748</updated>
     </task>
-    <option name="localTasksCounter" value="95" />
+    <task id="LOCAL-00095" summary="Moved Gui panes to separate file">
+      <created>1648552688728</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1648552688728</updated>
+    </task>
+    <option name="localTasksCounter" value="96" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -606,7 +607,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Initial work on importing delay arrays from file" />
     <MESSAGE value="More work on delay from file" />
     <MESSAGE value="Implemented file delay scaling/multiplier" />
     <MESSAGE value="Implemented delay choice pane. Must fix resetting button colour bug!" />
@@ -631,7 +631,8 @@
     <MESSAGE value="Continued refactoring TkGui into classes" />
     <MESSAGE value="More refactoring" />
     <MESSAGE value="Gui panes now inherit from base class" />
-    <option name="LAST_COMMIT_MESSAGE" value="Gui panes now inherit from base class" />
+    <MESSAGE value="Moved Gui panes to separate file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Moved Gui panes to separate file" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -652,7 +653,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/test$main_MIGHT_WORK.coverage" NAME="main MIGHT WORK Coverage Results" MODIFIED="1639732688629" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1648550556214" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1648552427564" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1648554148599" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working.coverage" NAME="test working Coverage Results" MODIFIED="1641399553253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test.coverage" NAME="test working Coverage Results" MODIFIED="1641315252094" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/test$test_working_05_01_2022.coverage" NAME="main Coverage Results" MODIFIED="1641832996586" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
