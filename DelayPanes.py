@@ -2,6 +2,7 @@ import numpy as np
 import time
 import tkinter as tk
 from tkinter import ttk, filedialog
+from GuiPanes import ParentFrame
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.ticker import PercentFormatter
