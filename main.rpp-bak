@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.46/win64" 1648571684
+<REAPER_PROJECT 0.1 "6.46/win64" 1648574250
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -14,8 +14,8 @@
   TIMEMODE 1 5 -1 30 0 0 -1
   VIDEO_CONFIG 0 0 256
   PANMODE 3
-  CURSOR 16
-  ZOOM 196.52609062867103 2350 0
+  CURSOR 8
+  ZOOM 86.51762874198485 0 0
   VZOOMEX 6 79
   USE_REC_CFG 0
   RECMODE 1
@@ -57,8 +57,8 @@
   GLOBAL_AUTO -1
   TEMPO 120 4 4
   PLAYRATE 1 0 0.25 4
-  SELECTION 9.5 9.5
-  SELECTION2 9.5 9.5
+  SELECTION 0 0
+  SELECTION2 0 0
   MASTERAUTOMODE 0
   MASTERTRACKHEIGHT 145 0
   MASTERPEAKCOL 16576
@@ -122,41 +122,13 @@
       SHOW 0
       LASTSEL 0
       DOCKED 0
-      BYPASS 0 0 0
+      BYPASS 1 0 0
       <JS midi_delay ""
-        193 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        694 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {438D9420-182B-44A6-9C73-C06DA8DB907C}
       WAK 0 0
-    >
-    <ITEM
-      POSITION 8
-      SNAPOFFS 0
-      LENGTH 14.11192743764172
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0
-      FADEOUT 1 0 0 1 0 0 0
-      MUTE 0 0
-      SEL 1
-      IGUID {593057D2-BD2C-4D96-AFA5-46B57EDBBA88}
-      IID 120
-      NAME "01-Keys - Delay-220329_1733.mid"
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {BEAED4D7-D680-4E6F-AE12-1EB2DEA3635E}
-      RECPASS 48
-      <SOURCE MIDI
-        FILE "output\audio\01-Keys - Delay-220329_1733.mid" QN
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {211F6EDB-E35A-463A-A373-298BD53942F0}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 257
-      >
     >
   >
   <TRACK {04586083-9375-4649-8C21-B5E51BFFA343}
@@ -188,45 +160,17 @@
       SHOW 0
       LASTSEL 0
       DOCKED 0
-      BYPASS 0 0 0
+      BYPASS 1 0 0
       <JS midi_delay ""
-        193 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        694 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {A6D45B7B-A1D9-4AD0-AE49-7925D221CF7F}
       WAK 0 0
     >
-    <ITEM
-      POSITION 8
-      SNAPOFFS 0
-      LENGTH 14.11192743764172
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0
-      FADEOUT 1 0 0 1 0 0 0
-      MUTE 0 0
-      SEL 1
-      IGUID {339B5892-54BD-4D48-9E22-91704C0F4FE7}
-      IID 121
-      NAME "02-Drums - Delay-220329_1733.mid"
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {4F92724B-9CF5-419E-BCA7-D0FF0FE59B15}
-      RECPASS 48
-      <SOURCE MIDI
-        FILE "output\audio\02-Drums - Delay-220329_1733.mid" QN
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {F2EBB815-A6AA-4D20-B081-2E68A1BCD84F}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 258
-      >
-    >
   >
   <TRACK {B7C014B8-A4D6-4FF0-BF77-D8B1A368E9B0}
-    NAME Keys
+    NAME "Keys - Live"
     PEAKCOL 16576
     BEAT -1
     AUTOMODE 0
@@ -238,7 +182,7 @@
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
-    SEL 1
+    SEL 0
     REC 1 4096 1 0 0 0 0
     VU 2
     TRACKHEIGHT 145 0 0 0 0 0
@@ -278,37 +222,9 @@
       FXID {04E8D6CD-E060-4780-B09F-108BC94B923E}
       WAK 0 0
     >
-    <ITEM
-      POSITION 8
-      SNAPOFFS 0
-      LENGTH 14.09374149659864
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0
-      FADEOUT 1 0 0 1 0 0 0
-      MUTE 0 0
-      SEL 1
-      IGUID {E4A0937C-956F-4B6A-A72D-C7BBEE43B0E4}
-      IID 122
-      NAME 03-Keys-220329_1733.mid
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {EA861B7D-7549-45CE-8269-E5F0F92FE718}
-      RECPASS 48
-      <SOURCE MIDI
-        FILE "output\audio\03-Keys-220329_1733.mid" QN
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {1E753DE5-C96A-4F20-BE8A-4CC1FC1EA3CA}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 259
-      >
-    >
   >
   <TRACK {D63DD6FE-741A-4DB0-ACE0-F09EADBFC0DB}
-    NAME Drums
+    NAME "Drums - Live"
     PEAKCOL 16576
     BEAT -1
     AUTOMODE 0
@@ -357,34 +273,6 @@
     <ITEM
       POSITION 8
       SNAPOFFS 0
-      LENGTH 14.09374149659864
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0
-      FADEOUT 1 0 0 1 0 0 0
-      MUTE 0 0
-      SEL 1
-      IGUID {E699249C-FCDA-436B-97C6-4889068952D8}
-      IID 123
-      NAME 04-Drums-220329_1733.mid
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {BE85E63D-3584-4650-AB9D-65DCA078A869}
-      RECPASS 48
-      <SOURCE MIDI
-        FILE "output\audio\04-Drums-220329_1733.mid" QN
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {1D4B35ED-AEF8-4EE7-9572-1EEF4AC2EE81}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 260
-      >
-    >
-    <ITEM
-      POSITION 8
-      SNAPOFFS 0
       LENGTH -0.02473922902494
       LOOP 1
       ALLTAKES 0
@@ -423,7 +311,7 @@
     SEL 0
     REC 0 -1 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 145 0 0 0 -1 0
+    TRACKHEIGHT 60 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -475,10 +363,10 @@
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 -1 -1 -1
     FREEMODE 0
-    SEL 0
+    SEL 1
     REC 0 -1 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 145 0 0 0 -1 0
+    TRACKHEIGHT 60 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -612,7 +500,7 @@
     SEL 0
     REC 0 -1 1 2 0 0 0
     VU 2
-    TRACKHEIGHT 145 0 0 0 -1 0
+    TRACKHEIGHT 60 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1

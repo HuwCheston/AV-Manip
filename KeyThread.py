@@ -65,6 +65,8 @@ class KeyThread:
         # Start the recording in both reathread and for all of our camthreads
         self.reathread.start_recording(bpm)
         _ = [threading.Thread(target=cam.cam_write.start_recording).start() for cam in self.camthread]
+        # TODO: check that recording the delayed video works!
+        __ = [threading.Thread(target=cam.performer_cam_write.start_recording).start() for cam in self.camthread]
         self.params['*recording'] = True    # This parameter is used to add text onto the camera view
         self.gui.log_text(text=f'Started recording at {datetime.datetime.now().strftime("%H:%M:%S")}')
 
@@ -75,5 +77,6 @@ class KeyThread:
         self.reathread.stop_recording()
         for cam in self.camthread:
             cam.cam_write.stop_recording()
+            cam.performer_cam_write.stop_recording()
         self.params['*recording'] = False    # This parameter is used to remove text from the camera view
         self.gui.log_text(text=f'Finished recording at {datetime.datetime.now().strftime("%H:%M:%S")}')

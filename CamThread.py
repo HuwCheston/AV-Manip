@@ -33,7 +33,8 @@ class CamThread:
                                                      params=self.params)
         self.performer_cam_view = PerformerCamView(source=self.source, queue=self.performer_cam_queue,
                                                    params=self.params)
-        self.cam_write = CamWrite(source=self.source,)
+        self.cam_write = CamWrite(source=self.source, windowname='Rec')
+        self.performer_cam_write = CamWrite(source=self.source, windowname='View')
 
         # Start threads
         classes = [self.cam_read, self.researcher_cam_view, self.performer_cam_view]
@@ -268,15 +269,16 @@ class CamWrite:
     # If you run into FileNotFound errors when importing ffmpeg-python, make sure that ffmpeg.exe is placed in the
     # Python/Scripts directory of your environment.
 
-    def __init__(self, source: int):
+    def __init__(self, source: int, windowname):
         self.source = source
-        self.window_name = f"Cam {self.source + 1} Rec"
+        self.ext = windowname
+        self.window_name = f"Cam {self.source + 1} {self.ext}"
         self.process = None
 
     def start_recording(self):
         # On high-resolution monitors, gdigrab may display black padding around the captured video. I'd suggest
         # changing your monitor display resolution/scaling if this is an issue, as I can't find a workaround in ffmpeg.
-        filename = f'output/video/{datetime.now().strftime("%y%m%d_%H%M")}_cam{self.source + 1}_out.avi'
+        filename = f'output/video/{datetime.now().strftime("%y%m%d_%H%M")}_cam{self.source + 1}_{self.ext}_out.avi'
         p = (
             ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={self.window_name}", loglevel='warning',
                          probesize='500M').output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080')
