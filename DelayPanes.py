@@ -199,15 +199,15 @@ class FixedDelay(ParentFrame):
         # Inherit from parent class
         super().__init__(**kwargs)
 
-        self.frame_1, self.entry_1, self.label_1 = self.get_tk_entry(t1='Time:',)
-        self.entry_1.insert(0, str(self.params['*delay time']))
+        self.frame_1, self.delay_time_entry, self.label_1 = self.get_tk_entry(t1='Time:', )
+        self.delay_time_entry.insert(0, str(self.params['*delay time']))
 
         self.combo = self.get_tk_combo()
         self.start_delay_button = tk.Button(self.tk_frame,
                                             command=lambda: [
                                                 self.keythread.enable_manip(manip='delayed',
                                                                             button=self.start_delay_button),
-                                                set_delay_time(d_time=self.try_get_entry(self.entry_1),
+                                                set_delay_time(d_time=self.try_get_entry(self.delay_time_entry),
                                                                params=self.params,
                                                                reathread=self.keythread.reathread)
                                             ],
@@ -227,8 +227,8 @@ class FixedDelay(ParentFrame):
                              values=[f'{k} - {v} msec' for (k, v) in self.params["*delay time presets"].items()])
         combo.set('Delay Time Presets')
         combo.bind("<<ComboboxSelected>>",
-                   lambda e: [self.entry_1.delete(0, 'end'),
-                              self.entry_1.insert(0, str(preset_list[combo.current()]))])
+                   lambda e: [self.delay_time_entry.delete(0, 'end'),
+                              self.delay_time_entry.insert(0, str(preset_list[combo.current()]))])
         return combo
 
 

@@ -3,7 +3,9 @@ from tkinter import messagebox, scrolledtext, ttk, filedialog
 from PresetCreator import PresetCreator
 import webbrowser
 import json
+import csv
 import os
+from random import shuffle
 
 
 class ParentFrame:
@@ -162,7 +164,7 @@ class ManipChoicePane(ParentFrame):
         combo.set('Choose a Manipulation')
         # Create the necessary pane whenever a new manipulation is selected
         combo.bind("<<ComboboxSelected>>",
-                   lambda e: self.gui.add_manip_to_frame(pane=self.gui.manip_panes[combo.get()]))
+                   lambda e: self.gui.add_manip_to_root(pane=self.gui.manip_panes[combo.get()]))
         # Return the combobox so it can be added to the list and packed
         return combo
 
@@ -250,15 +252,18 @@ class PresetPane(ParentFrame):
         # Initialise basic parameters
         self.presets_dir = './input/'
         self.presets_list = []
+        self.default_path = './output/'
         # Initialise the preset selector combobox with default functionality (i.e. no presets loaded)
-        self.presets_combo = ttk.Combobox(self.tk_frame, state='readonly',)
+        self.presets_combo = ttk.Combobox(self.tk_frame, state='readonly', width=30)
         self.reset_preset_combo()
         # These widgets should be packed in TkGui
         self.tk_list = [
             tk.Label(self.tk_frame, text='Presets'),
             tk.Button(self.tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
             tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
-            self.presets_combo
+            self.presets_combo,
+            tk.Button(self.tk_frame, text='Randomise Presets', command=self.randomise_presets),
+            tk.Button(self.tk_frame, text='Save Preset Order', command=self.save_preset_order)
         ]
         self.organise_pane()
 
@@ -282,7 +287,11 @@ class PresetPane(ParentFrame):
         jsons = [f for f in os.listdir(self.presets_dir) if f.endswith('.json')]
         # Iterate through our json files and add those that are valid to our preset list
         for js in jsons:
+            # Load in the json
             f = json.loads(open(self.presets_dir + '/' + js, 'r').read())
+            # Add the json filename as a parameter to the dictionary we just created
+            f['JSON Filename'] = js.removesuffix('.json')
+            # Add the json to the preset list if it is valid
             if self.check_json(js=f):
                 self.presets_list.append(f)
         # We only want to update the functionality of our combobox if valid presets have been loaded
@@ -295,18 +304,20 @@ class PresetPane(ParentFrame):
         # This key should always be present in any valid .JSON made for use with this software
         if 'Manipulation' not in js:
             return False
-        # TODO: check that this works in cases where a checkbutton is used
+
+        # TODO: Add more checks in here: disabled for now for ease of using Delay From File presets
         # If the user entered nothing in a field, discard the JSON
-        elif any(v == '' for v in js.values()):
-            return False
+        # elif any(v == '' for v in js.values()):
+        #     return False
+
         # If the json passes the above checks, it is valid
         else:
             return True
 
     def populate_preset_combo(self):
         """Populates the preset combobox with valid preset files"""
-        # Format the string to display in the combobox, including the manipulation name & preset number
-        presets = [f'Preset {num + 1}: {k["Manipulation"]}' for (num, k) in enumerate(self.presets_list)]
+        # Format the string to display in the combobox, including the json filename & preset number
+        presets = [f'{num + 1}:  {k["JSON Filename"]}, {k["Manipulation"]}' for (num, k) in enumerate(self.presets_list)]
         # Update the combobox values and default text
         self.presets_combo.config(values=presets)
         self.presets_combo.set('Select Preset')
@@ -320,7 +331,7 @@ class PresetPane(ParentFrame):
         # The combobox doesn't display the full preset, so get this from the JSON list using the index
         selected_preset = self.presets_list[combo_ind]
         # Send this information to TkGui to create the correct pane and fill in the values
-        print(selected_preset)
+        self.gui.preset_handler(selected_preset)
 
     def reset_preset_combo(self):
         """Resets the functionality and appearance of the preset combobox"""
@@ -335,3 +346,47 @@ class PresetPane(ParentFrame):
         """Creates a new toplevel window to allow the user to create preset files"""
         pc = PresetCreator(root=self.root)
         pc.create_window()
+
+    def randomise_presets(self):
+        """Shuffles the loaded presets and populates the combobox with the new list"""
+        # We don't want to shuffle if we haven't loaded any presets in yet!
+        if len(self.presets_list) > 0:
+            shuffle(self.presets_list)
+            self.populate_preset_combo()
+        # If we haven't loaded in any presets, reset the combobox for safety
+        else:
+            self.reset_preset_combo()
+
+    def save_preset_order(self):
+        """Saves the order of loaded in presets to a .csv file"""
+        # Convert the current order of presets to a .csv file
+        to_csv = self.preset_order_to_csv()
+        # Prompt for a location to save the .csv
+        save_dir = self.file_save()
+        # Save the .csv file
+        with open(save_dir, 'w', newline='') as output_file:
+            dict_writer = csv.DictWriter(output_file, list(to_csv[0].keys()))
+            dict_writer.writeheader()
+            dict_writer.writerows(to_csv)
+
+    def preset_order_to_csv(self):
+        # Iterate through the presets list and generate the lines for the .csv file
+        to_csv = []
+        for (num, preset) in enumerate(self.presets_list):
+            dic = {
+                'Preset Number': num + 1,
+                'Manipulation': preset['Manipulation'],
+                'JSON Filename': preset['JSON Filename'] + '.json'
+            }
+            to_csv.append(dic)
+        return to_csv
+
+    def file_save(self):
+        """Ask for where to save the .csv preset order"""
+        path_to_pref = filedialog.asksaveasfilename(
+            defaultextension='.json', filetypes=[("csv files", '*.csv')],
+            initialdir=self.default_path,
+            title="Choose filename")
+        if path_to_pref is None:    # asksaveasfile returns None if dialog closed with cancel
+            return self.default_path + '.csv'
+        return path_to_pref
