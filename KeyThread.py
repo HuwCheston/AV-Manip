@@ -42,6 +42,7 @@ class KeyThread:
         self.gui.log_text(text=f'{manip} now active.')
 
     def reset_manips(self):
+        # TODO: refactor this into seperate functions
         self.gui.log_text(text='Resetting...')
         self.params['*reset video'] = True  # This param is reset to False by CamThread once resetting has completed
         for param in self.params.keys():

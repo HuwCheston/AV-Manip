@@ -31,6 +31,12 @@ class TkGui:
             'Control Audio': ControlPane,
             'Flip Video': FlipPane
         }
+        self.kwargs = {
+            "root": self.root,
+            "keythread": self.keythread,
+            "params": self.params,
+            "gui": self
+        }
 
     def tk_setup(self):
         info_pane = InfoPane(root=self.root, keythread=self.keythread, params=self.params, gui=self)
@@ -47,6 +53,7 @@ class TkGui:
                 frame.grid_forget()
         new_pane = pane(root=self.root, keythread=self.keythread, params=self.params, gui=self)
         new_pane.tk_frame.grid(column=5, row=1, sticky='n', padx=10, pady=10)
+        self.buttons_list = [widget for widget in new_pane.tk_list if isinstance(widget, tk.Button)]
 
     def log_text(self, text):
         self.logging_window.config(state='normal')
@@ -55,17 +62,53 @@ class TkGui:
         self.logging_window.config(state='disabled')
 
 
-class InfoPane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
+class ParentFrame:
+    def __init__(self, **kwargs):
+        self.root = kwargs.get('root')
+        self.params = kwargs.get('params')
+        self.keythread = kwargs.get('keythread')
+        self.gui = kwargs.get('gui')
         self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
+        self.tk_list = []
+
+    def organise_pane(self, col_num=1, px=10, py=1):
+        for row_num, b in enumerate(self.tk_list):
+            b.grid(row=row_num, column=col_num, padx=px, pady=py)
+
+    def populate_class(self, manip_str, arg=None,):
+        lis = []
+        for k in self.params.keys():
+            if k.startswith(manip_str):
+                b = tk.Button(self.tk_frame, text=k.title())
+                if arg is not None:
+                    b.config(fg='black',
+                             command=lambda manip=k, button=b: [self.keythread.enable_manip(manip, button), arg()])
+                else:
+                    b.config(fg='black', command=lambda manip=k, button=b: [self.keythread.enable_manip(manip, button)])
+                lis.append(b)
+        return lis
+
+
+class FlipPane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
+        # Store all widgets in a list
+        b_list = self.populate_class(manip_str='flip',)
+        self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
+        # Pack all the widgets in our list into the frame
+        self.organise_pane()
+
+
+class InfoPane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
+        # We want this frame to look different to the others, so let's override the parent tk_frame attribute
         self.tk_frame = tk.Frame(self.root, padx=10, pady=1)
         self.logging_window = self.init_logging_window()
         self.tk_list = [i for sublist in [self.init_labels(), [self.logging_window]] for i in sublist]
-        organise_pane(tk_list=self.tk_list, px=0, py=0)
+        self.organise_pane(px=0, py=0)
 
     def init_labels(self):
         labels = [
@@ -96,19 +139,12 @@ class InfoPane:
         return log
 
 
-class CommandPane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
-
-        # Master frame for this pane (all other widgets should use this as their root)
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
+class CommandPane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         # These frames and entries are used to enter desired BPM and number of bars to count-in by
         bpm_frame, bpm_entry = self.init_bpm_entry()
-
         # Store all widgets in a list
         self.tk_list = [
             tk.Label(self.tk_frame, text='Commands'),
@@ -121,7 +157,7 @@ class CommandPane:
             tk.Button(self.tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
         # Pack all the widgets in our list into the frame
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
     def init_info_popup(self):
         # Format the screen resolution by getting info from the params file
@@ -140,16 +176,12 @@ class CommandPane:
         return bpm_frame, bpm_entry
 
 
-class ManipChoicePane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
-
+class ManipChoicePane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         self.tk_list = [tk.Label(self.tk_frame, text='Manipulations'), self.init_combo()]
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
     def init_combo(self):
         # Fill the combobox options with the possible manipulations
@@ -159,17 +191,11 @@ class ManipChoicePane:
         combo.bind("<<ComboboxSelected>>", lambda e: self.gui.add_manip_to_frame(pane=self.gui.manip_panes[combo.get()]))
         return combo
 
-class PausePane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
 
-        # Master frame for this pane (all other widgets should use this as their root)
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-
+class PausePane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         # Store all widgets in a list
         self.tk_list = [
             tk.Label(self.tk_frame, text='Pause'),
@@ -179,7 +205,7 @@ class PausePane:
             self.init_pause_both(),
         ]
         # Pack all the widgets in our list into the frame
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
     def init_pause_audio(self):
         b = tk.Button(
@@ -208,69 +234,37 @@ class PausePane:
         return b
 
 
-class LoopPane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
-
+class LoopPane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         # Store all widgets in a list
-        b_list = populate_class(manip_str='loop', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        b_list = self.populate_class(manip_str='loop',)
         self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Looper')], b_list] for i in sublist]
-
         # Pack all the widgets in our list into the frame
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
 
-class BlankPane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
-
+class BlankPane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         # Store all widgets in a list
-        b_list = populate_class(manip_str='blank', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        b_list = self.populate_class(manip_str='blank',)
         self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
-
         # Pack all the widgets in our list into the frame
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
 
-# TODO: these generic classes should all inherit from another class
-class ControlPane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
-
+class ControlPane(ParentFrame):
+    def __init__(self, **kwargs):
+        # Inherit from parent class
+        super().__init__(**kwargs)
         # Store all widgets in a list
-        b_list = populate_class(manip_str='control', frame=self.tk_frame, params=self.params, keythread=self.keythread)
+        b_list = self.populate_class(manip_str='control')
         self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
-
         # Pack all the widgets in our list into the frame
-        organise_pane(tk_list=self.tk_list,)
-
-
-class FlipPane:
-    def __init__(self, root, params, keythread, gui):
-        self.root = root
-        self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
-        self.params = params
-        self.keythread = keythread
-        self.gui = gui
-
-        # Store all widgets in a list
-        b_list = populate_class(manip_str='flip', frame=self.tk_frame, params=self.params, keythread=self.keythread)
-        self.tk_list = [i for sublist in [[tk.Label(self.tk_frame, text='Flip')], b_list] for i in sublist]
-
-        # Pack all the widgets in our list into the frame
-        organise_pane(tk_list=self.tk_list,)
+        self.organise_pane()
 
 
 def organise_pane(tk_list, col_num=1, px=10, py=1):

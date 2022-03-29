@@ -189,6 +189,7 @@ class PerformerCamView:
                 case {'loop rec': True}:
                     self._manip_loop_rec(frame, loop_params)
 
+                # TODO: catch error when no loop recorded
                 case {'loop play': True}:
                     frame = self._manip_loop_play(loop_params)
 
