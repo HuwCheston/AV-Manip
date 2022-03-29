@@ -1,5 +1,4 @@
 import reapy
-import time
 
 # On certain machines (or a portable Reaper install), you may need to repeat the process of configuring Reapy every
 # time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
@@ -15,7 +14,7 @@ class ReaTrack:
     def __init__(self, project: reapy.Project, track_name: str, track_index: int, vst: str):
         # Set the track name and arm it for recording
         self.track = project.tracks[track_index]
-        self.track.name = track_name
+        self.track.name = track_name + ' - Delay'
         self.track.set_info_value('I_RECARM', 1)
 
         # If any of these FX don't exist, these lines will add them in.
@@ -28,7 +27,7 @@ class ReaTrack:
         ]
 
         # This FX should not normally be touched, as it's used to convert the MIDI into audio
-        self.vsti = self.track.add_fx(name=vst, input_fx=False, even_if_exists=False)
+        # self.vsti = self.track.add_fx(name=vst, input_fx=False, even_if_exists=False)
 
 
 class ReaThread:

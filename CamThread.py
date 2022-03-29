@@ -276,7 +276,7 @@ class CamWrite:
     def start_recording(self):
         # On high-resolution monitors, gdigrab may display black padding around the captured video. I'd suggest
         # changing your monitor display resolution/scaling if this is an issue, as I can't find a workaround in ffmpeg.
-        filename = f'output/video/{datetime.now().strftime("%d-%m-%y_%H.%M.%S")}_cam{self.source + 1}_out.avi'
+        filename = f'output/video/{datetime.now().strftime("%y%m%d_%H%M")}_cam{self.source + 1}_out.avi'
         p = (
             ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={self.window_name}", loglevel='warning',
                          probesize='500M').output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080')
