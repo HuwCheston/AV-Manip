@@ -44,10 +44,13 @@ def keep_focus(func):
 
 
 class PresetPane:
-    def __init__(self, root: tk.Tk):
+    def __init__(self, root, params, keythread, gui):
         """This class creates a pane in TkGui that enables the user to load and create manipulation presets"""
         # Initialise basic parameters
         self.root = root
+        self.params = params
+        self.keythread = keythread
+        self.gui = gui
         self.presets_dir = './input/'
         self.presets_list = []
         # All widgets should go into this tk_pane, which should be accessed in TkGui and packed
@@ -62,7 +65,7 @@ class PresetPane:
             tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
             self.presets_combo
         ]
-        organise_pane(tk_list=self.tk_list)
+        organise_pane(tk_list=self.tk_list,)
 
     def open_preset_folder(self):
         """Prompts for the user to select a directory to search for valid preset files in"""

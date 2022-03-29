@@ -13,7 +13,7 @@ import scipy.stats as stats
 
 
 class DelayFromFile:
-    def __init__(self, root: tk.Tk, params: dict, keythread, gui, col_num):
+    def __init__(self, root: tk.Tk, params: dict, keythread, gui,):
         self.params = params
         self.root = root
         self.gui = gui
@@ -71,7 +71,7 @@ class DelayFromFile:
             self.plot_hist_button,
             self.frame_1,
         ]
-        organise_pane(tk_list=self.tk_list, col_num=col_num)
+        organise_pane(tk_list=self.tk_list,)
 
     def open_file(self):
         filetypes = (
@@ -198,7 +198,7 @@ class DelayFromFile:
 
 
 class FixedDelay:
-    def __init__(self, root: tk.Tk, params: dict, keythread, gui, col_num):
+    def __init__(self, root: tk.Tk, params: dict, keythread, gui):
         self.params = params
         self.root = root
         self.gui = gui
@@ -225,7 +225,7 @@ class FixedDelay:
             self.combo,
             self.start_delay_button,
         ]
-        organise_pane(tk_list=self.tk_list, col_num=col_num)
+        organise_pane(tk_list=self.tk_list,)
 
     def get_tk_combo(self):
         preset_list = [v for (k, v) in self.params["*delay time presets"].items()]
@@ -239,7 +239,7 @@ class FixedDelay:
 
 
 class VariableDelay:
-    def __init__(self, params, root: tk.Tk, keythread, gui, col_num):
+    def __init__(self, params, root: tk.Tk, keythread, gui,):
         self.params = params
         self.root = root
         self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
@@ -283,7 +283,7 @@ class VariableDelay:
                         self.delay_time_frame,
                         self.checkbutton
                         ]
-        organise_pane(tk_list=self.tk_list, col_num=col_num)
+        organise_pane(tk_list=self.tk_list,)
 
     def checkbutton_func(self):
         self.resample_entry['state'] = 'readonly' if self.resample_entry['state'] == 'normal' else 'normal'
@@ -371,7 +371,7 @@ class VariableDelay:
 
 
 class IncrementalDelay:
-    def __init__(self, params, root: tk.Tk, keythread, gui, col_num):
+    def __init__(self, params, root: tk.Tk, keythread, gui,):
         self.params = params
         self.root = root
         self.gui = gui
@@ -419,7 +419,7 @@ class IncrementalDelay:
                         self.start_delay_button,
                         self.delay_time_frame,
                         ]
-        organise_pane(tk_list=self.tk_list, col_num=col_num)
+        organise_pane(tk_list=self.tk_list)
 
     def get_tk_combo(self):
         combo = ttk.Combobox(self.tk_frame, state='readonly',
@@ -570,6 +570,6 @@ def set_delay_time(params, d_time: int, reathread=None):
     if reathread is not None:
         reathread.delayed_manip()
 
-def organise_pane(tk_list, col_num, px=10, py=1):
+def organise_pane(tk_list, col_num=1, px=10, py=1):
     for row_num, b in enumerate(tk_list):
         b.grid(row=row_num, column=col_num, padx=px, pady=py)
