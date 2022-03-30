@@ -17,6 +17,7 @@ class DelayFromFile(ParentFrame):
         # Inherit from parent class
         super().__init__(**kwargs)
         self.file = None  # Used as placeholder until file loaded in
+        self.orig_file = None
 
         self.frame_1, self.delay_time_entry, self.label_1 = self.get_tk_entry(t1='Time:')
         self.delay_time_entry.insert(0, str(self.params['*delay time']))
@@ -95,18 +96,24 @@ class DelayFromFile(ParentFrame):
             return array
 
         else:
-            # Transpose the array to match the baseline
-            func = lambda x: (x - array.min() + baseline)
-            array = func(array)
-
+            # Scale the array by the multiplier value
+            scale = lambda x: (x * multiplier)
+            scaled_array = scale(array)
+            # Transpose the array onto the baseline value
+            amount_to_subtract = scaled_array.min() - baseline
+            transpose = lambda x: (x - amount_to_subtract)
+            scaled_array = transpose(scaled_array)
+            # Round the array to the nearest integer
+            scaled_array = np.rint(scaled_array)
             # Return an array scaled to the multiplier
             # TODO: Raise exception if new max value is now below the baseline!
-            return np.interp(array, (array.min(), array.max()), (array.min(), array.max() * multiplier))
+            return scaled_array
 
     def file_to_array(self, filename):
         # TODO: Improve this error catching process... will do for now. e.g. should make sure all elements are ints
         try:
             self.file = np.genfromtxt(filename, delimiter=',', dtype=int)
+            self.orig_file = self.file
         except TypeError:  # This will trigger if the user cancels out of the file select window
             self.gui.log_text("Couldn't convert file to array!")
         else:
@@ -139,7 +146,7 @@ class DelayFromFile(ParentFrame):
 
         loop_var = 0
         while self.params['delayed']:
-            # We need to start a timer so we know how long it took to execute all the code when waiting for the resample
+            # We need to start a timer so we know how long it took to execute all the code below
             start_time = time.time()
             # If the count-in hasn't finished, we don't want to start delaying yet
             if self.keythread.reathread.project.play_position < self.keythread.reathread.project.markers[1].position:
@@ -147,7 +154,7 @@ class DelayFromFile(ParentFrame):
                 set_delay_time(params=self.params, d_time=0, reathread=self.keythread.reathread)
                 self.delay_time_entry.delete(0, 'end')
                 loop_var = 0
-                time.sleep(1)
+                time.sleep(0.3)
             else:
                 # Get next value from array
                 i = self.file[loop_var]
@@ -185,6 +192,7 @@ class DelayFromFile(ParentFrame):
         ax.plot(range(len(self.file)), self.file)
         ax.set_ylabel('Delay (ms)')
         ax.set_xlabel('Delay Resample')
+        ax.set_ylim(0, self.orig_file.max())
         ax.set_title("Delay from File: progression")
         pack_distribution_display(fig)
 
