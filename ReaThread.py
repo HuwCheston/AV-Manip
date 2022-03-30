@@ -1,4 +1,5 @@
 import reapy
+import time
 
 # On certain machines (or a portable Reaper install), you may need to repeat the process of configuring Reapy every
 # time you close and open Reaper. To do this, run the enable_distant_api.py script in Reaper (via Actions -> Show
@@ -39,7 +40,7 @@ class ReaThread:
                              ReaTrack(project=self.project, track_name='Drums', track_index=1, vst='MT-PowerDrumKit',)]
         self.countin = self.project.tracks[self.project.n_tracks-1]
 
-    def start_recording(self, bpm):
+    def start_recording(self, bpm, auto_stop_bool=False, auto_stop_dur=0):
         # Sets the project BPM to value inputted by user (or to default provided in UserParams, if none provided in GUI)
         self.project.bpm = bpm if bpm is not None else self.params['*default bpm']
         # Sets the playback cursor to the position of the first marker, the start of the count-in

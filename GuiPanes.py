@@ -119,20 +119,42 @@ class CommandPane(ParentFrame):
         # Inherit from parent class
         super().__init__(**kwargs)
         # These frames and entries are used to enter desired BPM and number of bars to count-in by
-        bpm_frame, bpm_entry = self.init_bpm_entry()
+        bpm_frame, self.bpm_entry = self.init_bpm_entry()
+        # This checkbutton is used to indicate whether the user wants to stop the recording after a certain time
+        self.checkbutton_var = tk.BooleanVar()
+        checkbutton = ttk.Checkbutton(self.tk_frame, text='Auto Stop?', var=self.checkbutton_var,)
+        # These frames and entries are used to enter desired recording length
+        dur_frame, self.dur_entry = self.init_record_duration_entry()
         # Store all widgets in a list
         self.tk_list = [
             tk.Label(self.tk_frame, text='Commands'),
-            tk.Button(self.tk_frame, text='Start Recording',
-                      command=lambda: self.keythread.start_recording(bpm=self.try_get_entry(bpm_entry))),
+            tk.Button(self.tk_frame, text='Start Recording', command=lambda: self.record_button_func()),
             tk.Button(self.tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
             bpm_frame,
+            # checkbutton,
+            # dur_frame,
             tk.Button(self.tk_frame, text="Reset", command=self.keythread.reset_manips),
             tk.Button(self.tk_frame, text='Info', command=self.init_info_popup),
             tk.Button(self.tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
         # Pack all the widgets in our list into the frame
         self.organise_pane()
+
+    def record_button_func(self):
+        dur = self.try_get_entry(self.dur_entry)
+        if self.checkbutton_var.get() is True and dur is not None:
+            func = self.keythread.start_recording(
+                bpm=self.try_get_entry(self.bpm_entry),
+                auto_stop_bool=True,
+                auto_stop_dur=dur
+            )
+        else:
+            func = self.keythread.start_recording(
+                bpm=self.try_get_entry(self.bpm_entry),
+                auto_stop_bool=False,
+                auto_stop_dur=0
+            )
+        return func
 
     def init_info_popup(self):
         # Format the screen resolution by getting info from the params file
@@ -149,6 +171,13 @@ class CommandPane(ParentFrame):
         bpm_frame, bpm_entry, _ = self.get_tk_entry(t1='Tempo:', t2='BPM')
         bpm_entry.insert('end', self.params['*default bpm'])
         return bpm_frame, bpm_entry
+
+    def init_record_duration_entry(self):
+        dur_frame, dur_entry, _ = self.get_tk_entry(t1='Rec Duration:', t2='s')
+        return dur_frame, dur_entry
+
+    def auto_stop_func(self):
+        pass
 
 
 class ManipChoicePane(ParentFrame):

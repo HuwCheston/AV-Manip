@@ -59,18 +59,31 @@ class KeyThread:
         self.reathread.reset_manips()
         self.gui.log_text(text='done!')
 
-    def start_recording(self, bpm):
+    def start_recording(self, bpm, auto_stop_bool=False, auto_stop_dur=0):
         # We need to reset all of our manips before starting the recording (can turn them on after)
         self.reset_manips()
         # Start the recording in both reathread and for all of our camthreads
-        self.reathread.start_recording(bpm)
+        self.reathread.start_recording(bpm, auto_stop_bool, auto_stop_dur)
         _ = [threading.Thread(target=cam.cam_write.start_recording).start() for cam in self.camthread]
-        # TODO: check that recording the delayed video works!
         __ = [threading.Thread(target=cam.performer_cam_write.start_recording).start() for cam in self.camthread]
         self.params['*recording'] = True    # This parameter is used to add text onto the camera view
         self.gui.log_text(text=f'Started recording at {datetime.datetime.now().strftime("%H:%M:%S")}')
+        if auto_stop_bool and auto_stop_dur >= 1:
+            threading.Thread(target=self.auto_stop_recording, args=(auto_stop_dur,)).start()
+
+    def auto_stop_recording(self, auto_stop_dur):
+        count = 0
+        while self.params['*recording']:
+            # If we haven't passed the count-down yet, don't start the auto-stop process
+            if not self.reathread.project.play_position < self.reathread.project.markers[1].position:
+                if count >= auto_stop_dur:
+                    self.stop_recording()
+                else:
+                    count += 1
+                    time.sleep(1)
 
     def stop_recording(self):
+        self.params['*recording'] = False    # This parameter is used to remove text from the camera view
         # We need to reset all of our manips before stopping the recording (can turn them on after)
         self.reset_manips()
         # Stop the recording in both reathread and for all our camthreads
@@ -78,5 +91,4 @@ class KeyThread:
         for cam in self.camthread:
             cam.cam_write.stop_recording()
             cam.performer_cam_write.stop_recording()
-        self.params['*recording'] = False    # This parameter is used to remove text from the camera view
         self.gui.log_text(text=f'Finished recording at {datetime.datetime.now().strftime("%H:%M:%S")}')

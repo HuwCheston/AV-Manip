@@ -9,15 +9,14 @@ class TkGui:
         self.params = params
         self.keythread = keythread
         self.logging_window = None  # This attribute will be set later when we pack our default_panes
-        # TODO: is this attribute needed later?
-        # self.file_delay = None
 
         # These are the panes that should be active at all times, and are packed at startup
+        self.info_pane, self.command_pane, self.preset_pane, self.manip_choice_pane = InfoPane, CommandPane, PresetPane, ManipChoicePane
         self.default_panes = [
-            InfoPane,
-            CommandPane,
-            PresetPane,
-            ManipChoicePane
+            self.info_pane,
+            self.command_pane,
+            self.preset_pane,
+            self.manip_choice_pane,
         ]
         # These are the manip panes we have available. Whenever a new choice is selected in the ManipChoicePane
         # combobox, the relevent class will be selected from the list and its frame packed into the GUI.

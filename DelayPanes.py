@@ -139,6 +139,8 @@ class DelayFromFile(ParentFrame):
 
         loop_var = 0
         while self.params['delayed']:
+            # We need to start a timer so we know how long it took to execute all the code when waiting for the resample
+            start_time = time.time()
             # If the count-in hasn't finished, we don't want to start delaying yet
             if self.keythread.reathread.project.play_position < self.keythread.reathread.project.markers[1].position:
                 self.gui.log_text(text='Waiting for end of count-in to start delay...')
@@ -159,8 +161,14 @@ class DelayFromFile(ParentFrame):
                 if loop_var == len(self.file):
                     self.gui.log_text(text='Reached the end of array, looping back to start.')
                     loop_var = 0
-                # Wait for the resample length before continuing
-                time.sleep(resample)
+                # Calculate how long it has taken to carry out all the above actions
+                pre_resample_time = time.time()
+                # Wait for the resample rate minus the time it has taken for the above actions
+                time.sleep(resample-(pre_resample_time-start_time))
+                # Log the array position and the actual resample time in the GUI (for monitoring)
+                end_time = time.time()
+                self.gui.log_text(text=f'{loop_var}/{len(self.file)}')
+                self.gui.log_text(text=f'{round(end_time-start_time, 2)}')
 
         # Once delaying has finished, delete anything in the delay time entry and reset states
         self.delay_time_entry.delete(0, 'end')
@@ -335,6 +343,7 @@ class VariableDelay(ParentFrame):
             self.keythread.reset_manips()
             return
         # Convert resample rate to seconds
+        resample = int(self.delay_time_entry.get()) if 'selected' in self.checkbutton.state() else resample
         resample /= 1000
 
         # Check if a distribution has been created: if not, print to the GUI and quit the function
@@ -350,11 +359,19 @@ class VariableDelay(ParentFrame):
         self.resample_entry.config(state='readonly')
 
         while self.params['delayed']:
+            # Get the time before carrying out the delay
+            start_time = time.time()
             self.delay_value = abs(np.random.choice(self.dist))
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, str(round(self.delay_value)))
             set_delay_time(params=self.params, d_time=self.delay_value, reathread=self.keythread.reathread)
-            time.sleep(int(self.delay_time_entry.get()) / 1000 if 'selected' in self.checkbutton.state() else resample)
+            # Calculate how long it has taken to carry out all the above actions
+            pre_resample_time = time.time()
+            # Wait for the resample rate minus the time it has taken for the above actions
+            time.sleep(resample - (pre_resample_time - start_time))
+            # Log the actual resample time in the GUI (for monitoring)
+            end_time = time.time()
+            self.gui.log_text(text=f'{round(end_time - start_time, 2)}')
 
         # Reset states of entry windows
         self.delay_time_entry.delete(0, 'end')
@@ -491,13 +508,19 @@ class IncrementalDelay(ParentFrame):
 
         # Iterate through our delay array
         for num in self.dist:
+            start_time = time.time()
             self.delay_time_entry.delete(0, 'end')
             self.delay_time_entry.insert(0, num)
             set_delay_time(params=self.params, d_time=int(num), reathread=self.keythread.reathread)
-
             # If we're still delaying, wait for the resample rate
             if self.params['delayed']:
-                time.sleep(resample)
+                # Calculate how long it has taken to carry out all the above actions
+                pre_resample_time = time.time()
+                # Wait for the resample rate minus the time it has taken for the above actions
+                time.sleep(resample - (pre_resample_time - start_time))
+                # Log the actual resample time in the GUI (for monitoring)
+                end_time = time.time()
+                self.gui.log_text(text=f'{round(end_time - start_time, 2)}')
             else:
                 break
 

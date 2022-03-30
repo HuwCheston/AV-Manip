@@ -1,7 +1,7 @@
 # These parameters can be edited by the user before running the program and should adjust system settings automatically
 cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
 user_params = {
-    '*participants': 1,     # Number of cameras/tracks to try and read
+    '*participants': 2,     # Number of cameras/tracks to try and read
     # TODO: set this value to create more tracks in ReaThread if not enough exist already
     '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)
     '*resolution': '640x480',   # Camera resolution (for researcher view and recording)
