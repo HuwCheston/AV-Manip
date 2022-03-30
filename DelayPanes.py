@@ -164,7 +164,10 @@ class DelayFromFile(ParentFrame):
                 # Calculate how long it has taken to carry out all the above actions
                 pre_resample_time = time.time()
                 # Wait for the resample rate minus the time it has taken for the above actions
-                time.sleep(resample-(pre_resample_time-start_time))
+                try:
+                    time.sleep(resample-(pre_resample_time-start_time))
+                except ValueError:
+                    time.sleep(resample)
                 # Log the array position and the actual resample time in the GUI (for monitoring)
                 end_time = time.time()
                 self.gui.log_text(text=f'{loop_var}/{len(self.file)}')

@@ -280,8 +280,19 @@ class CamWrite:
         # changing your monitor display resolution/scaling if this is an issue, as I can't find a workaround in ffmpeg.
         filename = f'output/video/{datetime.now().strftime("%y%m%d_%H%M")}_cam{self.source + 1}_{self.ext}_out.avi'
         p = (
-            ffmpeg.input(format='gdigrab', framerate="30", filename=f"title={self.window_name}", loglevel='warning',
-                         probesize='500M').output(filename=filename, pix_fmt='yuv420p', video_size='1920x1080')
+            ffmpeg.input(
+                format='gdigrab',
+                framerate="30",
+                filename=f"title={self.window_name}",
+                loglevel='warning',
+                probesize='500M',
+                draw_mouse=0,
+            )
+            .output(
+                filename=filename,
+                pix_fmt='yuv420p',
+                video_size='1920x1080'
+            )
         )
         self.process = p.run_async(pipe_stdin=True)
 
