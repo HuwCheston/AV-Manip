@@ -280,6 +280,7 @@ class PresetPane(ParentFrame):
             tk.Button(self.tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
             tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
             self.presets_listbox,
+            tk.Button(self.tk_frame, text='-', command=self.remove_preset),
             tk.Button(self.tk_frame, text='Randomise Presets', command=self.randomise_presets),
             tk.Button(self.tk_frame, text='Save Preset Order', command=self.save_preset_order),
         ]
@@ -288,7 +289,7 @@ class PresetPane(ParentFrame):
     def open_preset_folder(self):
         """Prompts for the user to select a directory to search for valid preset files in"""
         # Open the directory
-        f = tk.filedialog.askdirectory(title='Open presets folder', initialdir=self.presets_dir,)
+        f = filedialog.askdirectory(title='Open presets folder', initialdir=self.presets_dir,)
         # Tk askdirectory returns None if dialog closed with cancel
         if f == '':
             return
@@ -345,8 +346,9 @@ class PresetPane(ParentFrame):
 
     def preset_selected(self, selected):
         """Opens the selected preset pane in the GUI"""
-        selected_preset = self.presets_list[selected]
-        self.gui.preset_handler(selected_preset)
+        if len(self.presets_list) > 0:
+            selected_preset = self.presets_list[selected]
+            self.gui.preset_handler(selected_preset)
 
     def open_preset_creator(self):
         """Creates a new toplevel window to allow the user to create preset files"""
@@ -389,7 +391,7 @@ class PresetPane(ParentFrame):
     def csv_file_save(self):
         """Ask for where to save the .csv preset order"""
         path_to_pref = filedialog.asksaveasfilename(
-            defaultextension='.json', filetypes=[("csv files", '*.csv')],
+            defaultextension='.csv', filetypes=[("csv files", '*.csv')],
             initialdir=self.default_path,
             title="Choose filename"
         )
@@ -401,6 +403,17 @@ class PresetPane(ParentFrame):
         """Readjust the underlying presets list when presets are dragged-dropped in the listbox"""
         self.presets_list.remove(selected)
         self.presets_list.insert(index, selected)
+
+    def remove_preset(self):
+        try:
+            self.presets_list.pop(self.presets_listbox.cur_index)
+        except IndexError:
+            pass
+        finally:
+            if len(self.presets_list) > 0:
+                self.populate_preset_listbox()
+            elif len(self.presets_list) == 0:
+                self.presets_listbox.clear_listbox()
 
 
 class PresetListbox(tk.Listbox):
