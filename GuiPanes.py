@@ -165,7 +165,8 @@ class ManipChoicePane(ParentFrame):
     def __init__(self, **kwargs):
         # Inherit from parent class
         super().__init__(**kwargs)
-        self.tk_list = [tk.Label(self.tk_frame, text='Manipulations'), self.init_combo()]
+        self.combo = self.init_combo()
+        self.tk_list = [tk.Label(self.tk_frame, text='Manipulations'), self.combo]
         self.organise_pane()
 
     def init_combo(self) -> ttk.Combobox:
@@ -405,19 +406,24 @@ class PresetPane(ParentFrame):
         self.presets_list.insert(index, selected)
 
     def remove_preset(self):
+        """Removes the selected preset from the listbox"""
+        # Try and remove the selected element from the preset list
         try:
             self.presets_list.pop(self.presets_listbox.cur_index)
+        # If an element isn't selected, cur_index will return None - so need to catch error
         except IndexError:
             pass
         finally:
+            # Refresh the listbox if there are still presets in our presets_list
             if len(self.presets_list) > 0:
                 self.populate_preset_listbox()
+            # Else, clear the listbox and remove its functionality
             elif len(self.presets_list) == 0:
                 self.presets_listbox.clear_listbox()
 
 
 class PresetListbox(tk.Listbox):
-    """A listbox for loaded presets with drag and drop reordering of entries."""
+    """A listbox holding loaded loaded presets with drag and drop reordering of entries."""
     def __init__(self, tk_frame, presetpane, **kw):
         kw['selectmode'] = tk.SINGLE
         tk.Listbox.__init__(self, tk_frame, kw)
@@ -471,7 +477,7 @@ class PresetListbox(tk.Listbox):
         self.set_listbox_apperance()
 
     def populate_listbox(self, presets: list):
-        """Enable the listbox functionality and fill it with the selected presets"""
+        """Enable the listbox functionality and fill it with presets"""
         self.init_listbox_func()
         self.delete(0, 'end')
         # Iterate through the list of presets
