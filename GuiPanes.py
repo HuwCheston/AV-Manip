@@ -120,41 +120,19 @@ class CommandPane(ParentFrame):
         super().__init__(**kwargs)
         # These frames and entries are used to enter desired BPM and number of bars to count-in by
         bpm_frame, self.bpm_entry = self.init_bpm_entry()
-        # This checkbutton is used to indicate whether the user wants to stop the recording after a certain time
-        self.checkbutton_var = tk.BooleanVar()
-        checkbutton = ttk.Checkbutton(self.tk_frame, text='Auto Stop?', var=self.checkbutton_var,)
-        # These frames and entries are used to enter desired recording length
-        dur_frame, self.dur_entry = self.init_record_duration_entry()
         # Store all widgets in a list
         self.tk_list = [
             tk.Label(self.tk_frame, text='Commands'),
-            tk.Button(self.tk_frame, text='Start Recording', command=lambda: self.record_button_func()),
+            tk.Button(self.tk_frame, text='Start Recording',
+                      command=lambda: self.keythread.start_recording(bpm=self.try_get_entry(self.bpm_entry))),
             tk.Button(self.tk_frame, text='Stop Recording', command=self.keythread.stop_recording),
             bpm_frame,
-            # checkbutton,
-            # dur_frame,
             tk.Button(self.tk_frame, text="Reset", command=self.keythread.reset_manips),
             tk.Button(self.tk_frame, text='Info', command=self.init_info_popup),
             tk.Button(self.tk_frame, text="Quit", command=self.keythread.exit_loop),
         ]
         # Pack all the widgets in our list into the frame
         self.organise_pane()
-
-    def record_button_func(self):
-        dur = self.try_get_entry(self.dur_entry)
-        if self.checkbutton_var.get() is True and dur is not None:
-            func = self.keythread.start_recording(
-                bpm=self.try_get_entry(self.bpm_entry),
-                auto_stop_bool=True,
-                auto_stop_dur=dur
-            )
-        else:
-            func = self.keythread.start_recording(
-                bpm=self.try_get_entry(self.bpm_entry),
-                auto_stop_bool=False,
-                auto_stop_dur=0
-            )
-        return func
 
     def init_info_popup(self):
         # Format the screen resolution by getting info from the params file
@@ -171,13 +149,6 @@ class CommandPane(ParentFrame):
         bpm_frame, bpm_entry, _ = self.get_tk_entry(t1='Tempo:', t2='BPM')
         bpm_entry.insert('end', self.params['*default bpm'])
         return bpm_frame, bpm_entry
-
-    def init_record_duration_entry(self):
-        dur_frame, dur_entry, _ = self.get_tk_entry(t1='Rec Duration:', t2='s')
-        return dur_frame, dur_entry
-
-    def auto_stop_func(self):
-        pass
 
 
 class ManipChoicePane(ParentFrame):
@@ -282,17 +253,16 @@ class PresetPane(ParentFrame):
         self.presets_dir = './input/'
         self.presets_list = []
         self.default_path = './output/'
-        # Initialise the preset selector combobox with default functionality (i.e. no presets loaded)
-        self.presets_combo = ttk.Combobox(self.tk_frame, state='readonly', width=30)
-        self.reset_preset_combo()
+        # Initialise the preset selector listbox
+        self.presets_listbox = PresetListbox(tk_frame=self.tk_frame, presetpane=self)
         # These widgets should be packed in TkGui
         self.tk_list = [
             tk.Label(self.tk_frame, text='Presets'),
             tk.Button(self.tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
             tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
-            self.presets_combo,
+            self.presets_listbox,
             tk.Button(self.tk_frame, text='Randomise Presets', command=self.randomise_presets),
-            tk.Button(self.tk_frame, text='Save Preset Order', command=self.save_preset_order)
+            tk.Button(self.tk_frame, text='Save Preset Order', command=self.save_preset_order),
         ]
         self.organise_pane()
 
@@ -310,11 +280,18 @@ class PresetPane(ParentFrame):
 
     def get_jsons_from_dir(self):
         """Searches through a directory for preset files and adds them to a list if they're valid"""
-        # Reset the combobox to neutral
-        self.reset_preset_combo()
+        # Reset the presets list to neutral
+        self.presets_list.clear()
         # Get all the json files in our directory
         jsons = [f for f in os.listdir(self.presets_dir) if f.endswith('.json')]
         # Iterate through our json files and add those that are valid to our preset list
+        self.iterate_through_jsons(jsons)
+        # We only want to update the functionality of our combobox if valid presets have been loaded
+        if len(self.presets_list) > 0:
+            self.populate_preset_listbox()
+
+    def iterate_through_jsons(self, jsons):
+        """Iterate through our json files and add those that are valid to our preset list"""
         for js in jsons:
             # Load in the json
             f = json.loads(open(self.presets_dir + '/' + js, 'r').read())
@@ -323,9 +300,6 @@ class PresetPane(ParentFrame):
             # Add the json to the preset list if it is valid
             if self.check_json(js=f):
                 self.presets_list.append(f)
-        # We only want to update the functionality of our combobox if valid presets have been loaded
-        if len(self.presets_list) > 0:
-            self.populate_preset_combo()
 
     @staticmethod
     def check_json(js: dict):
@@ -333,43 +307,27 @@ class PresetPane(ParentFrame):
         # This key should always be present in any valid .JSON made for use with this software
         if 'Manipulation' not in js:
             return False
-
         # TODO: Add more checks in here: disabled for now for ease of using Delay From File presets
         # If the user entered nothing in a field, discard the JSON
         # elif any(v == '' for v in js.values()):
         #     return False
-
         # If the json passes the above checks, it is valid
         else:
             return True
 
-    def populate_preset_combo(self):
-        """Populates the preset combobox with valid preset files"""
+    def populate_preset_listbox(self):
+        """Populates the preset listbox with valid preset files"""
         # Format the string to display in the combobox, including the json filename & preset number
-        presets = [f'{num + 1}:  {k["JSON Filename"]}, {k["Manipulation"]}' for (num, k) in enumerate(self.presets_list)]
-        # Update the combobox values and default text
-        self.presets_combo.config(values=presets)
-        self.presets_combo.set('Select Preset')
-        # Enable the combobox functionality
-        self.presets_combo.bind("<<ComboboxSelected>>", lambda x: self.preset_combo_func())
+        presets = [f'{k["JSON Filename"]}, {k["Manipulation"]}' for k in self.presets_list]
+        # Clear the listbox out
+        self.presets_listbox.clear_listbox()
+        # Populate the listbox with the new functionality
+        self.presets_listbox.populate_listbox(presets=presets)
 
-    def preset_combo_func(self):
-        """Sends the preset selected in the combobox to TkGui"""
-        # Look through the list of combobox values, and get the index of the one selected.
-        combo_ind = self.presets_combo['values'].index(self.presets_combo.get())
-        # The combobox doesn't display the full preset, so get this from the JSON list using the index
-        selected_preset = self.presets_list[combo_ind]
-        # Send this information to TkGui to create the correct pane and fill in the values
+    def preset_selected(self, selected):
+        """Opens the selected preset pane in the GUI"""
+        selected_preset = self.presets_list[selected]
         self.gui.preset_handler(selected_preset)
-
-    def reset_preset_combo(self):
-        """Resets the functionality and appearance of the preset combobox"""
-        # Clear out any previously saved presets from the list
-        self.presets_list.clear()
-        # Reset the functionality of the combobox, the values displayed within it, and the default text
-        self.presets_combo.bind("<<ComboboxSelected>>", '')
-        self.presets_combo.configure(values=[])
-        self.presets_combo.set('No Presets Loaded!')
 
     def open_preset_creator(self):
         """Creates a new toplevel window to allow the user to create preset files"""
@@ -381,17 +339,17 @@ class PresetPane(ParentFrame):
         # We don't want to shuffle if we haven't loaded any presets in yet!
         if len(self.presets_list) > 0:
             shuffle(self.presets_list)
-            self.populate_preset_combo()
+            self.populate_preset_listbox()
         # If we haven't loaded in any presets, reset the combobox for safety
         else:
-            self.reset_preset_combo()
+            self.presets_listbox.clear_listbox()
 
     def save_preset_order(self):
         """Saves the order of loaded in presets to a .csv file"""
         # Convert the current order of presets to a .csv file
         to_csv = self.preset_order_to_csv()
         # Prompt for a location to save the .csv
-        save_dir = self.file_save()
+        save_dir = self.csv_file_save()
         # Save the .csv file
         with open(save_dir, 'w', newline='') as output_file:
             dict_writer = csv.DictWriter(output_file, list(to_csv[0].keys()))
@@ -399,23 +357,96 @@ class PresetPane(ParentFrame):
             dict_writer.writerows(to_csv)
 
     def preset_order_to_csv(self):
-        # Iterate through the presets list and generate the lines for the .csv file
+        """Iterate through the presets list and generate the lines for the .csv file"""
         to_csv = []
         for (num, preset) in enumerate(self.presets_list):
             dic = {
-                'Preset Number': num + 1,
-                'Manipulation': preset['Manipulation'],
-                'JSON Filename': preset['JSON Filename'] + '.json'
+                'Preset Number': num,
+                'JSON': preset
             }
             to_csv.append(dic)
         return to_csv
 
-    def file_save(self):
+    def csv_file_save(self):
         """Ask for where to save the .csv preset order"""
         path_to_pref = filedialog.asksaveasfilename(
             defaultextension='.json', filetypes=[("csv files", '*.csv')],
             initialdir=self.default_path,
-            title="Choose filename")
+            title="Choose filename"
+        )
         if path_to_pref is None:    # asksaveasfile returns None if dialog closed with cancel
             return self.default_path + '.csv'
         return path_to_pref
+
+    def shift_preset_list(self, selected, index):
+        """Readjust the underlying presets list when presets are dragged-dropped in the listbox"""
+        self.presets_list.remove(selected)
+        self.presets_list.insert(index, selected)
+
+
+class PresetListbox(tk.Listbox):
+    """ A listbox for loaded presets with drag and drop reordering of entries."""
+    def __init__(self, tk_frame, presetpane, **kw):
+        kw['selectmode'] = tk.SINGLE
+        tk.Listbox.__init__(self, tk_frame, kw)
+        self.presetpane = presetpane
+        self.cur_index = 1
+        self.clear_listbox()
+
+    def reset_listbox_func(self):
+        """Reset the functionality of the listbox if no presets have been loaded"""
+        self.bind('<Button-1>',)
+        self.bind('<Double-Button-1>',)
+        self.bind('<B1-Motion>',)
+
+    def init_listbox_func(self):
+        """If presets have been loaded, bind the correct functionality to the listbox"""
+        self.bind('<Button-1>', self.set_current)
+        self.bind('<Double-Button-1>', self.make_active)
+        self.bind('<B1-Motion>', self.shift_selection)
+
+    def set_current(self, event):
+        """Set the current index whenever a listbox element is clicked on"""
+        self.cur_index = self.nearest(event.y)
+
+    def make_active(self, event):
+        """Make the selected preset active in the GUI whenever it is double-clicked on"""
+        self.cur_index = self.nearest(event.y)
+        self.presetpane.preset_selected(self.cur_index)
+
+    def shift_selection(self, event):
+        """Allows the user to rearrange listbox elements by dragging and dropping them"""
+        i = self.nearest(event.y)
+        # Get the selected element from the presets list
+        selected = self.presetpane.presets_list[self.cur_index]
+        if i < self.cur_index:
+            x = self.get(i)
+            self.delete(i)
+            self.insert(i + 1, x)
+            self.cur_index = i
+        elif i > self.cur_index:
+            x = self.get(i)
+            self.delete(i)
+            self.insert(i - 1, x)
+            self.cur_index = i
+        self.presetpane.shift_preset_list(selected=selected, index=self.cur_index)
+
+    def clear_listbox(self):
+        """Clear the listbox and reset its functionality"""
+        self.reset_listbox_func()
+        self.delete(0, 'end')
+        self.insert(0, 'No presets loaded!')
+        self.set_listbox_apperance()
+
+    def populate_listbox(self, presets: list):
+        """Enable the listbox functionality and fill it with the selected presets"""
+        self.init_listbox_func()
+        self.delete(0, 'end')
+        # Iterate through the list of presets
+        for num, preset in enumerate(presets):
+            self.insert(num, preset)
+        self.set_listbox_apperance()
+
+    def set_listbox_apperance(self):
+        """Scale the listbox appearance to match the number of entries"""
+        self.config(width=0, height=0)
