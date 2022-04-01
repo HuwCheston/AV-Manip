@@ -93,7 +93,6 @@ class TkGui:
     def preset_handler(self, preset: dict):
         manip_pane = self.manip_panes[preset['Manipulation']]
         preset_pane = self.add_manip_to_root(pane=manip_pane)
-
         if preset['Manipulation'] == 'Delay From File':
             insert_into_entry(preset_pane.resample_entry, preset['Resample Rate'])
             if preset['Scale Delay']:

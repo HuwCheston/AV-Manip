@@ -9,19 +9,25 @@ from random import shuffle
 
 
 class ParentFrame:
+    """Parent frame inherited by other GUI panes, includes methods for creating/organising tk widgets"""
     def __init__(self, **kwargs):
+        # This is the root tk widget from which all panes are packed into
         self.root = kwargs.get('root')
         self.params = kwargs.get('params')
         self.keythread = kwargs.get('keythread')
         self.gui = kwargs.get('gui')
+        # These two attributes are important: all GUI widgets should be placed within them so they can be packed
         self.tk_frame = tk.Frame(self.root, borderwidth=2, relief="groove")
         self.tk_list = []
 
     def organise_pane(self, col_num=1, px=10, py=1):
+        """Organise all the widgets in the pane into the GUI"""
         for row_num, b in enumerate(self.tk_list):
             b.grid(row=row_num, column=col_num, padx=px, pady=py)
 
-    def populate_class(self, manip_str, arg=None,):
+    # TODO: this should probably be deprecated at some point
+    def populate_class(self, manip_str: str, arg=None,) -> list:
+        """Populates the tk_list with buttons according to a certain manip string"""
         lis = []
         for k in self.params.keys():
             if k.startswith(manip_str):
@@ -34,26 +40,24 @@ class ParentFrame:
                 lis.append(b)
         return lis
 
-    def get_tk_entry(self, t1='Default', t2='ms'):
+    def get_tk_entry(self, t1='Default', t2='ms') -> tuple[tk.Frame, tk.Entry, tk.Label]:
+        """Creates a frame with own Label-Entry-Label widgets, with customisable text. Frame must be in tk_list"""
+        # Create the frame - this will need to be included in tk_list
         frame = tk.Frame(self.tk_frame)
+        # Creates the widgets inside the frame, according to the text provided: these don't need to be gridded
         label = tk.Label(frame, text=t1)
         entry = tk.Entry(frame, width=5)
         ms = tk.Label(frame, text=t2)
+        # Grid the widgets
         label.grid(row=1, column=1)
         entry.grid(row=1, column=2)
         ms.grid(row=1, column=3)
+        # Return the frame (for including in tk_list), the entry (so values can be got), and the label
         return frame, entry, label
 
     @staticmethod
-    def try_get_entry(entry: tk.Entry):
-        """
-        This function takes a single tk entry and tries to get an integer value from it. If an integer value can be
-        obtained, it is returned. Otherwise, any value in the entry is deleted and replaced with NaN, and the function
-        returns None.
-        :param entry:
-        :return:
-        """
-
+    def try_get_entry(entry: tk.Entry) -> int | None:
+        """Takes a single entry widget and tries to get an integer value from it"""
         # Can get an integer value, so return it
         try:
             return int(entry.get())
@@ -65,6 +69,7 @@ class ParentFrame:
 
 
 class FlipPane(ParentFrame):
+    """Flips the performer's video. This is mostly useful for testing that manipulations are working."""
     def __init__(self, **kwargs):
         # Inherit from parent class
         super().__init__(**kwargs)
@@ -85,7 +90,7 @@ class InfoPane(ParentFrame):
         self.tk_list = [i for sublist in [self.init_labels(), [self.logging_window]] for i in sublist]
         self.organise_pane(px=0, py=0)
 
-    def init_labels(self):
+    def init_labels(self) -> list:
         labels = [
             '',
             'AV-Manip (v.0.1)',
@@ -96,7 +101,6 @@ class InfoPane(ParentFrame):
             'https://github.com/HuwCheston/AV-Manip/',
             'https://github.com/HuwCheston/',
         ]
-
         lablist = []
         for (label, url) in zip(labels, urls):
             lab = tk.Label(self.tk_frame, text=label)
@@ -107,7 +111,7 @@ class InfoPane(ParentFrame):
             lablist.append(lab)
         return lablist
 
-    def init_logging_window(self):
+    def init_logging_window(self) -> tk.scrolledtext.ScrolledText:
         log = tk.scrolledtext.ScrolledText(self.tk_frame, height=5, width=20,
                                            state='disabled', wrap='word', font='TkDefaultFont')
         log.insert('end', 'Started')
@@ -115,6 +119,7 @@ class InfoPane(ParentFrame):
 
 
 class CommandPane(ParentFrame):
+    """This pane is used to control the central functionality of the program, e.g. starting/stopping recording"""
     def __init__(self, **kwargs):
         # Inherit from parent class
         super().__init__(**kwargs)
@@ -134,31 +139,37 @@ class CommandPane(ParentFrame):
         # Pack all the widgets in our list into the frame
         self.organise_pane()
 
+    # TODO: would be nice to add some more info here - to do with Reaper?
     def init_info_popup(self):
+        """Creates a tk messagebox showing information e.g. number of active cameras, fps, resolution..."""
         # Format the screen resolution by getting info from the params file
         p_res = 'x'.join([str(round(int(i) * self.params['*scaling'])) for i in self.params['*resolution'].split('x')])
         # Create the messagebox
-        message = tk.messagebox.showinfo(title='Info',
-                                         message=f'Active cameras: {str(self.params["*participants"])}\n'
-                                                 f'Camera FPS: {str(self.params["*fps"])}\n'
-                                                 f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
-                                                 f'Performer Camera Resolution: {p_res}')
-        return message
+        _ = tk.messagebox.showinfo(
+            title='Info',
+            message=f'Active cameras: {str(self.params["*participants"])}\n'
+                    f'Camera FPS: {str(self.params["*fps"])}\n'
+                    f'Researcher Camera Resolution: {self.params["*resolution"]}\n'
+                    f'Performer Camera Resolution: {p_res}'
+        )
 
-    def init_bpm_entry(self):
+    def init_bpm_entry(self) -> tuple[tk.Frame, tk.Entry]:
+        """Returns frame/entry used to enter desired BPM value for recording"""
         bpm_frame, bpm_entry, _ = self.get_tk_entry(t1='Tempo:', t2='BPM')
         bpm_entry.insert('end', self.params['*default bpm'])
         return bpm_frame, bpm_entry
 
 
 class ManipChoicePane(ParentFrame):
+    """This pane is used to select a manipulation to be packed into the GUI"""
     def __init__(self, **kwargs):
         # Inherit from parent class
         super().__init__(**kwargs)
         self.tk_list = [tk.Label(self.tk_frame, text='Manipulations'), self.init_combo()]
         self.organise_pane()
 
-    def init_combo(self):
+    def init_combo(self) -> ttk.Combobox:
+        """Returns a combobox filled with the available manipulations listed in TkGui, creates pane when selected"""
         # Fill the combobox options with the possible manipulations
         combo = ttk.Combobox(self.tk_frame, state='readonly', values=[k for k in self.gui.manip_panes.keys()])
         combo.set('Choose a Manipulation')
@@ -170,6 +181,7 @@ class ManipChoicePane(ParentFrame):
 
 
 class PausePane(ParentFrame):
+    """Enables the user to pause the video and audio feedback participants receive"""
     def __init__(self, **kwargs):
         # Inherit from parent class
         super().__init__(**kwargs)
@@ -184,7 +196,9 @@ class PausePane(ParentFrame):
         # Pack all the widgets in our list into the frame
         self.organise_pane()
 
-    def init_pause_audio(self):
+    # TODO: do these all need to be functions? can we define them in __init__?
+    def init_pause_audio(self) -> tk.Button:
+        """Pause the audio in reathread"""
         b = tk.Button(
             self.tk_frame, text='Pause Audio', fg='black', command=lambda: [
                 self.keythread.enable_manip('pause audio', b),
@@ -193,7 +207,8 @@ class PausePane(ParentFrame):
         )
         return b
 
-    def init_pause_video(self):
+    def init_pause_video(self) -> tk.Button:
+        """Pause the video in all the camthreads"""
         b = tk.Button(
             self.tk_frame, text='Pause Video', fg='black', command=lambda: [
                 self.keythread.enable_manip('pause video', b)
@@ -201,7 +216,8 @@ class PausePane(ParentFrame):
         )
         return b
 
-    def init_pause_both(self):
+    def init_pause_both(self) -> tk.Button:
+        """Pause both the audio and video"""
         b = tk.Button(
             self.tk_frame, text='Pause Both', fg='black', command=lambda: [
                 self.keythread.enable_manip('pause video', b),
@@ -211,7 +227,9 @@ class PausePane(ParentFrame):
         return b
 
 
+# TODO: ensure that audio can be looped as well!
 class LoopPane(ParentFrame):
+    """Enables the user to loop a portion of video and play it back again later"""
     def __init__(self, **kwargs):
         # Inherit from parent class
         super().__init__(**kwargs)
@@ -245,6 +263,7 @@ class ControlPane(ParentFrame):
 
 
 class PresetPane(ParentFrame):
+    """Allows the user to create and load in presets as .JSON files"""
     def __init__(self, **kwargs):
         """This class creates a pane in TkGui that enables the user to load and create manipulation presets"""
         # Inherit from parent class
@@ -385,7 +404,7 @@ class PresetPane(ParentFrame):
 
 
 class PresetListbox(tk.Listbox):
-    """ A listbox for loaded presets with drag and drop reordering of entries."""
+    """A listbox for loaded presets with drag and drop reordering of entries."""
     def __init__(self, tk_frame, presetpane, **kw):
         kw['selectmode'] = tk.SINGLE
         tk.Listbox.__init__(self, tk_frame, kw)
