@@ -1,12 +1,17 @@
 # These parameters can be edited by the user before running the program and should adjust system settings automatically
 cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
 user_params = {
-    '*participants': 1,     # Number of cameras/tracks to try and read
     # TODO: set this value to create more tracks in ReaThread if not enough exist already
+    '*participants': 1,     # Number of cameras/tracks to try and read
+    '*polar mac addresses': [
+        'A0:9E:1A:AD:16:3B'
+    ],
+
     '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)
     '*resolution': '640x480',   # Camera resolution (for researcher view and recording)
     '*scaling': 2.0,     # Amount to scale up the performer camera view by
     '*exit time': 3,    # Number of seconds to wait before exiting the program
+
     '*default bpm': 120,    # The default BPM to use in Reaper: can be overridden in the GUI
     '*default count-in': 4,     # The default number of count-in bars to use in Reaper: can be overridden in the GUI
 

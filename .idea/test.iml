@@ -25,7 +25,7 @@
       <excludeFolder url="file://$MODULE_DIR$/Reaper/TrackTemplates" />
       <excludeFolder url="file://$MODULE_DIR$/Reaper/UserPlugins" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (AV-Manip) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
