@@ -5,6 +5,7 @@ from bleak import BleakClient
 import pandas as pd
 import time
 import pickle
+import sys
 
 pd.set_option('display.float_format', lambda x: '%.7f' % x)
 
@@ -52,9 +53,11 @@ class PolThread:
         """Send bytes to PMD Control to start data streams and keep them alive until the GUI is closed"""
         try:
             await self.client.connect()
+        # If no device was found, close PolThread
         except Exception as e:
-            print(e)
-        finally:
+            print(f'{e} Heartrate/PPG will not be tracked from this device!')
+            sys.exit()   # This keeps the rest of the app alive
+        else:
             # Send bytes to open PPG + HR streams
             await self.client.start_notify(UUID['PMD_Control'], self.report_init)
             await self.client.write_gatt_char(UUID['PMD_Control'], REQUEST_SETTINGS, response=True)
@@ -63,7 +66,13 @@ class PolThread:
             await self.client.start_notify(UUID['PMD_Data'], self.format_ppg)   # Receive PPG data
             await self.client.start_notify(UUID['HR_UUID'], self.format_hr)     # Receive HR data
             # Keep the connection alive until the signal is given to close
-            await self.running.wait()
+            await self.running.wait()   # Event set with call of polar.quit_python() in KeyThread
+            # Close the Control, PPG, and HR streams
+            await self.client.stop_notify(UUID['PMD_Control'])  # Stop PMD Control
+            await self.client.stop_notify(UUID['PMD_Data'], )  # Stop PPG data
+            await self.client.stop_notify(UUID['HR_UUID'])  # Stop HR data
+            # Disconnect from the client
+            await self.client.disconnect()
 
     def report_init(self, sender, data):
         """Report once correct response reported from device"""
@@ -128,14 +137,5 @@ class PolThread:
         return df_length
 
     def quit_polar(self):
-        """Stop receiving data, called when GUI closes to allow application to finish successfully"""
+        """Shut down the Bluetooth connection, called when GUI closes to allow application to finish successfully"""
         self.running.set()
-        threading.Thread(target=asyncio.run, args=(self._quit_polar(),)).start()
-
-    async def _quit_polar(self):
-        """Disconnect from the sensor"""
-        if self.client.is_connected:
-            await self.client.stop_notify(UUID['PMD_Control'])  # Stop PMD Control
-            await self.client.stop_notify(UUID['PMD_Data'], )  # Stop PPG data
-            await self.client.stop_notify(UUID['HR_UUID'])  # Stop HR data
-            await self.client.disconnect()

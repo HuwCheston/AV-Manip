@@ -2,7 +2,6 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/venv/Lib/site-packages" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/output/audio" />
       <excludeFolder url="file://$MODULE_DIR$/output/video" />
@@ -25,7 +24,7 @@
       <excludeFolder url="file://$MODULE_DIR$/Reaper/TrackTemplates" />
       <excludeFolder url="file://$MODULE_DIR$/Reaper/UserPlugins" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (AV-Manip) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (AV-Manip) (3)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
