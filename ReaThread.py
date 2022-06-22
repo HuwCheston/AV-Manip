@@ -11,7 +11,7 @@ import reapy
 
 
 class ReaTrack:
-    def __init__(self, project: reapy.Project, track_name: str, track_index: int, vst: str):
+    def __init__(self, project: reapy.Project, track_name: str, track_index: int,):
         # Set the track name and arm it for recording
         self.track = project.tracks[track_index]
         self.track.name = track_name + ' - Delay'
@@ -35,8 +35,8 @@ class ReaThread:
         # Initialise basic attributes
         self.project = reapy.Project()  # Initialise the Reaper project in Python
         self.params = params
-        self.participants = [ReaTrack(project=self.project, track_name='Keys', track_index=0, vst='CollaB3 (Collab)',),
-                             ReaTrack(project=self.project, track_name='Drums', track_index=1, vst='MT-PowerDrumKit',)]
+        self.participants = [ReaTrack(project=self.project, track_name='Drums', track_index=2, ),
+                             ReaTrack(project=self.project, track_name='Keys', track_index=6,)]
         self.countin = self.project.tracks[self.project.n_tracks-1]
 
     def start_recording(self, bpm,):
