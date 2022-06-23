@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 import tkinter
 from TkGui import TkGui
+from PolThread import PolThread
 
 
 class KeyThread:
@@ -10,15 +11,15 @@ class KeyThread:
                  params: dict,
                  stop_event: threading.Event,
                  reathread,
-                 camthread: list,
-                 polthread: list):
+                 camthread: list,):
         self.name = 'Keypress Manager'
         self.stop_event = stop_event
         self.params = params
+
         self.gui = TkGui(params=self.params, keythread=self)
+        self.polthread = [PolThread(address=add, params=params, logger=self.gui.log_text) for add in self.params['*polar mac addresses']]
         self.reathread = reathread
         self.camthread = camthread
-        self.polthread = polthread
         self.start_keymanager()
 
     def start_keymanager(self):
@@ -74,7 +75,7 @@ class KeyThread:
             threading.Thread(target=cam.performer_cam_write.start_recording, args=([record_start])).start()
         self.params['*recording'] = True  # This parameter is used to add text onto the camera view
         for pol in self.polthread:
-            self.gui.log_text(pol.start_polar(record_start))
+            pol.start_polar(record_start)
         self.gui.log_text(text=f'Started recording at {record_start.strftime("%H:%M:%S")}')
 
     def stop_recording(self):
@@ -87,5 +88,5 @@ class KeyThread:
             cam.cam_write.stop_recording()
             cam.performer_cam_write.stop_recording()
         for pol in self.polthread:
-            self.gui.log_text(pol.stop_polar())
+            pol.stop_polar()
         self.gui.log_text(text=f'Finished recording at {datetime.now().strftime("%H:%M:%S")}')

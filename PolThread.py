@@ -6,6 +6,7 @@ import pandas as pd
 import time
 import pickle
 import sys
+from typing import Callable
 
 pd.set_option('display.float_format', lambda x: '%.7f' % x)
 
@@ -49,14 +50,22 @@ OTHER_COLS = ['epoch_time', 'self_time', 'data', ]
 
 class PolThread:
     """Receives heart rate and PPG data from a single Polar Verity Sense unit over Bluetooth LE"""
-    def __init__(self, address, params):
+    def __init__(self, address, params, logger: Callable):
         self.running = asyncio.Event()
         self.address = address
         self.params = params
-        self.hr = []
-        self.ppg = []
-        self.ppi = []
-        self.acc = []
+        self.logger = logger
+
+        # Results are appended into the corresponding lists here
+        self.results = {
+            'hr': [],
+            'ppg': [],
+            'ppi': [],
+            'acc': []
+        }
+        # Used to log if its the first time a stream has reported data
+        self.is_firstrun = {k: True for k in self.results.keys()}
+
         self.timer = datetime.now()
         self.client = BleakClient(self.address)
         threading.Thread(target=asyncio.run, args=(self._init_polar(),)).start()
@@ -65,9 +74,9 @@ class PolThread:
         """Send bytes to PMD Control to start data streams and keep them alive until the GUI is closed"""
         try:
             await self.client.connect()
-        # If no device was found, close PolThread
+        # If no device was found, close PolThread and log the error in the GUI
         except Exception as e:
-            print(f'{e} Heartrate/PPG will not be tracked from this device!')
+            self.logger(f'{e} Heartrate/PPG will not be tracked from this device!')
             sys.exit()   # This keeps the rest of the app alive
         else:
             # Send bytes to open PPG + HR streams
@@ -81,7 +90,6 @@ class PolThread:
             await self.client.start_notify(UUID['HR_UUID'], self._format_hr)     # Receive HR data
             # Keep the connection alive until the signal is given to close
             await self.running.wait()   # Event set with call of polar.quit_python() in KeyThread
-
             # Close the Control, PPG, and HR streams
             try:
                 await self.client.stop_notify(UUID['PMD_Control'])  # Stop PMD Control
@@ -90,29 +98,39 @@ class PolThread:
                 # Disconnect from the client
                 await self.client.disconnect()
             except Exception as e:
-                print(e)
+                self.logger(f'{e}')
             finally:
                 sys.exit()
 
     def _report_init(self, _, data):
         """Report once correct response reported from device"""
         if data == bytearray(b'\xf0\x01\x01\x00\x00\x00\x01\x87\x00\x01\x01\x16\x00\x04\x01\x04'):  # success response
-            print(f'{self.address}: initialised')
+            self.logger(f'{self.address}: initialised')
 
     def _format_pmd_data(self, _, data):
-        """Gets timestamp from raw PPG bytes and appends Polar timestamp, OS timestamp, + PPG byte array to list"""
+        """Formats incoming stream from PMD_Data point, combines with OS timestamp and appends to required list"""
         li = [
             datetime.now().strftime(time_fmt),     # OS epoch time
             time.time() - self.timer.timestamp(),       # self time
             data        # data in form of bytesarray
         ]
-        if data[0] == 0x01 and self.params['*recording']:   # 0x01 first byte means that data is from the PPG stream
+        if data[0] == 0x01:   # 0x01 first byte means that data is from the PPG stream
             li.append(self._convert_to_timestamp(data, 1, 9).strftime(time_fmt))   # PPG stream also reports timestamp
-            self.ppg.append(li)  # polar reported timestamp
-        elif data[0] == 0x02 and self.params['*recording']:       # 0x02 first byte means that data is from ACC stream
-            self.acc.append(li)
-        elif data[0] == 0x03 and self.params['*recording']:     # 0x03 first byte means that data is from PPI stream
-            self.ppi.append(li)
+            self._append_results(stream='ppg', data=li)
+        elif data[0] == 0x02:       # 0x02 first byte means that data is from ACC stream
+            self._append_results(stream='acc', data=li)
+        elif data[0] == 0x03:     # 0x03 first byte means that data is from PPI stream
+            self._append_results(stream='ppi', data=li)
+
+    def _append_results(self, stream: str, data: list):
+        """Appends results to required list and logs when data is received for the first time"""
+        # Check if this is the first time data has been received from a stream and log in GUI if so
+        if self.is_firstrun[stream]:
+            self.logger(f'{self.address}:\n{stream.upper()} received')
+            self.is_firstrun[stream] = False
+        # If we're recording, append the results to the required list
+        if self.params['*recording']:
+            self.results[stream].append(data)
 
     @ staticmethod
     def _convert_to_timestamp(data, start, end):
@@ -126,26 +144,27 @@ class PolThread:
 
     def _format_hr(self, _, data):
         """Appends reported heart rate and current OS time to HR list"""
-        if self.params['*recording']:
-            self.hr.append(
-                (datetime.now().strftime(time_fmt),    # OS epoch time
-                 (time.time() - self.timer.timestamp()),    # self timer
-                 data[1],   # heart rate BPM
-                 )
-            )
+        li = [
+            datetime.now().strftime(time_fmt),    # OS epoch time
+            (time.time() - self.timer.timestamp()),    # self timer
+            data[1],   # heart rate BPM
+        ]
+        self._append_results(stream='hr', data=li)
 
     def start_polar(self, record_start):
-        """Starts appending data to HR/PPG lists"""
+        """Starts appending data to results lists"""
         self.timer = record_start
-        return f'{self.address} started'
+        self.logger(f'{self.address} started')
 
     def stop_polar(self):
         """Save and clear both data streams and report number of observations"""
-        hr = self._save_data(data=self.hr, cols=OTHER_COLS, ext='hr')
-        ppg = self._save_data(data=self.ppg, cols=PPG_COLS, ext='ppg')
-        acc = self._save_data(data=self.acc, cols=OTHER_COLS, ext='acc')
-        ppi = self._save_data(data=self.ppi, cols=OTHER_COLS, ext='ppi')
-        return self._report_results(streams=[hr, ppg, acc, ppi])
+        report_data = []
+        for k, v in self.results.items():
+            if k == 'ppg':
+                report_data.append(self._save_data(data=v, cols=PPG_COLS, ext=k))
+            else:
+                report_data.append(self._save_data(data=v, cols=OTHER_COLS, ext=k))
+        self.logger(self._report_results(streams=report_data))
 
     def _save_data(self, data, cols, ext='hr'):
         """Saves given data as dataframe and pickle object, returns length of dataframe for reporting"""
