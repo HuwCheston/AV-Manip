@@ -38,10 +38,10 @@ START_ACC = bytearray(      # Open ACC stream
 """Timestamp constants"""
 # According to the Polar technical documentation, the epoch time in polar sensors is 2000-01-01T00:00:00Z,
 # not the standard Unix 1970-01-01T00:00:00Z, so we need to offset this difference.
-div = 1000000000
-offset = 946684800000000000 / div
-time_fmt = '%Y-%m-%d %H:%M:%S.%f'   # strftime format
-time_fmt_save = '%Y-%m-%d_%H-%M-%S'
+DIV = 1000000000
+OFFSET = 946684800000000000 / DIV
+TIME_FMT = '%Y-%m-%d %H:%M:%S.%f'   # strftime format
+TIME_FMT_SAVE = '%Y-%m-%d_%H-%M-%S'
 
 """DataFrame columns"""
 PPG_COLS = ['epoch_time', 'self_time', 'data', 'polar_reported_sample_time']
@@ -49,7 +49,7 @@ OTHER_COLS = ['epoch_time', 'self_time', 'data', ]
 
 
 class PolThread:
-    """Receives heart rate and PPG data from a single Polar Verity Sense unit over Bluetooth LE"""
+    """Receives biometric data from a single Polar Verity Sense unit over Bluetooth LE"""
     def __init__(self, address, params, logger: Callable):
         self.running = asyncio.Event()
         self.address = address
@@ -110,12 +110,12 @@ class PolThread:
     def _format_pmd_data(self, _, data):
         """Formats incoming stream from PMD_Data point, combines with OS timestamp and appends to required list"""
         li = [
-            datetime.now().strftime(time_fmt),     # OS epoch time
+            datetime.now().strftime(TIME_FMT),     # OS epoch time
             time.time() - self.timer.timestamp(),       # self time
             data        # data in form of bytesarray
         ]
         if data[0] == 0x01:   # 0x01 first byte means that data is from the PPG stream
-            li.append(self._convert_to_timestamp(data, 1, 9).strftime(time_fmt))   # PPG stream also reports timestamp
+            li.append(self._convert_to_timestamp(data, 1, 9).strftime(TIME_FMT))   # PPG stream also reports timestamp
             self._append_results(stream='ppg', data=li)
         elif data[0] == 0x02:       # 0x02 first byte means that data is from ACC stream
             self._append_results(stream='acc', data=li)
@@ -137,7 +137,7 @@ class PolThread:
         """Converts bytearray to timestamp"""
         return (
             datetime.fromtimestamp(
-                (int.from_bytes(bytearray(data[start:end]), byteorder="little", signed=False,) / div) + offset,
+                (int.from_bytes(bytearray(data[start:end]), byteorder="little", signed=False,) / DIV) + OFFSET,
                 timezone.utc,
             )
         )
@@ -145,7 +145,7 @@ class PolThread:
     def _format_hr(self, _, data):
         """Appends reported heart rate and current OS time to HR list"""
         li = [
-            datetime.now().strftime(time_fmt),    # OS epoch time
+            datetime.now().strftime(TIME_FMT),    # OS epoch time
             (time.time() - self.timer.timestamp()),    # self timer
             data[1],   # heart rate BPM
         ]
@@ -169,7 +169,7 @@ class PolThread:
     def _save_data(self, data, cols, ext='hr'):
         """Saves given data as dataframe and pickle object, returns length of dataframe for reporting"""
         # Construct filename from provided extension
-        filename = f'output/biometrics/{self.timer.strftime(time_fmt_save)}_{self.address.replace(":", "-")}_{ext}'
+        filename = f'output/biometrics/{self.timer.strftime(TIME_FMT_SAVE)}_{self.address.replace(":", "-")}_{ext}'
         # Construct dataframe
         df = pd.DataFrame(data, columns=cols)
         # Save if data is present and return true for reporting

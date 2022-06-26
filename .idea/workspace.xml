@@ -5,11 +5,9 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Added PPI, accelerometer stream support in PolThread.py">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PolThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/PolThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.rpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.rpp-bak" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp-bak" afterDir="false" />
     </list>
@@ -256,14 +254,8 @@
       <workItem from="1655911645615" duration="2700000" />
       <workItem from="1655916986365" duration="399000" />
       <workItem from="1655987666108" duration="28000" />
-      <workItem from="1655991045886" duration="5518000" />
-    </task>
-    <task id="LOCAL-00062" summary="Finished implementing moving delay. Fixed a lingering CamThread bug">
-      <created>1645118685215</created>
-      <option name="number" value="00062" />
-      <option name="presentableId" value="LOCAL-00062" />
-      <option name="project" value="LOCAL" />
-      <updated>1645118685215</updated>
+      <workItem from="1655991045886" duration="5808000" />
+      <workItem from="1656254913531" duration="312000" />
     </task>
     <task id="LOCAL-00063" summary="Implemented natural log (ln x) moving delay algorithm">
       <created>1645178569104</created>
@@ -601,7 +593,14 @@
       <option name="project" value="LOCAL" />
       <updated>1655998022023</updated>
     </task>
-    <option name="localTasksCounter" value="111" />
+    <task id="LOCAL-00111" summary="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)">
+      <created>1656000877288</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1656000877288</updated>
+    </task>
+    <option name="localTasksCounter" value="112" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -632,7 +631,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Implemented preset .json creation tool" />
     <MESSAGE value="Further work on PresetCreator.py" />
     <MESSAGE value="Fixed reapy socket closing unexpectedly (hopefully!)" />
     <MESSAGE value="More work on fixing unexpected socket closing (hopefully got it this time)" />
@@ -657,7 +655,8 @@
     <MESSAGE value="Updated ReaThread.py to reflect new main.rpp REAPER project configuration" />
     <MESSAGE value="Close PolThread.py without killing application if HR sensor not detected/malfunctions" />
     <MESSAGE value="Added PPI, accelerometer stream support in PolThread.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added PPI, accelerometer stream support in PolThread.py" />
+    <MESSAGE value="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
