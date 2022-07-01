@@ -4,10 +4,10 @@ user_params = {
     # TODO: set this value to create more tracks in ReaThread if not enough exist already
     '*participants': 1,     # Number of cameras/tracks to try and read
     '*polar mac addresses': [
-        'A0:9E:1A:AD:16:3B',    # My personal Polar Verity Sense: marked 'H' on armband
-        'A0:9E:1A:B2:2B:5B',    # CMS 1 on armband
-        'A0:9E:1A:B2:2B:B6',    # CMS 2 on armband
-        'A0:9E:1A:B2:2A:08',    # CMS 3 on armband
+        ('A0:9E:1A:AD:16:3B', 'H', ['ppg']),   # My personal Polar Verity Sense: marked 'H' on armband
+        ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),   # CMS 1 on armband
+        ('A0:9E:1A:B2:2B:B6', 'CMS_2', ['ppi']),   # CMS 2 on armband
+        ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
     ],
 
     '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)

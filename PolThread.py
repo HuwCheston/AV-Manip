@@ -3,10 +3,10 @@ import threading
 from datetime import datetime, timezone
 from bleak import BleakClient
 import pandas as pd
-import time
-import pickle
 import sys
 from typing import Callable
+import struct
+import math
 
 pd.set_option('display.float_format', lambda x: '%.7f' % x)
 
@@ -25,8 +25,14 @@ UUID = {
 REQUEST_SETTINGS = bytearray(       # Gets measurement settings for PPG stream
     [0x01, 0x01]
 )
+SDK_MODE = bytearray(
+    [0x02, 0x09]
+)
+STOP_SDK = bytearray(
+    [0x03, 0x09]
+)
 START_PPG = bytearray(      # Open PPG stream
-    [0x02, 0x01, 0x00, 0x01, 0x87, 0x00, 0x01, 0x01, 0x16, 0x00, 0x04, 0x01, 0x04]
+    [0x02, 0x01, 0x00, 0x01, 0x87, 0x00, 0x01, 0x01, 0x16, 0x00, 0x04, 0x01, 0x04] # Replace 0x87 with 176 for 176Hz
 )
 START_PPI = bytearray(      # Open PPI stream
     [0x02, 0x03]
@@ -43,26 +49,18 @@ OFFSET = 946684800000000000 / DIV
 TIME_FMT = '%Y-%m-%d %H:%M:%S.%f'   # strftime format
 TIME_FMT_SAVE = '%Y-%m-%d_%H-%M-%S'
 
-"""DataFrame columns"""
-PPG_COLS = ['epoch_time', 'self_time', 'data', 'polar_reported_sample_time']
-OTHER_COLS = ['epoch_time', 'self_time', 'data', ]
-
 
 class PolThread:
     """Receives biometric data from a single Polar Verity Sense unit over Bluetooth LE"""
     def __init__(self, address, params, logger: Callable):
         self.running = asyncio.Event()
-        self.address = address
+        self.address = address[0]
+        self.desc = address[1] if isinstance(address[1], str) else self.address
         self.params = params
         self.logger = logger
 
         # Results are appended into the corresponding lists here
-        self.results = {
-            'hr': [],
-            'ppg': [],
-            'ppi': [],
-            'acc': []
-        }
+        self.results = {s: [] for s in address[2]}
         # Used to log if its the first time a stream has reported data
         self.is_firstrun = {k: True for k in self.results.keys()}
 
@@ -76,64 +74,83 @@ class PolThread:
             await self.client.connect()
         # If no device was found, close PolThread and log the error in the GUI
         except Exception as e:
-            self.logger(f'{e} Heartrate/PPG will not be tracked from this device!')
-            sys.exit()   # This keeps the rest of the app alive
+            self.logger(f'{self.desc}: {e}')
         else:
-            # Send bytes to open PPG + HR streams
-            await self.client.start_notify(UUID['PMD_Control'], self._report_init)
-            await self.client.write_gatt_char(UUID['PMD_Control'], REQUEST_SETTINGS, response=True)
-            await self.client.write_gatt_char(UUID['PMD_Control'], START_PPG, response=True)
-            await self.client.write_gatt_char(UUID['PMD_Control'], START_ACC, response=True)
-            await self.client.write_gatt_char(UUID['PMD_Control'], START_PPI, response=True)
-            # Gather data from PPG and HR streams
-            await self.client.start_notify(UUID['PMD_Data'], self._format_pmd_data)   # Receive PPG data
-            await self.client.start_notify(UUID['HR_UUID'], self._format_hr)     # Receive HR data
-            # Keep the connection alive until the signal is given to close
-            await self.running.wait()   # Event set with call of polar.quit_python() in KeyThread
-            # Close the Control, PPG, and HR streams
-            try:
-                await self.client.stop_notify(UUID['PMD_Control'])  # Stop PMD Control
-                await self.client.stop_notify(UUID['PMD_Data'], )  # Stop PPG data
-                await self.client.stop_notify(UUID['HR_UUID'])  # Stop HR data
-                # Disconnect from the client
-                await self.client.disconnect()
-            except Exception as e:
-                self.logger(f'{e}')
-            finally:
-                sys.exit()
+            # Open all necessary streams
+            await asyncio.gather(*self._open_streams())
+            # Wait for stop event, set with call of polar.quit_polar() in KeyThread
+            await self.running.wait()
+            # Close all opened streams
+            await asyncio.gather(*self._close_streams())
+            # Disconnect from client
+            await self.client.disconnect()
+        finally:
+            sys.exit()  # This keeps the rest of the app alive
+
+    def _open_streams(self):
+        """Gathers functions to open Polar streams"""
+        # Report initialisation
+        tasks = [self.client.start_notify(UUID['PMD_Control'], self._report_init)]
+        # Gathering HR
+        if 'hr' in self.results:
+            tasks.append(self.client.start_notify(UUID['HR_UUID'], self._format_hr))  # Receive HR data
+        # Gathering PPG
+        if 'ppg' in self.results:
+            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], SDK_MODE, response=True))
+            # Open PPG stream
+            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], START_PPG, response=True))
+            # Gather data from PPI stream
+            tasks.append(self.client.start_notify(UUID['PMD_Data'], self._format_ppg))
+        # Gathering PPI
+        if 'ppi' in self.results:
+            # Open PPI stream
+            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], START_PPI, response=True))
+            # Gather data from PPI stream
+            tasks.append(self.client.start_notify(UUID['PMD_Data'], self._format_ppi))
+        return tasks
+
+    def _close_streams(self):
+        """Gathers functions to close open Polar streams"""
+        tasks = []
+        if 'hr' in self.results:
+            tasks.append(self.client.stop_notify(UUID['HR_UUID']))  # Stop HR data
+        if 'ppi' in self.results:
+            tasks.append(self.client.stop_notify(UUID['PMD_Data']))  # Stop PPG or PPI data
+        if 'ppg' in self.results:
+            tasks.append(self.client.stop_notify(UUID['PMD_Data']))
+            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], STOP_SDK))
+        # Disconnect from the client
+        tasks.append(self.client.stop_notify(UUID['PMD_Control']))  # Stop PMD Control
+        return tasks
 
     def _report_init(self, _, data):
         """Report once correct response reported from device"""
         if data == bytearray(b'\xf0\x01\x01\x00\x00\x00\x01\x87\x00\x01\x01\x16\x00\x04\x01\x04'):  # success response
-            self.logger(f'{self.address}: initialised')
+            self.logger(f'{self.desc}: initialised')
+        if data == bytearray([0xF0, 0x02, 0x09, 0x00, 0x00]):
+            self.logger(f'{self.desc}: SDK mode enabled')
 
-    def _format_pmd_data(self, _, data):
-        """Formats incoming stream from PMD_Data point, combines with OS timestamp and appends to required list"""
-        li = [
-            datetime.now().strftime(TIME_FMT),     # OS epoch time
-            time.time() - self.timer.timestamp(),       # self time
-            data        # data in form of bytesarray
-        ]
-        if data[0] == 0x01:   # 0x01 first byte means that data is from the PPG stream
-            li.append(self._convert_to_timestamp(data, 1, 9).strftime(TIME_FMT))   # PPG stream also reports timestamp
-            self._append_results(stream='ppg', data=li)
-        elif data[0] == 0x02:       # 0x02 first byte means that data is from ACC stream
-            self._append_results(stream='acc', data=li)
-        elif data[0] == 0x03:     # 0x03 first byte means that data is from PPI stream
-            self._append_results(stream='ppi', data=li)
+    def _format_ppi(self, _, data):
+        """Formats incoming PPI stream, combines with OS timestamp and appends to required list"""
+        type1, _, type2 = struct.unpack("<BqB", data[0:10])
+        if type1 == 3:
+            num = math.floor((len(data) - 8) / 6)
+            for x in range(num):
+                start = 10 + x * 6
+                sample = data[start:start + 6]
+                hr, ppi, err, flags = struct.unpack("<BHHB", sample)
+                sample = {
+                    'address': self.address,
+                    'desc': self.desc,
+                    'timestamp': datetime.now(tz=timezone.utc).strftime(TIME_FMT),
+                    'heart_rate': hr,
+                    'ppi_ms': ppi,
+                    'error_estimate': err,
+                    'flags': flags
+                }
+                self._append_results(stream='ppi', data=sample)
 
-    def _append_results(self, stream: str, data: list):
-        """Appends results to required list and logs when data is received for the first time"""
-        # Check if this is the first time data has been received from a stream and log in GUI if so
-        if self.is_firstrun[stream]:
-            self.logger(f'{self.address}:\n{stream.upper()} received')
-            self.is_firstrun[stream] = False
-        # If we're recording, append the results to the required list
-        if self.params['*recording']:
-            self.results[stream].append(data)
-
-    @ staticmethod
-    def _convert_to_timestamp(data, start, end):
+    def _convert_to_timestamp(self, data, start, end):
         """Converts bytearray to timestamp"""
         return (
             datetime.fromtimestamp(
@@ -142,40 +159,65 @@ class PolThread:
             )
         )
 
+    def _format_ppg(self, _, data):
+        def get_ppg_value(subdata):
+            return struct.unpack("<i", subdata + (b'\0' if subdata[2] < 128 else b'\xff'))[0]
+        num = math.floor((len(data) - 10) / 12)
+        # Iterate through the delta frames
+        for x in range(num):
+            sample = {
+                'address': self.address,
+                'desc': self.desc,
+                'timestamp': datetime.now(tz=timezone.utc).strftime(TIME_FMT),
+                'timestamp_polar': self._convert_to_timestamp(data, start=1, end=9).strftime(TIME_FMT),
+            }
+            # Iterate through bytes and get each PPG value
+            for y in range(4):
+                sample[f'ppg_{y}'] = get_ppg_value(data[10 + x * 12 + y * 3:(10 + x * 12 + y * 3) + 3])
+            # Append the delta frame
+            self._append_results(stream='ppg', data=sample)
+
     def _format_hr(self, _, data):
         """Appends reported heart rate and current OS time to HR list"""
-        li = [
-            datetime.now().strftime(TIME_FMT),    # OS epoch time
-            (time.time() - self.timer.timestamp()),    # self timer
-            data[1],   # heart rate BPM
-        ]
-        self._append_results(stream='hr', data=li)
+        sample = {
+            'address': self.address,
+            'desc': self.desc,
+            'timestamp': datetime.now(tz=timezone.utc).strftime(TIME_FMT),
+            'heart_rate': data[1],
+        }
+        self._append_results(stream='hr', data=sample)
 
     def start_polar(self, record_start):
         """Starts appending data to results lists"""
         self.timer = record_start
-        self.logger(f'{self.address} started')
+        self.logger(f'{self.desc} started')
 
     def stop_polar(self):
         """Save and clear both data streams and report number of observations"""
         report_data = []
         for k, v in self.results.items():
-            if k == 'ppg':
-                report_data.append(self._save_data(data=v, cols=PPG_COLS, ext=k))
-            else:
-                report_data.append(self._save_data(data=v, cols=OTHER_COLS, ext=k))
+            report_data.append(self._save_data(data=v, ext=k))
         self.logger(self._report_results(streams=report_data))
 
-    def _save_data(self, data, cols, ext='hr'):
+    def _append_results(self, stream: str, data: dict):
+        """Appends results to required list and logs when data is received for the first time"""
+        # Check if this is the first time data has been received from a stream and log in GUI if so
+        if self.is_firstrun[stream]:
+            self.logger(f'{self.desc}: {stream.upper()} received')
+            self.is_firstrun[stream] = False
+        # If we're recording, append the results to the required list
+        if self.params['*recording']:
+            self.results[stream].append(data)
+
+    def _save_data(self, data, ext='hr'):
         """Saves given data as dataframe and pickle object, returns length of dataframe for reporting"""
         # Construct filename from provided extension
         filename = f'output/biometrics/{self.timer.strftime(TIME_FMT_SAVE)}_{self.address.replace(":", "-")}_{ext}'
         # Construct dataframe
-        df = pd.DataFrame(data, columns=cols)
+        df = pd.DataFrame(data,)
         # Save if data is present and return true for reporting
         if len(df) > 0:
             df.to_csv(f'{filename}.csv')
-            pickle.dump(df, open(f'{filename}.p', 'wb'))
             data.clear()
             return ext, True
         # If no data present, don't save and return false for reporting
@@ -184,14 +226,22 @@ class PolThread:
 
     def _report_results(self, streams):
         """Construct report of recorded datastreams for logging in GUI"""
-        results = f'{self.address}\n'
+        results = f'{self.desc}: '
         for dat, cond in streams:
             if cond:
-                results += f'{dat.upper()} reported.\n'
+                results += f'{dat.upper()} reported.'
             else:
-                results += f'{dat.upper()} did not report.\n'
+                results += f'{dat.upper()} did not report.'
         return results
 
     def quit_polar(self):
-        """Shut down the Bluetooth connection, called when GUI closes to allow application to finish successfully"""
+        """Shut down the Bluetooth connection, called in GUI to allow application to finish successfully"""
         self.running.set()
+
+    # def _estimate_hr(self, ppi: int, err: int):
+    #     """Estimates heart rate using PPI calculation, where Polar does not do this automatically"""
+    #     return (
+    #         60000/ppi,
+    #         60000/ppi-err,  # lower bound
+    #         60000/ppi+err,  # upper bound
+    #     )

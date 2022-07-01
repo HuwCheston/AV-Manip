@@ -5,9 +5,13 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)">
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Added new CMS Polar addresses">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CamThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/CamThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GuiPanes.py" beforeDir="false" afterPath="$PROJECT_DIR$/GuiPanes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/KeyThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/KeyThread.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PolThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/PolThread.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UserParams.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserParams.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.rpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.rpp-bak" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp-bak" afterDir="false" />
     </list>
@@ -255,21 +259,18 @@
       <workItem from="1655916986365" duration="399000" />
       <workItem from="1655987666108" duration="28000" />
       <workItem from="1655991045886" duration="5808000" />
-      <workItem from="1656254913531" duration="312000" />
-    </task>
-    <task id="LOCAL-00063" summary="Implemented natural log (ln x) moving delay algorithm">
-      <created>1645178569104</created>
-      <option name="number" value="00063" />
-      <option name="presentableId" value="LOCAL-00063" />
-      <option name="project" value="LOCAL" />
-      <updated>1645178569104</updated>
-    </task>
-    <task id="LOCAL-00064" summary="Implemented moving delay climbdown">
-      <created>1645181705668</created>
-      <option name="number" value="00064" />
-      <option name="presentableId" value="LOCAL-00064" />
-      <option name="project" value="LOCAL" />
-      <updated>1645181705668</updated>
+      <workItem from="1656254913531" duration="431000" />
+      <workItem from="1656319285588" duration="749000" />
+      <workItem from="1656321528292" duration="527000" />
+      <workItem from="1656326290715" duration="1523000" />
+      <workItem from="1656328754191" duration="3933000" />
+      <workItem from="1656416725791" duration="711000" />
+      <workItem from="1656417655249" duration="30000" />
+      <workItem from="1656417694891" duration="674000" />
+      <workItem from="1656443267162" duration="4036000" />
+      <workItem from="1656493243190" duration="21683000" />
+      <workItem from="1656575749456" duration="5564000" />
+      <workItem from="1656663518400" duration="15522000" />
     </task>
     <task id="LOCAL-00065" summary="Refactored log_text to TkGui.py">
       <created>1645182412954</created>
@@ -600,7 +601,21 @@
       <option name="project" value="LOCAL" />
       <updated>1656000877288</updated>
     </task>
-    <option name="localTasksCounter" value="112" />
+    <task id="LOCAL-00112" summary="Few changes in PolThread.py">
+      <created>1656255239279</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1656255239280</updated>
+    </task>
+    <task id="LOCAL-00113" summary="Added new CMS Polar addresses">
+      <created>1656417128759</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1656417128759</updated>
+    </task>
+    <option name="localTasksCounter" value="114" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -631,8 +646,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Further work on PresetCreator.py" />
-    <MESSAGE value="Fixed reapy socket closing unexpectedly (hopefully!)" />
     <MESSAGE value="More work on fixing unexpected socket closing (hopefully got it this time)" />
     <MESSAGE value="Implemented preset pane to load jsons" />
     <MESSAGE value="Started moving TkGui panes to seperate classes - continue when back" />
@@ -656,7 +669,9 @@
     <MESSAGE value="Close PolThread.py without killing application if HR sensor not detected/malfunctions" />
     <MESSAGE value="Added PPI, accelerometer stream support in PolThread.py" />
     <MESSAGE value="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)" />
+    <MESSAGE value="Few changes in PolThread.py" />
+    <MESSAGE value="Added new CMS Polar addresses" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added new CMS Polar addresses" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -670,6 +685,6 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1656000639470" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1656686432325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

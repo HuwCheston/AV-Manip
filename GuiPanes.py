@@ -112,7 +112,7 @@ class InfoPane(ParentFrame):
         return lablist
 
     def init_logging_window(self) -> tk.scrolledtext.ScrolledText:
-        log = tk.scrolledtext.ScrolledText(self.tk_frame, height=5, width=20,
+        log = tk.scrolledtext.ScrolledText(self.tk_frame, height=5, width=30,
                                            state='disabled', wrap='word', font='TkDefaultFont')
         log.insert('end', 'Started')
         return log

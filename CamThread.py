@@ -1,11 +1,10 @@
 import threading
 import ffmpeg
 import time
-import os
+import sys
 import numpy as np
 from cv2 import cv2
 from queue import Queue, Empty
-from datetime import datetime
 from collections import deque
 
 
@@ -75,7 +74,7 @@ class CamRead:
         _, frame = self.cam.read()
         if frame is None:
             print('no frame!')
-            os._exit(1)
+            sys.exit()
         else:
             self.researcher_cam_queue.put(frame)
             self.performer_cam_queue.put(frame)
@@ -275,10 +274,32 @@ class CamWrite:
         self.window_name = f"Cam {self.source + 1} {self.ext}"
         self.process = None
 
-    def start_recording(self, start_time):
+    def start_recording(self, start_time, res='1920x1080'):
         # On high-resolution monitors, gdigrab may display black padding around the captured video. I'd suggest
         # changing your monitor display resolution/scaling if this is an issue, as I can't find a workaround in ffmpeg.
         f = "%Y-%m-%d_%H-%M-%S"
+        # filename = f'output/video/{start_time.strftime(f)}_cam{self.source + 1}_{self.ext}_out.mkv'
+        # p = (
+        #     ffmpeg.input(
+        #         format='gdigrab',
+        #         framerate="30",
+        #         filename=f"title={self.window_name}",
+        #         loglevel='warning',
+        #         probesize='500M',
+        #         draw_mouse=0,
+        #     )
+        #     .output(
+        #         filename=filename,
+        #         video_size=res,
+        #         **{
+        #             'vf': "pad=ceil(iw/2)*2:ceil(ih/2)*2",
+        #             'c:v': 'libx264',
+        #             'pix_fmt': 'yuv420p'
+        #         }
+        #     )
+        # )
+
+        # Slow computer option - resolution is low!
         filename = f'output/video/{start_time.strftime(f)}_cam{self.source + 1}_{self.ext}_out.avi'
         p = (
             ffmpeg.input(
@@ -291,8 +312,8 @@ class CamWrite:
             )
             .output(
                 filename=filename,
+                video_size=res,
                 pix_fmt='yuv420p',
-                video_size='1920x1080'
             )
         )
         self.process = p.run_async(pipe_stdin=True)

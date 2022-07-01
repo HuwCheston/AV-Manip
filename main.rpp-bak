@@ -1,4 +1,4 @@
-<REAPER_PROJECT 0.1 "6.46/win64" 1656001885
+<REAPER_PROJECT 0.1 "6.46/win64" 1656676402
   RIPPLE 0
   GROUPOVERRIDE 0 0 0
   AUTOXFADE 1
@@ -14,8 +14,8 @@
   TIMEMODE 1 5 -1 30 0 0 -1
   VIDEO_CONFIG 0 0 256
   PANMODE 3
-  CURSOR 9
-  ZOOM 13.65823219591063 0 0
+  CURSOR 71.125
+  ZOOM 9.92721233209529 0 0
   VZOOMEX 4 0
   USE_REC_CFG 0
   RECMODE 1
@@ -28,13 +28,13 @@
   >
   <APPLYFX_CFG
   >
-  RENDER_FILE "C:\Python Projects\AV-Manip\output\keys delay.wav"
+  RENDER_FILE "C:\Python Projects\AV-Manip\output\cam_test.wav"
   RENDER_FMT 0 2 0
   RENDER_1X 0
   RENDER_RANGE 2 0 0 18 1000
   RENDER_RESAMPLE 3 0 1
   RENDER_ADDTOPROJ 0
-  RENDER_STEMS 3
+  RENDER_STEMS 0
   RENDER_DITHER 0
   TIMELOCKMODE 1
   TEMPOENVLOCKMODE 1
@@ -57,10 +57,10 @@
   GLOBAL_AUTO -1
   TEMPO 120 4 4
   PLAYRATE 1 0 0.25 4
-  SELECTION 109 8
-  SELECTION2 109 8
+  SELECTION 8 109
+  SELECTION2 8 109
   MASTERAUTOMODE 0
-  MASTERTRACKHEIGHT 147 0
+  MASTERTRACKHEIGHT 74 0
   MASTERPEAKCOL 16576
   MASTERMUTESOLO 0
   MASTERTRACKVIEW 1 0.6667 0.5 0.5 0 -1 0 0 0 0 0 0 0
@@ -107,7 +107,7 @@
     SEL 0
     REC 0 -1 1 2 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -116,7 +116,7 @@
     AUXRECV 1 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
     AUXRECV 3 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
     MIDIOUT -1
-    MAINSEND 0 0
+    MAINSEND 1 0
     MAINSEND_NCH 1
     HWOUT 2 0 1 0 0 0 0 -1:U -1
     <FXCHAIN
@@ -140,9 +140,9 @@
     SHOWINMIX 1 0.6667 0.5 1 0.5 0 -1 0
     FREEMODE 0
     SEL 1
-    REC 1 4128 1 0 0 0 0
+    REC 1 4256 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 0 0
+    TRACKHEIGHT 74 0 0 0 0 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -481,7 +481,7 @@
     SEL 1
     REC 1 5056 1 4 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -496,7 +496,7 @@
       DOCKED 0
       BYPASS 1 0 0
       <JS midi_delay ""
-        191 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        188 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {A6D45B7B-A1D9-4AD0-AE49-7925D221CF7F}
@@ -519,7 +519,7 @@
     SEL 1
     REC 0 -1 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -5859,7 +5859,7 @@
     SEL 1
     REC 0 -1 1 2 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -5868,7 +5868,7 @@
     AUXRECV 5 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
     AUXRECV 7 0 1 0 0 0 0 0 0 -1:U 0 -1 ''
     MIDIOUT -1
-    MAINSEND 0 0
+    MAINSEND 1 0
     HWOUT 4 0 1 0 0 0 0 -1:U -1
     <FXCHAIN
       WNDRECT 1458 757 1736 970
@@ -5893,7 +5893,7 @@
     SEL 1
     REC 1 5056 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 0 0
+    TRACKHEIGHT 74 0 0 0 0 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -10845,9 +10845,9 @@
     SHOWINMIX 1 0.6667 0.5 1 0.5 0 -1 0
     FREEMODE 0
     SEL 1
-    REC 1 4128 1 4 0 0 0
+    REC 1 4256 1 4 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -10862,7 +10862,7 @@
       DOCKED 0
       BYPASS 1 0 0
       <JS midi_delay ""
-        191 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+        188 0 0 0 0 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       >
       FLOATPOS 0 0 0 0
       FXID {438D9420-182B-44A6-9C73-C06DA8DB907C}
@@ -10882,10 +10882,10 @@
     BUSCOMP 0 0 0 0 0
     SHOWINMIX 1 0.6667 0.5 1 0.5 0 -1 0
     FREEMODE 0
-    SEL 0
+    SEL 1
     REC 0 -1 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -11226,7 +11226,7 @@
     SEL 0
     REC 0 -1 1 2 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -11254,7 +11254,7 @@
     SEL 0
     REC 0 -1 1 2 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1
@@ -11342,7 +11342,7 @@
     SEL 0
     REC 0 -1 1 0 0 0 0
     VU 2
-    TRACKHEIGHT 147 0 0 0 -1 0
+    TRACKHEIGHT 74 0 0 0 -1 0
     INQ 0 0 0 0.5 100 0 0 100
     NCHAN 2
     FX 1

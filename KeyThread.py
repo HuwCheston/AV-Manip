@@ -17,7 +17,9 @@ class KeyThread:
         self.params = params
 
         self.gui = TkGui(params=self.params, keythread=self)
-        self.polthread = [PolThread(address=add, params=params, logger=self.gui.log_text) for add in self.params['*polar mac addresses']]
+        self.polthread = [PolThread(address=add, params=params, logger=self.gui.log_text)
+                          for add
+                          in self.params['*polar mac addresses']]
         self.reathread = reathread
         self.camthread = camthread
         self.start_keymanager()
@@ -71,8 +73,14 @@ class KeyThread:
         # Start the recording in both reathread and for all of our camthreads
         self.reathread.start_recording(bpm,)
         for cam in self.camthread:
-            threading.Thread(target=cam.cam_write.start_recording, args=([record_start])).start()
-            threading.Thread(target=cam.performer_cam_write.start_recording, args=([record_start])).start()
+            threading.Thread(
+                target=cam.cam_write.start_recording,
+                args=([record_start, self.params['*resolution']])
+            ).start()
+            threading.Thread(
+                target=cam.performer_cam_write.start_recording,
+                args=([record_start, self.params['*resolution']])
+            ).start()
         self.params['*recording'] = True  # This parameter is used to add text onto the camera view
         for pol in self.polthread:
             pol.start_polar(record_start)
