@@ -3,10 +3,10 @@ import threading
 from datetime import datetime, timezone
 from bleak import BleakClient
 import pandas as pd
-import sys
 from typing import Callable
 import struct
 import math
+import pickle
 
 pd.set_option('display.float_format', lambda x: '%.7f' % x)
 
@@ -31,8 +31,8 @@ SDK_MODE = bytearray(
 STOP_SDK = bytearray(
     [0x03, 0x09]
 )
-START_PPG = bytearray(      # Open PPG stream
-    [0x02, 0x01, 0x00, 0x01, 0x87, 0x00, 0x01, 0x01, 0x16, 0x00, 0x04, 0x01, 0x04] # Replace 0x87 with 176 for 176Hz
+START_PPG = bytearray(      # Open PPG stream   0xb0 = 176Hz
+    [0x02, 0x01, 0x00, 0x01, 0xb0, 0x00, 0x01, 0x01, 0x16, 0x00, 0x04, 0x01, 0x04]
 )
 START_PPI = bytearray(      # Open PPI stream
     [0x02, 0x03]
@@ -61,6 +61,7 @@ class PolThread:
 
         # Results are appended into the corresponding lists here
         self.results = {s: [] for s in address[2]}
+        self.raw_data = {s: [] for s in address[2]}
         # Used to log if its the first time a stream has reported data
         self.is_firstrun = {k: True for k in self.results.keys()}
 
@@ -77,37 +78,37 @@ class PolThread:
             self.logger(f'{self.desc}: {e}')
         else:
             # Open all necessary streams
-            await asyncio.gather(*self._open_streams())
+            await self._open_streams()
             # Wait for stop event, set with call of polar.quit_polar() in KeyThread
             await self.running.wait()
             # Close all opened streams
             await asyncio.gather(*self._close_streams())
             # Disconnect from client
             await self.client.disconnect()
-        finally:
-            sys.exit()  # This keeps the rest of the app alive
 
-    def _open_streams(self):
-        """Gathers functions to open Polar streams"""
+    async def _open_streams(self):
+        """Gathers functions to open Polar streams. Doesn't run concurrently, as need to wait when SDK activated"""
         # Report initialisation
-        tasks = [self.client.start_notify(UUID['PMD_Control'], self._report_init)]
+        await self.client.start_notify(UUID['PMD_Control'], self._report_init)
         # Gathering HR
         if 'hr' in self.results:
-            tasks.append(self.client.start_notify(UUID['HR_UUID'], self._format_hr))  # Receive HR data
+            # Receive HR data
+            await self.client.start_notify(UUID['HR_UUID'], self._format_hr)
         # Gathering PPG
         if 'ppg' in self.results:
-            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], SDK_MODE, response=True))
+            # Start SDK mode
+            await self.client.write_gatt_char(UUID['PMD_Control'], SDK_MODE, response=True)
+            await asyncio.sleep(5)
             # Open PPG stream
-            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], START_PPG, response=True))
+            await self.client.write_gatt_char(UUID['PMD_Control'], START_PPG, response=True)
             # Gather data from PPI stream
-            tasks.append(self.client.start_notify(UUID['PMD_Data'], self._format_ppg))
+            await self.client.start_notify(UUID['PMD_Data'], self._format_ppg)
         # Gathering PPI
         if 'ppi' in self.results:
             # Open PPI stream
-            tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], START_PPI, response=True))
+            await self.client.write_gatt_char(UUID['PMD_Control'], START_PPI, response=True)
             # Gather data from PPI stream
-            tasks.append(self.client.start_notify(UUID['PMD_Data'], self._format_ppi))
-        return tasks
+            await self.client.start_notify(UUID['PMD_Data'], self._format_ppi)
 
     def _close_streams(self):
         """Gathers functions to close open Polar streams"""
@@ -119,20 +120,24 @@ class PolThread:
         if 'ppg' in self.results:
             tasks.append(self.client.stop_notify(UUID['PMD_Data']))
             tasks.append(self.client.write_gatt_char(UUID['PMD_Control'], STOP_SDK))
-        # Disconnect from the client
         tasks.append(self.client.stop_notify(UUID['PMD_Control']))  # Stop PMD Control
         return tasks
 
     def _report_init(self, _, data):
         """Report once correct response reported from device"""
+        # TODO: fix this!
         if data == bytearray(b'\xf0\x01\x01\x00\x00\x00\x01\x87\x00\x01\x01\x16\x00\x04\x01\x04'):  # success response
-            self.logger(f'{self.desc}: initialised')
+            self.logger(f'{self.desc}: connected')
         if data == bytearray([0xF0, 0x02, 0x09, 0x00, 0x00]):
             self.logger(f'{self.desc}: SDK mode enabled')
 
     def _format_ppi(self, _, data):
         """Formats incoming PPI stream, combines with OS timestamp and appends to required list"""
+        # Append raw data plus timestamp
+        if self.params['*recording']:
+            self.raw_data['ppi'].append((datetime.now(tz=timezone.utc).strftime(TIME_FMT), data))
         type1, _, type2 = struct.unpack("<BqB", data[0:10])
+        # If data is from PPI stream
         if type1 == 3:
             num = math.floor((len(data) - 8) / 6)
             for x in range(num):
@@ -162,6 +167,10 @@ class PolThread:
     def _format_ppg(self, _, data):
         def get_ppg_value(subdata):
             return struct.unpack("<i", subdata + (b'\0' if subdata[2] < 128 else b'\xff'))[0]
+        # Append raw data plus timestamp
+        if self.params['*recording']:
+            self.raw_data['ppg'].append((datetime.now(tz=timezone.utc).strftime(TIME_FMT), data))
+        # Calculate number of delta frames
         num = math.floor((len(data) - 10) / 12)
         # Iterate through the delta frames
         for x in range(num):
@@ -179,6 +188,9 @@ class PolThread:
 
     def _format_hr(self, _, data):
         """Appends reported heart rate and current OS time to HR list"""
+        # Append raw data plus timestamp
+        if self.params['*recording']:
+            self.raw_data['hr'].append((datetime.now(tz=timezone.utc).strftime(TIME_FMT), data))
         sample = {
             'address': self.address,
             'desc': self.desc,
@@ -190,7 +202,6 @@ class PolThread:
     def start_polar(self, record_start):
         """Starts appending data to results lists"""
         self.timer = record_start
-        self.logger(f'{self.desc} started')
 
     def stop_polar(self):
         """Save and clear both data streams and report number of observations"""
@@ -219,10 +230,18 @@ class PolThread:
         if len(df) > 0:
             df.to_csv(f'{filename}.csv')
             data.clear()
+            self._save_raw_data(fn=filename)
             return ext, True
         # If no data present, don't save and return false for reporting
         else:
             return ext, False
+
+    def _save_raw_data(self, fn):
+        """Saves raw data as Python pickle file"""
+        # Construct filename
+        filename = fn + "_raw.p"
+        # Dump raw data as pickle file
+        pickle.dump(self.raw_data, open(filename, "wb"))
 
     def _report_results(self, streams):
         """Construct report of recorded datastreams for logging in GUI"""
