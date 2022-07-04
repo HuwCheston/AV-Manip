@@ -5,12 +5,8 @@
     <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Completely rewrote PolThread.py">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Removed concurrence when opening Polar streams. Added raw data capture.">
       <change beforePath="$PROJECT_DIR$/PolThread.py" beforeDir="false" afterPath="$PROJECT_DIR$/PolThread.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UserParams.py" beforeDir="false" afterPath="$PROJECT_DIR$/UserParams.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp-bak" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp-bak" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -269,14 +265,7 @@
       <workItem from="1656575749456" duration="5564000" />
       <workItem from="1656663518400" duration="19780000" />
       <workItem from="1656750696564" duration="2133000" />
-      <workItem from="1656920785843" duration="4147000" />
-    </task>
-    <task id="LOCAL-00066" summary="Refactored fixed delay as seperate class in DelayPanes.py">
-      <created>1645184858389</created>
-      <option name="number" value="00066" />
-      <option name="presentableId" value="LOCAL-00066" />
-      <option name="project" value="LOCAL" />
-      <updated>1645184858389</updated>
+      <workItem from="1656920785843" duration="4972000" />
     </task>
     <task id="LOCAL-00067" summary="Refactored set delay time function into DelayPanes.py">
       <created>1645185291782</created>
@@ -614,7 +603,14 @@
       <option name="project" value="LOCAL" />
       <updated>1656686920353</updated>
     </task>
-    <option name="localTasksCounter" value="115" />
+    <task id="LOCAL-00115" summary="Removed concurrence when opening Polar streams. Added raw data capture.">
+      <created>1656926555957</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1656926555958</updated>
+    </task>
+    <option name="localTasksCounter" value="116" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -645,7 +641,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Implemented preset pane to load jsons" />
     <MESSAGE value="Started moving TkGui panes to seperate classes - continue when back" />
     <MESSAGE value="Continued refactoring TkGui into classes" />
     <MESSAGE value="More refactoring" />
@@ -670,7 +665,8 @@
     <MESSAGE value="Few changes in PolThread.py" />
     <MESSAGE value="Added new CMS Polar addresses" />
     <MESSAGE value="Completely rewrote PolThread.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="Completely rewrote PolThread.py" />
+    <MESSAGE value="Removed concurrence when opening Polar streams. Added raw data capture." />
+    <option name="LAST_COMMIT_MESSAGE" value="Removed concurrence when opening Polar streams. Added raw data capture." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

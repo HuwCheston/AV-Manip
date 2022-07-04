@@ -142,7 +142,7 @@ class PolThread:
             num = math.floor((len(data) - 8) / 6)
             for x in range(num):
                 start = 10 + x * 6
-                sample = data[start:start + 6]
+                sample = data[start: start + 6]
                 hr, ppi, err, flags = struct.unpack("<BHHB", sample)
                 sample = {
                     'address': self.address,
@@ -256,11 +256,3 @@ class PolThread:
     def quit_polar(self):
         """Shut down the Bluetooth connection, called in GUI to allow application to finish successfully"""
         self.running.set()
-
-    # def _estimate_hr(self, ppi: int, err: int):
-    #     """Estimates heart rate using PPI calculation, where Polar does not do this automatically"""
-    #     return (
-    #         60000/ppi,
-    #         60000/ppi-err,  # lower bound
-    #         60000/ppi+err,  # upper bound
-    #     )
