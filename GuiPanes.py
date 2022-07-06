@@ -281,11 +281,24 @@ class PresetPane(ParentFrame):
             tk.Button(self.tk_frame, text="Open Preset Creator", command=self.open_preset_creator),
             tk.Button(self.tk_frame, text="Load Preset Folder", command=self.open_preset_folder),
             self.presets_listbox,
-            tk.Button(self.tk_frame, text='-', command=self.remove_preset),
+            self.add_remove_shift_presets_buttons(),
             tk.Button(self.tk_frame, text='Randomise Presets', command=self.randomise_presets),
             tk.Button(self.tk_frame, text='Save Preset Order', command=self.save_preset_order),
         ]
         self.organise_pane()
+
+    def add_remove_shift_presets_buttons(self):
+        f = tk.Frame(self.tk_frame)
+        li = [
+            tk.Button(f, text='+', command=self.add_preset_from_file),
+            tk.Button(f, text='-', command=self.remove_preset),
+            tk.Button(f, text='▲', command=lambda: self.move_preset_button(shift=-1)),
+            tk.Button(f, text='▼', command=lambda: self.move_preset_button(shift=1)),
+            tk.Button(f, text='Clear', command=self.clear_presets)
+        ]
+        for num, b in enumerate(li):
+            b.grid(column=num, row=0)
+        return f
 
     def open_preset_folder(self):
         """Prompts for the user to select a directory to search for valid preset files in"""
@@ -299,10 +312,27 @@ class PresetPane(ParentFrame):
             self.presets_dir = f
             self.get_jsons_from_dir()
 
+    def add_preset_from_file(self):
+        # Open the directory
+        js = filedialog.askopenfilename(title='Open preset file', initialdir=self.presets_dir,)
+        fname = os.path.basename(js)
+        # If we've opened a JSON file
+        if js.endswith('.json'):
+            # Load the JSON file and read
+            f = json.loads(open(js, 'r').read())
+            # Add the json filename as a parameter to the dictionary we just created
+            f['JSON Filename'] = fname.removesuffix('.json')
+            # Add the json to the preset list if it is valid
+            if self.check_json(js=f):
+                self.presets_list.append(f)
+                self.populate_preset_listbox()
+        else:
+            self.gui.log_text(f'File {fname} is not a .json file')
+
     def get_jsons_from_dir(self):
         """Searches through a directory for preset files and adds them to a list if they're valid"""
-        # Reset the presets list to neutral
-        self.presets_list.clear()
+        # Reset the presets list and listbox to neutral
+        self.clear_presets()
         # Get all the json files in our directory
         jsons = [f for f in os.listdir(self.presets_dir) if f.endswith('.json')]
         # Iterate through our json files and add those that are valid to our preset list
@@ -322,19 +352,26 @@ class PresetPane(ParentFrame):
             if self.check_json(js=f):
                 self.presets_list.append(f)
 
-    @staticmethod
-    def check_json(js: dict):
+    def check_json(self, js: dict):
         """Checks if a particular json file contains valid information for the application"""
         # This key should always be present in any valid .JSON made for use with this software
         if 'Manipulation' not in js:
             return False
+        # Discard if we've already added the JSON
+        if any(p['JSON Filename'] == js['JSON Filename'] for p in self.presets_list):
+            self.gui.log_text('Duplicate preset added, discarded...')
+            return False
         # TODO: Add more checks in here: disabled for now for ease of using Delay From File presets
         # If the user entered nothing in a field, discard the JSON
-        # elif any(v == '' for v in js.values()):
-        #     return False
+        if any(v == '' for v in js.values()):
+            return False
         # If the json passes the above checks, it is valid
         else:
             return True
+
+    def clear_presets(self):
+        self.presets_list.clear()
+        self.presets_listbox.clear_listbox()
 
     def populate_preset_listbox(self):
         """Populates the preset listbox with valid preset files"""
@@ -421,6 +458,19 @@ class PresetPane(ParentFrame):
             elif len(self.presets_list) == 0:
                 self.presets_listbox.clear_listbox()
 
+    def move_preset_button(self, shift):
+        """Moves presets using buttons"""
+        old_i = self.presets_list.index(self.presets_list[self.presets_listbox.cur_index])
+        shifted = old_i + shift
+        # Only move if it won't remove the element from the list
+        if 0 <= shifted < len(self.presets_list):
+            self.presets_list.insert(old_i + shift, self.presets_list.pop(old_i))
+            x = self.presets_listbox.get(old_i)
+            self.presets_listbox.delete(old_i)
+            self.presets_listbox.insert(old_i + shift, x)
+            self.presets_listbox.cur_index += shift
+            self.presets_listbox.activate(self.presets_listbox.cur_index)
+
 
 class PresetListbox(tk.Listbox):
     """A listbox holding loaded loaded presets with drag and drop reordering of entries."""
@@ -437,22 +487,24 @@ class PresetListbox(tk.Listbox):
         self.bind('<Double-Button-1>',)
         self.bind('<B1-Motion>',)
 
+
     def init_listbox_func(self):
         """If presets have been loaded, bind the correct functionality to the listbox"""
         self.bind('<Button-1>', self.set_current)
         self.bind('<Double-Button-1>', self.make_active)
-        self.bind('<B1-Motion>', self.shift_selection)
+        # self.bind('<B1-Motion>', self.shift_selection_drag)
 
     def set_current(self, event):
         """Set the current index whenever a listbox element is clicked on"""
         self.cur_index = self.nearest(event.y)
+        self.activate(self.cur_index)
 
     def make_active(self, event):
         """Make the selected preset active in the GUI whenever it is double-clicked on"""
         self.cur_index = self.nearest(event.y)
         self.presetpane.preset_selected(self.cur_index)
 
-    def shift_selection(self, event):
+    def shift_selection_drag(self, event):
         """Allows the user to rearrange listbox elements by dragging and dropping them"""
         i = self.nearest(event.y)
         # Get the selected element from the presets list

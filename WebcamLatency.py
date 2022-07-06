@@ -23,7 +23,6 @@ frame = None
 try:
     if cam.isOpened():  # try to get the first frame
         rval, frame = cam.read()
-
     else:
         rval = False
     ii = 100
