@@ -273,6 +273,7 @@ class PresetPane(ParentFrame):
         self.presets_dir = './input/'
         self.presets_list = []
         self.default_path = './output/'
+        self.selected_preset = None
         # Initialise the preset selector listbox
         self.presets_listbox = PresetListbox(tk_frame=self.tk_frame, presetpane=self)
         # These widgets should be packed in TkGui
@@ -385,8 +386,8 @@ class PresetPane(ParentFrame):
     def preset_selected(self, selected):
         """Opens the selected preset pane in the GUI"""
         if len(self.presets_list) > 0:
-            selected_preset = self.presets_list[selected]
-            self.gui.preset_handler(selected_preset)
+            self.selected_preset = self.presets_list[selected]
+            self.gui.preset_handler(self.selected_preset)
 
     def open_preset_creator(self):
         """Creates a new toplevel window to allow the user to create preset files"""
@@ -470,6 +471,9 @@ class PresetPane(ParentFrame):
             self.presets_listbox.insert(old_i + shift, x)
             self.presets_listbox.cur_index += shift
             self.presets_listbox.activate(self.presets_listbox.cur_index)
+
+    def return_current_preset(self):
+        return self.selected_preset
 
 
 class PresetListbox(tk.Listbox):
