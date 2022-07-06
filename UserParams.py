@@ -2,7 +2,10 @@
 cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
 user_params = {
     '*participants': 2,     # Number of cameras/tracks to try and read
-    '*backup directory': r"C:\Users\Huw Cheston\Documents\SAVE RESULTS HERE\Automatic Backup" ,
+    '*backup directory': [
+        r"C:\Users\Huw Cheston\Documents\SAVE RESULTS HERE\Automatic Backup",
+        r"D:\Automatic Backups",
+    ],
     '*polar mac addresses': [
         # ('A0:9E:1A:AD:16:3B', 'H', ['ppg', 'acc']),   # My personal Polar Verity Sense: marked 'H' on armband
         # ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg', 'acc']),   # CMS 1 on armband
