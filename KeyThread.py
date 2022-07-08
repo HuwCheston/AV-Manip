@@ -110,7 +110,7 @@ class KeyThread:
         for folder in self.params['*backup directory']:
             # Make a new folder in our backup directory
             try:
-                backup_dir = fr"{folder}\output_{datetime.now().strftime('%H_%M_%S')}"
+                backup_dir = fr"{folder}\output_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
                 os.mkdir(backup_dir)
             except FileNotFoundError:
                 self.gui.log_text(f'Backup directory {folder} not present')

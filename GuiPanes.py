@@ -411,10 +411,19 @@ class PresetPane(ParentFrame):
         # Prompt for a location to save the .csv
         save_dir = self.csv_file_save()
         # Save the .csv file
-        with open(save_dir, 'w', newline='') as output_file:
+        try:
+            output_file = open(save_dir, 'w', newline='')
             dict_writer = csv.DictWriter(output_file, list(to_csv[0].keys()))
             dict_writer.writeheader()
             dict_writer.writerows(to_csv)
+        except FileNotFoundError:
+            self.gui.log_text('No file selected')
+        except FileExistsError:
+            self.gui.log_text('File already exists')
+        except IndexError:
+            self.gui.log_text('No presets added')
+        else:
+            self.gui.log_text('')
 
     def preset_order_to_csv(self):
         """Iterate through the presets list and generate the lines for the .csv file"""

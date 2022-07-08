@@ -4,7 +4,7 @@ user_params = {
     '*participants': 2,     # Number of cameras/tracks to try and read
     '*backup directory': [
         r"C:\Users\Huw Cheston\Documents\SAVE RESULTS HERE\Automatic Backup",
-        r"D:\Automatic Backups",
+        # r"D:\SAVE RESULTS HERE\Automatic Backup",
     ],
     '*polar mac addresses': [
         # ('A0:9E:1A:AD:16:3B', 'H', ['ppg', 'acc']),   # My personal Polar Verity Sense: marked 'H' on armband
