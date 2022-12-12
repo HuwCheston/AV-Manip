@@ -1,9 +1,9 @@
 # These parameters can be edited by the user before running the program and should adjust system settings automatically
 cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
 user_params = {
-    '*participants': 2,     # Number of cameras/tracks to try and read
+    '*participants': 1,     # Number of cameras/tracks to try and read
     '*backup directory': [
-        r"C:\Users\Huw Cheston\Documents\SAVE RESULTS HERE\Automatic Backup",
+        # r"C:\Users\Huw Cheston\Documents\SAVE RESULTS HERE\Automatic Backup",
         # r"D:\SAVE RESULTS HERE\Automatic Backup",
     ],
     '*polar mac addresses': [

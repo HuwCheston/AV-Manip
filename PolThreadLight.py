@@ -312,8 +312,8 @@ class PolThread:
     def _report_results(
             self, streams: dict
     ) -> str:
-        """C
-        onstruct report of recorded datastreams for logging in GUI
+        """
+        Construct report of recorded datastreams for logging in GUI
         """
         results = f'{self.desc}: '
         for dat, cond in streams:
@@ -470,6 +470,8 @@ class Gui:
 
 
 if __name__ == '__main__':
+    # UPDATE THIS LIST!!! Add new Polar devices as separate tuples in the form:
+    # ('Mac address', 'user-created ID', [any from 'ppg', 'hr', 'acc', 'ppi'])
     polars = [
         ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),    # CMS 1 on armband
         ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
