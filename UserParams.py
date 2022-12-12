@@ -1,18 +1,21 @@
 # These parameters can be edited by the user before running the program and should adjust system settings automatically
 cascade_location = r".\venv\Lib\site-packages\opencv_python-4.5.5.62.dist-info"
 user_params = {
-    # TODO: set this value to create more tracks in ReaThread if not enough exist already
-    '*participants': 1,     # Number of cameras/tracks to try and read
+    '*participants': 2,     # Number of cameras/tracks to try and read
+    '*backup directory': [
+        r"C:\Users\Huw Cheston\Documents\SAVE RESULTS HERE\Automatic Backup",
+        # r"D:\SAVE RESULTS HERE\Automatic Backup",
+    ],
     '*polar mac addresses': [
-        # ('A0:9E:1A:AD:16:3B', 'H', ['ppg']),   # My personal Polar Verity Sense: marked 'H' on armband
-        # ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),   # CMS 1 on armband
-        ('A0:9E:1A:B2:2B:B6', 'CMS_2', ['ppg']),   # CMS 2 on armband
+        # ('A0:9E:1A:AD:16:3B', 'H', ['ppg', 'acc']),   # My personal Polar Verity Sense: marked 'H' on armband
+        # ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg', 'acc']),   # CMS 1 on armband
+        # ('A0:9E:1A:B2:2B:B6', 'CMS_2', ['ppi']),   # CMS 2 on armband
         # ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
     ],
 
     '*fps': 30,     # Try and set camera FPS to this value (and adjust all params that require this as needed)
-    '*resolution': '640x480',   # Camera resolution (for researcher view and recording)
-    '*scaling': 2.0,     # Amount to scale up the performer camera view by
+    '*resolution': '1920x1080',   # Camera resolution (for researcher view and recording)
+    '*scaling': 0.5,     # Amount to scale up the performer camera view by
     '*exit time': 3,    # Number of seconds to wait before exiting the program
 
     '*default bpm': 120,    # The default BPM to use in Reaper: can be overridden in the GUI

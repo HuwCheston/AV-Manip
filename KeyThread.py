@@ -1,9 +1,11 @@
 import threading
 import time
+import os
 from datetime import datetime
 import tkinter
 from TkGui import TkGui
 from PolThread import PolThread
+import shutil
 
 
 class KeyThread:
@@ -36,7 +38,9 @@ class KeyThread:
         # for num in range(self.params['*exit time'], 0, -1):
         #     # Wait to make sure everything has shut down (prevents tkinter RunTime errors w/threading)
         #     time.sleep(1)
-        self.stop_recording()
+        # If we're recording, stop first
+        if self.reathread.project.is_recording:
+            self.stop_recording()
         self.stop_event.set()
         for pol in self.polthread:
             pol.quit_polar()
@@ -98,3 +102,25 @@ class KeyThread:
         for pol in self.polthread:
             pol.stop_polar()
         self.gui.log_text(text=f'Finished recording at {datetime.now().strftime("%H:%M:%S")}')
+        self.backup_output()
+
+    def backup_output(self):
+        """Automatically backs up output to specified directories after each recording"""
+        # Iterate through all backup folders
+        for folder in self.params['*backup directory']:
+            # Make a new folder in our backup directory
+            try:
+                backup_dir = fr"{folder}\output_{datetime.now().strftime('%Y_%m_%d_%H_%M_%S')}"
+                os.mkdir(backup_dir)
+            except FileNotFoundError:
+                self.gui.log_text(f'Backup directory {folder} not present')
+            else:
+                # Iterate through our output files and copy them to the backup directory
+                for (root, dirs, files) in os.walk(r".\output", topdown=False):
+                    for name in files:
+                        try:
+                            shutil.copy(os.path.join(root, name), backup_dir)
+                        except PermissionError:
+                            self.gui.log_text(f'Permission denied when backing up {name}')
+                        except FileExistsError:
+                            self.gui.log_text(f'File already exists when backing up {name}')

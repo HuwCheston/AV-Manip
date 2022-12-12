@@ -70,9 +70,8 @@ class PresetCreator:
 
         # Widgets created here will not be cleared whenever a new manipulation is selected - e.g. combobox
         self.creator_frame = tk.Frame(self.creator_window, borderwidth=2, relief="groove")
-        _ = tk.Label(self.creator_frame, text='Preset Creator').pack()
-        _ = tk.Label(self.creator_frame,
-                     text='Use this tool to create preset .JSON files').pack()
+        tk.Label(self.creator_frame, text='Preset Creator').pack()
+        tk.Label(self.creator_frame, text='Use this tool to create preset .JSON files').pack()
         self.creator_frame.pack(padx=10, pady=10, anchor='center')
 
         # Widgets created here will be cleared whenever a new manipulation is selected - these are the parameters
@@ -165,7 +164,6 @@ class PresetCreator:
         )
         # Open the file
         f = tk.filedialog.askopenfile(title='Open a file', initialdir='./input/', filetypes=filetypes)
-
         # Tk askopenfile returns None if dialog closed with cancel
         if f is None:
             return
@@ -191,10 +189,13 @@ class PresetCreator:
         # Create the JSON, including the manipulation string we are using
         data = {'Manipulation': manip, **self.add_to_json(entries_labels=zip(labels, entries))}
         # Get the location to save the file
-        # TODO: need to catch errors here if file window closed out of
         path = self.file_save()
         # Save the .JSON
-        with open(path, 'w') as f:
+        try:
+            f = open(path, 'w')
+        except FileNotFoundError:
+            pass
+        else:
             f.write(json.dumps(data))
 
     def file_save(self):
