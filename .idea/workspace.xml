@@ -1,74 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AnalysisUIOptions">
-    <option name="SCOPE_TYPE" value="8" />
-    <option name="CUSTOM_SCOPE_NAME" value="Recently Changed Files" />
-  </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="Latest PolThread commit">
-      <change afterPath="$PROJECT_DIR$/PolThreadLight.py" afterDir="false" />
+    <list default="true" id="ca51b7c1-a2b3-42b2-bb25-bf85c4edb404" name="Changes" comment="More PolThreadLight changes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.rpp-bak" beforeDir="false" afterPath="$PROJECT_DIR$/main.rpp-bak" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PolThreadLight.py" beforeDir="false" afterPath="$PROJECT_DIR$/PolThreadLight.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Python Script" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitSEFilterConfiguration">
-    <file-type-list>
-      <filtered-out-file-type name="LOCAL_BRANCH" />
-      <filtered-out-file-type name="REMOTE_BRANCH" />
-      <filtered-out-file-type name="TAG" />
-      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
-    </file-type-list>
-  </component>
-  <component name="NamedScopeManager">
-    <scope name="Project Scope" pattern="file:.gitignore||file:CamThread.py||file:get_filename.py||file:KeyThread.py||file:main.py||file:main.rpp||file:main.rpp-bak||file:README.md||file:ReaThread.py||file:scratch.py||file[test]:output/*||file:ReaEdit.py||file:TkGui.py||file:UserParams.py" />
-  </component>
-  <component name="ProjectId" id="22KaKOM3T3C1AikBtybgRC17dmk" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectId" id="2IogQfkNPRL0jRLgufaKFo9fwVg" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="TODO_SCOPE" value="Project Scope" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/PolThreadLight.py" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Python Projects\AV-Manip" />
-      <recent name="C:\test" />
-    </key>
-  </component>
   <component name="RunManager" selected="Python.PolThreadLight">
-    <configuration name="PolThreadLight" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="test" />
+    <configuration name="PolThreadLight" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="AV-Manip" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Python Projects\AV-Manip\venv\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -82,7 +51,7 @@
       <method v="2" />
     </configuration>
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="test" />
+      <module name="AV-Manip" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -103,567 +72,34 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="test" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\test\main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
-      <module name="test" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\test\main.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="scratch" type="PythonConfigurationType" factoryName="Python">
-      <module name="test" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="C:\Users\huwch\AppData\Local\Programs\Python\Python310\python.exe" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/scratch.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.main" />
-      <item itemvalue="Python.scratch" />
       <item itemvalue="Python.PolThreadLight" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.PolThreadLight" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="d6985210-961e-4a25-ac51-b07138a28adf" name="Changes" comment="" />
-      <created>1639588667180</created>
+      <changelist id="ca51b7c1-a2b3-42b2-bb25-bf85c4edb404" name="Changes" comment="" />
+      <created>1670853338387</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1639588667180</updated>
-      <workItem from="1639588669724" duration="161000" />
-      <workItem from="1639588852135" duration="511000" />
-      <workItem from="1639589375029" duration="245000" />
-      <workItem from="1639589641587" duration="26000" />
-      <workItem from="1639589682689" duration="180000" />
-      <workItem from="1639645366149" duration="1101000" />
-      <workItem from="1639647115057" duration="9051000" />
-      <workItem from="1639662448675" duration="11704000" />
-      <workItem from="1639732641524" duration="5599000" />
-      <workItem from="1639738599554" duration="772000" />
-      <workItem from="1639739602072" duration="874000" />
-      <workItem from="1639740899692" duration="3593000" />
-      <workItem from="1641294423551" duration="943000" />
-      <workItem from="1641295789454" duration="5861000" />
-      <workItem from="1641303958440" duration="3240000" />
-      <workItem from="1641307556022" duration="7839000" />
-      <workItem from="1641315948190" duration="1448000" />
-      <workItem from="1641375310261" duration="12546000" />
-      <workItem from="1641462128139" duration="558000" />
-      <workItem from="1641805147607" duration="24268000" />
-      <workItem from="1641979678549" duration="7102000" />
-      <workItem from="1642587095414" duration="6407000" />
-      <workItem from="1643032009878" duration="112000" />
-      <workItem from="1643045800435" duration="297000" />
-      <workItem from="1643099789633" duration="1353000" />
-      <workItem from="1643101162085" duration="1989000" />
-      <workItem from="1643103389604" duration="4631000" />
-      <workItem from="1643108595622" duration="12965000" />
-      <workItem from="1643143569306" duration="6482000" />
-      <workItem from="1643206289602" duration="11506000" />
-      <workItem from="1643296450632" duration="9802000" />
-      <workItem from="1643361321733" duration="4706000" />
-      <workItem from="1643375701178" duration="8948000" />
-      <workItem from="1643627971158" duration="4056000" />
-      <workItem from="1643633047594" duration="2716000" />
-      <workItem from="1643706874429" duration="2839000" />
-      <workItem from="1643734537701" duration="4803000" />
-      <workItem from="1643741913010" duration="211000" />
-      <workItem from="1643793986029" duration="20203000" />
-      <workItem from="1643879772322" duration="9443000" />
-      <workItem from="1643892879994" duration="13012000" />
-      <workItem from="1643913238341" duration="539000" />
-      <workItem from="1644062772682" duration="17876000" />
-      <workItem from="1644085056289" duration="546000" />
-      <workItem from="1644312006042" duration="4559000" />
-      <workItem from="1644336121042" duration="757000" />
-      <workItem from="1644392027785" duration="9946000" />
-      <workItem from="1644439265722" duration="7738000" />
-      <workItem from="1644936836709" duration="12721000" />
-      <workItem from="1644996849968" duration="15726000" />
-      <workItem from="1645035709119" duration="5971000" />
-      <workItem from="1645091743100" duration="17441000" />
-      <workItem from="1645121396044" duration="86000" />
-      <workItem from="1645176059907" duration="16038000" />
-      <workItem from="1645195042924" duration="1317000" />
-      <workItem from="1645452005675" duration="2779000" />
-      <workItem from="1645550913513" duration="1071000" />
-      <workItem from="1645636299601" duration="2894000" />
-      <workItem from="1645708949903" duration="40000" />
-      <workItem from="1646065909612" duration="1679000" />
-      <workItem from="1646679569844" duration="6644000" />
-      <workItem from="1646733588309" duration="477000" />
-      <workItem from="1646735465609" duration="1634000" />
-      <workItem from="1646749938003" duration="10700000" />
-      <workItem from="1646819360268" duration="9627000" />
-      <workItem from="1647248810643" duration="25384000" />
-      <workItem from="1647338828096" duration="9624000" />
-      <workItem from="1647431345466" duration="1258000" />
-      <workItem from="1647508632685" duration="26338000" />
-      <workItem from="1647594865021" duration="24503000" />
-      <workItem from="1648472466138" duration="8133000" />
-      <workItem from="1648541688259" duration="29187000" />
-      <workItem from="1648585815563" duration="138000" />
-      <workItem from="1648629600774" duration="19446000" />
-      <workItem from="1648802311552" duration="10769000" />
-      <workItem from="1648822356716" duration="4624000" />
-      <workItem from="1649060129146" duration="1226000" />
-      <workItem from="1649154079170" duration="656000" />
-      <workItem from="1649940144045" duration="696000" />
-      <workItem from="1652178006397" duration="6000" />
-      <workItem from="1653917368690" duration="1050000" />
-      <workItem from="1653918464557" duration="95000" />
-      <workItem from="1654005052631" duration="1516000" />
-      <workItem from="1654012359653" duration="872000" />
-      <workItem from="1655133669125" duration="2000" />
-      <workItem from="1655307529037" duration="249000" />
-      <workItem from="1655463507978" duration="6000" />
-      <workItem from="1655762527132" duration="133000" />
-      <workItem from="1655763548255" duration="2018000" />
-      <workItem from="1655798768447" duration="15181000" />
-      <workItem from="1655909471264" duration="1443000" />
-      <workItem from="1655911127010" duration="347000" />
-      <workItem from="1655911645615" duration="2700000" />
-      <workItem from="1655916986365" duration="399000" />
-      <workItem from="1655987666108" duration="28000" />
-      <workItem from="1655991045886" duration="5808000" />
-      <workItem from="1656254913531" duration="431000" />
-      <workItem from="1656319285588" duration="749000" />
-      <workItem from="1656321528292" duration="527000" />
-      <workItem from="1656326290715" duration="1523000" />
-      <workItem from="1656328754191" duration="3933000" />
-      <workItem from="1656416725791" duration="711000" />
-      <workItem from="1656417655249" duration="30000" />
-      <workItem from="1656417694891" duration="674000" />
-      <workItem from="1656443267162" duration="4036000" />
-      <workItem from="1656493243190" duration="21683000" />
-      <workItem from="1656575749456" duration="5564000" />
-      <workItem from="1656663518400" duration="19780000" />
-      <workItem from="1656750696564" duration="2133000" />
-      <workItem from="1656920785843" duration="5039000" />
-      <workItem from="1656963690937" duration="7103000" />
-      <workItem from="1657536637325" duration="32000" />
-      <workItem from="1661421191579" duration="675000" />
-      <workItem from="1661508671655" duration="9000" />
-      <workItem from="1664898114968" duration="183000" />
-      <workItem from="1670843017767" duration="6878000" />
+      <updated>1670853338387</updated>
+      <workItem from="1670853341317" duration="2486000" />
+      <workItem from="1671013653117" duration="5849000" />
     </task>
-    <task id="LOCAL-00068" summary="General refactoring and work on plt integration in DelayPanes.py">
-      <created>1645193430925</created>
-      <option name="number" value="00068" />
-      <option name="presentableId" value="LOCAL-00068" />
+    <task id="LOCAL-00001" summary="More PolThreadLight changes">
+      <created>1670856332140</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1645193430925</updated>
+      <updated>1670856332140</updated>
     </task>
-    <task id="LOCAL-00069" summary="Fixed a few plotting bugs and implemented a new way of calculating log interpolations (wasn't working for starting values greater than 0)">
-      <created>1645637618593</created>
-      <option name="number" value="00069" />
-      <option name="presentableId" value="LOCAL-00069" />
-      <option name="project" value="LOCAL" />
-      <updated>1645637618593</updated>
-    </task>
-    <task id="LOCAL-00070" summary="Initial work on importing delay arrays from file">
-      <created>1646686075066</created>
-      <option name="number" value="00070" />
-      <option name="presentableId" value="LOCAL-00070" />
-      <option name="project" value="LOCAL" />
-      <updated>1646686075067</updated>
-    </task>
-    <task id="LOCAL-00071" summary="More work on delay from file">
-      <created>1646688741103</created>
-      <option name="number" value="00071" />
-      <option name="presentableId" value="LOCAL-00071" />
-      <option name="project" value="LOCAL" />
-      <updated>1646688741103</updated>
-    </task>
-    <task id="LOCAL-00072" summary="Implemented file delay scaling/multiplier">
-      <created>1646753480405</created>
-      <option name="number" value="00072" />
-      <option name="presentableId" value="LOCAL-00072" />
-      <option name="project" value="LOCAL" />
-      <updated>1646753480406</updated>
-    </task>
-    <task id="LOCAL-00073" summary="Implemented delay choice pane. Must fix resetting button colour bug!">
-      <created>1646757095036</created>
-      <option name="number" value="00073" />
-      <option name="presentableId" value="LOCAL-00073" />
-      <option name="project" value="LOCAL" />
-      <updated>1646757095036</updated>
-    </task>
-    <task id="LOCAL-00074" summary="Hacky fix for bug when resetting manips. Check video delay is working and realistic!">
-      <created>1646780114695</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1646780114695</updated>
-    </task>
-    <task id="LOCAL-00075" summary="Implemented proper scaling of delay from file">
-      <created>1646822146969</created>
-      <option name="number" value="00075" />
-      <option name="presentableId" value="LOCAL-00075" />
-      <option name="project" value="LOCAL" />
-      <updated>1646822146970</updated>
-    </task>
-    <task id="LOCAL-00076" summary="Added some files to commit">
-      <created>1646840115997</created>
-      <option name="number" value="00076" />
-      <option name="presentableId" value="LOCAL-00076" />
-      <option name="project" value="LOCAL" />
-      <updated>1646840115997</updated>
-    </task>
-    <task id="LOCAL-00077" summary="Work on allowing GUI to control recording">
-      <created>1647255667691</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1647255667691</updated>
-    </task>
-    <task id="LOCAL-00078" summary="Added start/stop recording functionality to GUI">
-      <created>1647263231291</created>
-      <option name="number" value="00078" />
-      <option name="presentableId" value="LOCAL-00078" />
-      <option name="project" value="LOCAL" />
-      <updated>1647263231291</updated>
-    </task>
-    <task id="LOCAL-00079" summary="Updated gitignore">
-      <created>1647263435361</created>
-      <option name="number" value="00079" />
-      <option name="presentableId" value="LOCAL-00079" />
-      <option name="project" value="LOCAL" />
-      <updated>1647263435361</updated>
-    </task>
-    <task id="LOCAL-00080" summary="Updated gitignore again">
-      <created>1647263470487</created>
-      <option name="number" value="00080" />
-      <option name="presentableId" value="LOCAL-00080" />
-      <option name="project" value="LOCAL" />
-      <updated>1647263470487</updated>
-    </task>
-    <task id="LOCAL-00081" summary="Added lots of functionality to ReaThread">
-      <created>1647278975391</created>
-      <option name="number" value="00081" />
-      <option name="presentableId" value="LOCAL-00081" />
-      <option name="project" value="LOCAL" />
-      <updated>1647278975391</updated>
-    </task>
-    <task id="LOCAL-00082" summary="More work in ReaThread">
-      <created>1647281174335</created>
-      <option name="number" value="00082" />
-      <option name="presentableId" value="LOCAL-00082" />
-      <option name="project" value="LOCAL" />
-      <updated>1647281174335</updated>
-    </task>
-    <task id="LOCAL-00083" summary="Added custom BPM in GUI. Refactoring/Tidying/Commenting">
-      <created>1647346825903</created>
-      <option name="number" value="00083" />
-      <option name="presentableId" value="LOCAL-00083" />
-      <option name="project" value="LOCAL" />
-      <updated>1647346825903</updated>
-    </task>
-    <task id="LOCAL-00084" summary="Commit before restructuring ReaThread cals">
-      <created>1647511099950</created>
-      <option name="number" value="00084" />
-      <option name="presentableId" value="LOCAL-00084" />
-      <option name="project" value="LOCAL" />
-      <updated>1647511099950</updated>
-    </task>
-    <task id="LOCAL-00085" summary="Implemented delay blocking for Delay From File">
-      <created>1647515512785</created>
-      <option name="number" value="00085" />
-      <option name="presentableId" value="LOCAL-00085" />
-      <option name="project" value="LOCAL" />
-      <updated>1647515512785</updated>
-    </task>
-    <task id="LOCAL-00086" summary="Implemented preset .json creation tool">
-      <created>1647530775941</created>
-      <option name="number" value="00086" />
-      <option name="presentableId" value="LOCAL-00086" />
-      <option name="project" value="LOCAL" />
-      <updated>1647530775941</updated>
-    </task>
-    <task id="LOCAL-00087" summary="Further work on PresetCreator.py">
-      <created>1647532787186</created>
-      <option name="number" value="00087" />
-      <option name="presentableId" value="LOCAL-00087" />
-      <option name="project" value="LOCAL" />
-      <updated>1647532787187</updated>
-    </task>
-    <task id="LOCAL-00088" summary="Fixed reapy socket closing unexpectedly (hopefully!)">
-      <created>1647540042811</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1647540042811</updated>
-    </task>
-    <task id="LOCAL-00089" summary="More work on fixing unexpected socket closing (hopefully got it this time)">
-      <created>1647598869051</created>
-      <option name="number" value="00089" />
-      <option name="presentableId" value="LOCAL-00089" />
-      <option name="project" value="LOCAL" />
-      <updated>1647598869051</updated>
-    </task>
-    <task id="LOCAL-00090" summary="Implemented preset pane to load jsons">
-      <created>1647616427569</created>
-      <option name="number" value="00090" />
-      <option name="presentableId" value="LOCAL-00090" />
-      <option name="project" value="LOCAL" />
-      <updated>1647616427569</updated>
-    </task>
-    <task id="LOCAL-00091" summary="Started moving TkGui panes to seperate classes - continue when back">
-      <created>1647622069872</created>
-      <option name="number" value="00091" />
-      <option name="presentableId" value="LOCAL-00091" />
-      <option name="project" value="LOCAL" />
-      <updated>1647622069872</updated>
-    </task>
-    <task id="LOCAL-00092" summary="Continued refactoring TkGui into classes">
-      <created>1648499644865</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1648499644866</updated>
-    </task>
-    <task id="LOCAL-00093" summary="More refactoring">
-      <created>1648546223184</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1648546223185</updated>
-    </task>
-    <task id="LOCAL-00094" summary="Gui panes now inherit from base class">
-      <created>1648551537748</created>
-      <option name="number" value="00094" />
-      <option name="presentableId" value="LOCAL-00094" />
-      <option name="project" value="LOCAL" />
-      <updated>1648551537748</updated>
-    </task>
-    <task id="LOCAL-00095" summary="Moved Gui panes to separate file">
-      <created>1648552688728</created>
-      <option name="number" value="00095" />
-      <option name="presentableId" value="LOCAL-00095" />
-      <option name="project" value="LOCAL" />
-      <updated>1648552688728</updated>
-    </task>
-    <task id="LOCAL-00096" summary="More work refactoring gui panes...">
-      <created>1648554541979</created>
-      <option name="number" value="00096" />
-      <option name="presentableId" value="LOCAL-00096" />
-      <option name="project" value="LOCAL" />
-      <updated>1648554541979</updated>
-    </task>
-    <task id="LOCAL-00097" summary="Added functionality to PresetPane - randomise presets, save preset order as csv...">
-      <created>1648567050220</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1648567050220</updated>
-    </task>
-    <task id="LOCAL-00098" summary="Adjusted file naming in reathread/camthread">
-      <created>1648573809064</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1648573809064</updated>
-    </task>
-    <task id="LOCAL-00099" summary="Added recording of delayed video">
-      <created>1648585908945</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1648585908945</updated>
-    </task>
-    <task id="LOCAL-00100" summary="Fixed delay resample rate not matching actual user input">
-      <created>1648639906926</created>
-      <option name="number" value="00100" />
-      <option name="presentableId" value="LOCAL-00100" />
-      <option name="project" value="LOCAL" />
-      <updated>1648639906926</updated>
-    </task>
-    <task id="LOCAL-00101" summary="Fixed a bug relating to resample rates. Added some more CamWrite params.">
-      <created>1648643439574</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1648643439574</updated>
-    </task>
-    <task id="LOCAL-00102" summary="Fixed a bug relating to scaling delay from file">
-      <created>1648671927568</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1648671927568</updated>
-    </task>
-    <task id="LOCAL-00103" summary="Changed preset loader to listbox">
-      <created>1648810942894</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1648810942895</updated>
-    </task>
-    <task id="LOCAL-00104" summary="Added a few comments, removed auto-stop">
-      <created>1648822593437</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1648822593437</updated>
-    </task>
-    <task id="LOCAL-00105" summary="Added remove preset button in preset manager">
-      <created>1648825203627</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1648825203627</updated>
-    </task>
-    <task id="LOCAL-00106" summary="Added a few comments">
-      <created>1648826544521</created>
-      <option name="number" value="00106" />
-      <option name="presentableId" value="LOCAL-00106" />
-      <option name="project" value="LOCAL" />
-      <updated>1648826544521</updated>
-    </task>
-    <task id="LOCAL-00107" summary="Added integrated tracking of HR/PPG from Polar Heart Rate Monitor(s)">
-      <created>1655825001745</created>
-      <option name="number" value="00107" />
-      <option name="presentableId" value="LOCAL-00107" />
-      <option name="project" value="LOCAL" />
-      <updated>1655825001745</updated>
-    </task>
-    <task id="LOCAL-00108" summary="Updated ReaThread.py to reflect new main.rpp REAPER project configuration">
-      <created>1655910842625</created>
-      <option name="number" value="00108" />
-      <option name="presentableId" value="LOCAL-00108" />
-      <option name="project" value="LOCAL" />
-      <updated>1655910842625</updated>
-    </task>
-    <task id="LOCAL-00109" summary="Close PolThread.py without killing application if HR sensor not detected/malfunctions">
-      <created>1655914722978</created>
-      <option name="number" value="00109" />
-      <option name="presentableId" value="LOCAL-00109" />
-      <option name="project" value="LOCAL" />
-      <updated>1655914722979</updated>
-    </task>
-    <task id="LOCAL-00110" summary="Added PPI, accelerometer stream support in PolThread.py">
-      <created>1655998022022</created>
-      <option name="number" value="00110" />
-      <option name="presentableId" value="LOCAL-00110" />
-      <option name="project" value="LOCAL" />
-      <updated>1655998022023</updated>
-    </task>
-    <task id="LOCAL-00111" summary="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)">
-      <created>1656000877288</created>
-      <option name="number" value="00111" />
-      <option name="presentableId" value="LOCAL-00111" />
-      <option name="project" value="LOCAL" />
-      <updated>1656000877288</updated>
-    </task>
-    <task id="LOCAL-00112" summary="Few changes in PolThread.py">
-      <created>1656255239279</created>
-      <option name="number" value="00112" />
-      <option name="presentableId" value="LOCAL-00112" />
-      <option name="project" value="LOCAL" />
-      <updated>1656255239280</updated>
-    </task>
-    <task id="LOCAL-00113" summary="Added new CMS Polar addresses">
-      <created>1656417128759</created>
-      <option name="number" value="00113" />
-      <option name="presentableId" value="LOCAL-00113" />
-      <option name="project" value="LOCAL" />
-      <updated>1656417128759</updated>
-    </task>
-    <task id="LOCAL-00114" summary="Completely rewrote PolThread.py">
-      <created>1656686920352</created>
-      <option name="number" value="00114" />
-      <option name="presentableId" value="LOCAL-00114" />
-      <option name="project" value="LOCAL" />
-      <updated>1656686920353</updated>
-    </task>
-    <task id="LOCAL-00115" summary="Removed concurrence when opening Polar streams. Added raw data capture.">
-      <created>1656926555957</created>
-      <option name="number" value="00115" />
-      <option name="presentableId" value="LOCAL-00115" />
-      <option name="project" value="LOCAL" />
-      <updated>1656926555958</updated>
-    </task>
-    <task id="LOCAL-00116" summary="Latest PolThread commit">
-      <created>1656931033400</created>
-      <option name="number" value="00116" />
-      <option name="presentableId" value="LOCAL-00116" />
-      <option name="project" value="LOCAL" />
-      <updated>1656931033400</updated>
-    </task>
-    <option name="localTasksCounter" value="117" />
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.History.Properties">
-    <option name="COLUMN_ID_ORDER">
-      <list>
-        <option value="Default.Root" />
-        <option value="Default.Author" />
-        <option value="Default.Date" />
-        <option value="Default.Subject" />
-        <option value="Space.CommitStatus" />
-      </list>
-    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -678,48 +114,11 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="Continued refactoring TkGui into classes" />
-    <MESSAGE value="More refactoring" />
-    <MESSAGE value="Gui panes now inherit from base class" />
-    <MESSAGE value="Moved Gui panes to separate file" />
-    <MESSAGE value="More work refactoring gui panes..." />
-    <MESSAGE value="Added functionality to PresetPane - randomise presets, save preset order as csv..." />
-    <MESSAGE value="Adjusted file naming in reathread/camthread" />
-    <MESSAGE value="Added recording of delayed video" />
-    <MESSAGE value="Fixed delay resample rate not matching actual user input" />
-    <MESSAGE value="Fixed a bug relating to resample rates. Added some more CamWrite params." />
-    <MESSAGE value="Fixed a bug relating to scaling delay from file" />
-    <MESSAGE value="Changed preset loader to listbox" />
-    <MESSAGE value="Added a few comments, removed auto-stop" />
-    <MESSAGE value="Added remove preset button in preset manager" />
-    <MESSAGE value="Added a few comments" />
-    <MESSAGE value="Added integrated tracking of HR/PPG from Polar Heart Rate Monitor(s)" />
-    <MESSAGE value="Updated ReaThread.py to reflect new main.rpp REAPER project configuration" />
-    <MESSAGE value="Close PolThread.py without killing application if HR sensor not detected/malfunctions" />
-    <MESSAGE value="Added PPI, accelerometer stream support in PolThread.py" />
-    <MESSAGE value="Refactored PolThread.py to be called in KeyThread.py (enables GUI logging of Bluetooth events)" />
-    <MESSAGE value="Few changes in PolThread.py" />
-    <MESSAGE value="Added new CMS Polar addresses" />
-    <MESSAGE value="Completely rewrote PolThread.py" />
-    <MESSAGE value="Removed concurrence when opening Polar streams. Added raw data capture." />
-    <MESSAGE value="Latest PolThread commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Latest PolThread commit" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$USER_HOME$/AppData/Local/Programs/Python/Python310/Lib/threading.py</url>
-          <line>2</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <MESSAGE value="More PolThreadLight changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="More PolThreadLight changes" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/main_py$scratch.coverage" NAME="scratch Coverage Results" MODIFIED="1656972139753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$main.coverage" NAME="main Coverage Results" MODIFIED="1664898150139" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/main_py$PolThreadLight.coverage" NAME="PolThreadLight Coverage Results" MODIFIED="1670852407104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AV_Manip$PolThreadLight.coverage" NAME="PolThreadLight Coverage Results" MODIFIED="1671019575195" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AV_Manip$main.coverage" NAME="main Coverage Results" MODIFIED="1670854116832" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

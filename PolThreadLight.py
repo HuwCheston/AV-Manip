@@ -114,12 +114,14 @@ class PolThread:
             await asyncio.sleep(5)
             # Open PPG stream
             await self.client.write_gatt_char(UUID['PMD_Control'], START_PPG, response=True)
+            await asyncio.sleep(5)
             # Gather data from PPI stream
             await self.client.start_notify(UUID['PMD_Data'], self._format_ppg)
         # Gathering PPI
         if 'ppi' in self.results:
             # Open PPI stream
             await self.client.write_gatt_char(UUID['PMD_Control'], START_PPI, response=True)
+            await asyncio.sleep(5)
             # Gather data from PPI stream
             await self.client.start_notify(UUID['PMD_Data'], self._format_ppi)
 
@@ -146,11 +148,19 @@ class PolThread:
         """
         Report once correct response reported from device
         """
-        # TODO: fix this!
-        if data == bytearray(b'\xf0\x01\x01\x00\x00\x00\x01\x87\x00\x01\x01\x16\x00\x04\x01\x04'):  # success response
-            self.logger(f'{self.desc}: connected')
-        if data == bytearray([0xF0, 0x02, 0x09, 0x00, 0x00]):
+        # print(f'INIT {self.address} {data}')
+        # Check to see if we've received the SDK mode response first, which should look like [F0, 02, 09, 00, 00]
+        # This is so we don't end up logging that we've connected twice when we're enabling SDK mode
+        if data == bytearray(b'\xf0\x02\t\x00\x00'):
             self.logger(f'{self.desc}: SDK mode enabled')
+        # A successful response code will look like [F0, 02, ????, 00, 00...]
+        # Bytes 1-2 correspond to control point response (F0), and start measurement code (02)
+        # Byte 3 (????) changes depending on the stream; 01 for ppg, 02 for acc...
+        # Byte 4 corresponds to the error code (00 = success)
+        # Byte 5 and 6 correspond to whether more frames are coming (00 = False) and reserved space (01)
+        # As such, we only need to check bytes 1, 2, and 4 in order to see if we've connected successfully to a stream
+        elif data[0:2] == bytearray(b'\xf0\x02') and data[3] == 0:
+            self.logger(f'{self.desc}: connected')
 
     def _format_ppi(
             self, _, data: bytearray
@@ -159,6 +169,7 @@ class PolThread:
         Formats incoming PPI stream, combines with OS timestamp and appends to required list
         """
         # Append raw data plus timestamp
+        # print(f'PPI {self.address} {data}')
         if self.is_recording:
             self.raw_data['ppi'].append((datetime.now(tz=timezone.utc).strftime(TIME_FMT), data))
         type1, _, type2 = struct.unpack("<BqB", data[0:10])
@@ -200,6 +211,7 @@ class PolThread:
         """
         Formats incoming ppg stream
         """
+        # print(f'PPG {self.address} {data}')
         def get_ppg_value(
                 subdata: bytearray
         ) -> tuple:
@@ -471,7 +483,7 @@ class Gui:
 
 if __name__ == '__main__':
     # UPDATE THIS LIST!!! Add new Polar devices as separate tuples in the form:
-    # ('Mac address', 'user-created ID', [any from 'ppg', 'hr', 'acc', 'ppi'])
+    # ('Mac address', 'user-created ID', [any from 'ppg', 'hr', 'ppi'])
     polars = [
         ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),    # CMS 1 on armband
         ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
