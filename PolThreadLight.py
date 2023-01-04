@@ -62,6 +62,7 @@ class PolThread:
         self.desc = address[1] if isinstance(address[1], str) else self.address
         self.is_recording: bool = is_recording
         self.logger = logger
+        self.user_comment: str = ''
 
         # Results are appended into the corresponding lists here
         self.results = {s: [] for s in address[2]}
@@ -148,7 +149,6 @@ class PolThread:
         """
         Report once correct response reported from device
         """
-        # print(f'INIT {self.address} {data}')
         # Check to see if we've received the SDK mode response first, which should look like [F0, 02, 09, 00, 00]
         # This is so we don't end up logging that we've connected twice when we're enabling SDK mode
         if data == bytearray(b'\xf0\x02\t\x00\x00'):
@@ -169,7 +169,6 @@ class PolThread:
         Formats incoming PPI stream, combines with OS timestamp and appends to required list
         """
         # Append raw data plus timestamp
-        # print(f'PPI {self.address} {data}')
         if self.is_recording:
             self.raw_data['ppi'].append((datetime.now(tz=timezone.utc).strftime(TIME_FMT), data))
         type1, _, type2 = struct.unpack("<BqB", data[0:10])
@@ -211,7 +210,6 @@ class PolThread:
         """
         Formats incoming ppg stream
         """
-        # print(f'PPG {self.address} {data}')
         def get_ppg_value(
                 subdata: bytearray
         ) -> tuple:
@@ -288,6 +286,11 @@ class PolThread:
             self.is_firstrun[stream] = False
         # If we're recording, append the results to the required list
         if self.is_recording:
+            # Get the current user_comment
+            data.update({'user_comment': self.user_comment})
+            # Reset the timestamp back to an empty string
+            self.user_comment = ''
+            # Append the data
             self.results[stream].append(data)
 
     def _save_data(
@@ -348,17 +351,39 @@ class Gui:
     """
     Basic Tkinter GUI to start, stop and log recordings made in multiple PolThreads.
     """
-    def __init__(self, pol_details: list[tuple[str | list]]):
+    def __init__(self, pol_details: list[tuple[str | list]], **kwargs):
+        # Boolean used to store whether we're currently recording data
         self.is_recording: bool = False
-        self.output_folder: str = os.getcwd()
+        # Folder to store output in, can be set as keyword argument when initialising GUI or via a button in the GUI
+        self.output_folder: str = kwargs.get('output_folder', os.getcwd())
+        # Whether we should clear the timestamp entry window after adding in a timestamp
+        self.clear_comment_entry_window = kwargs.get('clear_window', False)
+        # String to store the timestamp
+        self.timestamp: None | str = None
+        # List of polar threads
         self.polthreads = self._init_polthreads(pol_details)
-        self.root = self._init_root()
-        self.logging_window = self._init_logging_window()
-        self.logging_window.pack()
-        self.start_button = self._init_start_button()
-        self.start_button.pack()
-        self.folder_select_button = self._init_folder_select_button()
-        self.folder_select_button.pack()
+        # Tkinter GUI variables
+        self.root = self._init_root()   # GUI root
+        self.logging_window = self._init_logging_window()   # Logging window
+        self.start_button = self._init_start_button()   # Recording start button
+        self.folder_select_button = self._init_folder_select_button()   # Select folder button
+        self.timestamp_frame = self._init_comment_frame()  # Frame holding timestamp entry window and button
+        self.checkbutton_frame = self._init_checkbutton_frame()
+        # Pack all the above widgets into our GUI root
+        self._pack_widgets(
+            self.logging_window, self.start_button, self.folder_select_button,
+            self.timestamp_frame, self.checkbutton_frame
+        )
+
+    @staticmethod
+    def _pack_widgets(
+            *args
+    ) -> None:
+        """
+        Packs an arbitrary number of tkinter widgets passed in as arguments into the GUI root
+        """
+        for widget in args:
+            widget.pack()
 
     def _init_polthreads(
             self, pol_details
@@ -377,9 +402,10 @@ class Gui:
         # Create tkinter GUI root and set attributes
         root = tk.Tk()
         root.title('Polar Verity Sense Monitor')
+        root.geometry('300x225')
         root.attributes('-topmost', 'true')
         # Create descriptive labels
-        lab = tk.Label(root, text='Polar Verity Sense Monitor v.01')
+        lab = tk.Label(root, text='Polar Verity Sense Monitor v.02')
         lab2 = tk.Label(root, text='© Huw Cheston, 2022 (hwc31@cam.ac.uk)')
         lab.pack()
         lab2.pack()
@@ -423,7 +449,7 @@ class Gui:
         """
         # Create the logging window
         return tk.scrolledtext.ScrolledText(
-            self.root, height=5, width=30, state='disabled', wrap='word', font='TkDefaultFont'
+            self.root, height=5, width=45, state='disabled', wrap='word', font='TkDefaultFont'
         )
 
     def _init_start_button(
@@ -432,11 +458,68 @@ class Gui:
         """
         Initialises recording start/stop button
         """
-        button = tk.Button(
-            self.root, text='Start recording...', bg='SystemButtonFace'
-        )
+        button = tk.Button(self.root, text='Start recording...', bg='SystemButtonFace')
+        # We configure the button after defining it, as we need to pass it into its own command
         button.configure(command=lambda: self._start_button_command(button))
         return button
+
+    def _init_comment_frame(
+            self
+    ) -> tk.Frame:
+        """
+        Initialise frame, entry, and button for user to add comment to incoming data
+        """
+        # Create frame
+        frame = tk.Frame(self.root)
+        # Create text variable
+        text = tk.StringVar()
+        # Initialise entry widget with text variable and insert default string into it
+        entry = tk.Entry(frame, textvariable=text, width=30)
+        entry.insert('end', "Enter comment")
+        # Initialise button and set command
+        button = tk.Button(
+            frame, text='Add to data', bg='SystemButtonFace',
+            command=lambda: self._add_comment_button_command(text, entry)
+        )
+        # Pack entry and button into frame, using grid system
+        entry.grid(column=1, row=1)
+        button.grid(column=2, row=1)
+        # Return the frame
+        return frame
+
+    def _init_checkbutton_frame(
+            self
+    ) -> tk.Frame:
+        """
+        Initialise checkbutton for user to indicate whether comment entry window should be cleared after adding to data
+        """
+        # Convert the clear comment window into a tkinter boolean variable
+        self.clear_comment_entry_window = tk.BooleanVar(self.root, value=self.clear_comment_entry_window)
+        # Initialise frame
+        frame = tk.Frame(self.root)
+        # Create checkbutton and set variable
+        checkbutton = tk.Checkbutton(frame, variable=self.clear_comment_entry_window)
+        # Add label to go next to the checkbutton
+        lab = tk.Label(frame, text='Clear comment entry window after adding?')
+        # Pack the widgets into the frame, using the grid system
+        checkbutton.grid(column=1, row=1)
+        lab.grid(column=2, row=1)
+        # Return the frame
+        return frame
+
+    def _add_comment_button_command(
+            self, text: tk.StringVar, entry: tk.Entry
+    ):
+        """
+        Updates timestamp parameter in all polar threads to currently entered timestamp
+        """
+        # Iterate through all our polars
+        for pol in self.polthreads:
+            # Set the user comment to the current text entered
+            pol.user_comment = text.get()
+        # If we're clearing the comment window, do so now
+        if self.clear_comment_entry_window.get() is True:
+            entry.delete(0, 'end')
 
     def _start_button_command(
             self, button
@@ -485,7 +568,7 @@ if __name__ == '__main__':
     # UPDATE THIS LIST!!! Add new Polar devices as separate tuples in the form:
     # ('Mac address', 'user-created ID', [any from 'ppg', 'hr', 'ppi'])
     polars = [
-        ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),    # CMS 1 on armband
+        # ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),    # CMS 1 on armband
         ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
     ]
     gui = Gui(pol_details=polars)
