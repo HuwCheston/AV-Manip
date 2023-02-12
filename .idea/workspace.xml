@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ca51b7c1-a2b3-42b2-bb25-bf85c4edb404" name="Changes" comment="More PolThreadLight changes">
+    <list default="true" id="ca51b7c1-a2b3-42b2-bb25-bf85c4edb404" name="Changes" comment="Added free text entry to PolThreadLight GUI">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PolThreadLight.py" beforeDir="false" afterPath="$PROJECT_DIR$/PolThreadLight.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +87,10 @@
       <option name="presentableId" value="Default" />
       <updated>1670853338387</updated>
       <workItem from="1670853341317" duration="2486000" />
-      <workItem from="1671013653117" duration="5849000" />
+      <workItem from="1671013653117" duration="6654000" />
+      <workItem from="1672830031911" duration="5391000" />
+      <workItem from="1672928527802" duration="17000" />
+      <workItem from="1676200122635" duration="3004000" />
     </task>
     <task id="LOCAL-00001" summary="More PolThreadLight changes">
       <created>1670856332140</created>
@@ -95,7 +99,21 @@
       <option name="project" value="LOCAL" />
       <updated>1670856332140</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Fixed a small bug in PolThreadLight.py and added print statements.">
+      <created>1671019855345</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1671019855345</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Added free text entry to PolThreadLight GUI">
+      <created>1672834872908</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1672834872908</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -115,10 +133,12 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="More PolThreadLight changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="More PolThreadLight changes" />
+    <MESSAGE value="Fixed a small bug in PolThreadLight.py and added print statements." />
+    <MESSAGE value="Added free text entry to PolThreadLight GUI" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added free text entry to PolThreadLight GUI" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/AV_Manip$PolThreadLight.coverage" NAME="PolThreadLight Coverage Results" MODIFIED="1671019575195" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AV_Manip$PolThreadLight.coverage" NAME="PolThreadLight Coverage Results" MODIFIED="1676203763981" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/AV_Manip$main.coverage" NAME="main Coverage Results" MODIFIED="1670854116832" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

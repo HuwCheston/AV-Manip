@@ -6,7 +6,6 @@ import threading
 from datetime import datetime, timezone
 from bleak import BleakClient
 import pandas as pd
-from typing import Callable
 import struct
 import math
 import pickle
@@ -53,9 +52,7 @@ TIME_FMT_SAVE = '%Y-%m-%d_%H-%M-%S'
 
 class PolThread:
     """Receives biometric data from a single Polar Verity Sense unit over Bluetooth LE"""
-    def __init__(
-            self, address: str, is_recording: bool, logger: Callable
-    ):
+    def __init__(self, address, is_recording, logger):
         self.running = asyncio.Event()
         self.output_folder: str = os.getcwd()
         self.address = address[0]
@@ -74,9 +71,7 @@ class PolThread:
         self.client = BleakClient(self.address)
         threading.Thread(target=asyncio.run, args=(self._init_polar(),)).start()
 
-    async def _init_polar(
-            self
-    ) -> None:
+    async def _init_polar(self):
         """
         Send bytes to PMD Control to start data streams and keep them alive until the GUI is closed
         """
@@ -96,9 +91,7 @@ class PolThread:
             # Disconnect from client
             await self.client.disconnect()
 
-    async def _open_streams(
-            self
-    ) -> None:
+    async def _open_streams(self):
         """
         Gathers functions to open Polar streams. Doesn't run concurrently, as need to wait when SDK activated
         """
@@ -126,9 +119,7 @@ class PolThread:
             # Gather data from PPI stream
             await self.client.start_notify(UUID['PMD_Data'], self._format_ppi)
 
-    def _close_streams(
-            self
-    ) -> list[Callable]:
+    def _close_streams(self):
         """
         Gathers functions to close open Polar streams
         """
@@ -143,9 +134,7 @@ class PolThread:
         tasks.append(self.client.stop_notify(UUID['PMD_Control']))  # Stop PMD Control
         return tasks
 
-    def _report_init(
-            self, _, data: bytearray
-    ) -> None:
+    def _report_init(self, _, data):
         """
         Report once correct response reported from device
         """
@@ -162,9 +151,7 @@ class PolThread:
         elif data[0:2] == bytearray(b'\xf0\x02') and data[3] == 0:
             self.logger(f'{self.desc}: connected')
 
-    def _format_ppi(
-            self, _, data: bytearray
-    ) -> None:
+    def _format_ppi(self, _, data):
         """
         Formats incoming PPI stream, combines with OS timestamp and appends to required list
         """
@@ -191,9 +178,7 @@ class PolThread:
                 self._append_results(stream='ppi', data=sample)
 
     @staticmethod
-    def _convert_to_timestamp(
-            data: bytearray, start: int, end: int
-    ) -> datetime:
+    def _convert_to_timestamp(data, start, end):
         """
         Converts bytearray to timestamp
         """
@@ -204,19 +189,16 @@ class PolThread:
             )
         )
 
-    def _format_ppg(
-            self, _, data: bytearray
-    ) -> None:
+    def _format_ppg(self, _, data):
         """
         Formats incoming ppg stream
         """
-        def get_ppg_value(
-                subdata: bytearray
-        ) -> tuple:
+        def get_ppg_value(subdata):
             """
             Gets PPG value from subdata array
             """
             return struct.unpack("<i", subdata + (b'\0' if subdata[2] < 128 else b'\xff'))[0]
+
         # Append raw data plus timestamp
         if self.is_recording:
             self.raw_data['ppg'].append((datetime.now(tz=timezone.utc).strftime(TIME_FMT), data))
@@ -236,9 +218,7 @@ class PolThread:
             # Append the delta frame
             self._append_results(stream='ppg', data=sample)
 
-    def _format_hr(
-            self, _, data: bytearray
-    ) -> None:
+    def _format_hr(self, _, data):
         """
         Appends reported heart rate and current OS time to HR list
         """
@@ -253,18 +233,14 @@ class PolThread:
         }
         self._append_results(stream='hr', data=sample)
 
-    def start_polar(
-            self, record_start
-    ):
+    def start_polar(self, record_start):
         """
         Starts appending data to results lists
         """
         self.is_recording = True
         self.timer = record_start
 
-    def stop_polar(
-            self
-    ) -> None:
+    def stop_polar(self):
         """
         Save and clear both data streams and report number of observations
         """
@@ -274,9 +250,7 @@ class PolThread:
             report_data.append(self._save_data(data=v, ext=k))
         self.logger(self._report_results(streams=report_data))
 
-    def _append_results(
-            self, stream: str, data: dict
-    ) -> None:
+    def _append_results(self, stream, data):
         """
         Appends results to required list and logs when data is received for the first time
         """
@@ -293,9 +267,7 @@ class PolThread:
             # Append the data
             self.results[stream].append(data)
 
-    def _save_data(
-            self, data: list, ext='hr'
-    ) -> tuple[str, bool]:
+    def _save_data(self, data, ext='hr'):
         """
         Saves given data as dataframe and pickle object, returns length of dataframe for reporting
         """
@@ -313,9 +285,7 @@ class PolThread:
         else:
             return ext, False
 
-    def _save_raw_data(
-            self, fn: str
-    ) -> None:
+    def _save_raw_data(self, fn):
         """
         Saves raw data as Python pickle file
         """
@@ -324,9 +294,7 @@ class PolThread:
         # Dump raw data as pickle file
         pickle.dump(self.raw_data, open(filename, "wb"))
 
-    def _report_results(
-            self, streams: dict
-    ) -> str:
+    def _report_results(self, streams):
         """
         Construct report of recorded datastreams for logging in GUI
         """
@@ -351,7 +319,7 @@ class Gui:
     """
     Basic Tkinter GUI to start, stop and log recordings made in multiple PolThreads.
     """
-    def __init__(self, pol_details: list[tuple[str | list]], **kwargs):
+    def __init__(self, pol_details, **kwargs):
         # Boolean used to store whether we're currently recording data
         self.is_recording: bool = False
         # Folder to store output in, can be set as keyword argument when initialising GUI or via a button in the GUI
@@ -376,26 +344,21 @@ class Gui:
         )
 
     @staticmethod
-    def _pack_widgets(
-            *args
-    ) -> None:
+    def _pack_widgets(*args):
         """
         Packs an arbitrary number of tkinter widgets passed in as arguments into the GUI root
         """
         for widget in args:
             widget.pack()
 
-    def _init_polthreads(
-            self, pol_details
-    ) -> list[PolThread]:
+    def _init_polthreads(self, pol_details):
         """
         Creates polthread objects according to passed parameters
         """
         return [PolThread(address=polar, is_recording=self.is_recording, logger=self.log_text) for polar in pol_details]
 
     @staticmethod
-    def _init_root(
-    ) -> tk.Tk:
+    def _init_root():
         """
         Initialises tkinter root and packs
         """
@@ -411,9 +374,7 @@ class Gui:
         lab2.pack()
         return root
 
-    def _init_folder_select_button(
-            self
-    ) -> tk.Button:
+    def _init_folder_select_button(self):
         """
         Initialises button to select output directory.
         """
@@ -422,9 +383,7 @@ class Gui:
         button.configure(command=lambda: self.open_folder(button))
         return button
 
-    def open_folder(
-            self, button: tk.Button
-    ) -> str:
+    def open_folder(self, button):
         """
         Prompts for the user to select a directory for saving output results and passes to all PolThreads
         """
@@ -441,9 +400,7 @@ class Gui:
         else:
             button.configure(bg='red', text='Invalid folder!')
 
-    def _init_logging_window(
-            self
-    ) -> tk.scrolledtext.ScrolledText:
+    def _init_logging_window(self):
         """
         Initialises logging window
         """
@@ -452,9 +409,7 @@ class Gui:
             self.root, height=5, width=45, state='disabled', wrap='word', font='TkDefaultFont'
         )
 
-    def _init_start_button(
-            self
-    ) -> tk.Button:
+    def _init_start_button(self):
         """
         Initialises recording start/stop button
         """
@@ -463,9 +418,7 @@ class Gui:
         button.configure(command=lambda: self._start_button_command(button))
         return button
 
-    def _init_comment_frame(
-            self
-    ) -> tk.Frame:
+    def _init_comment_frame(self):
         """
         Initialise frame, entry, and button for user to add comment to incoming data
         """
@@ -487,9 +440,7 @@ class Gui:
         # Return the frame
         return frame
 
-    def _init_checkbutton_frame(
-            self
-    ) -> tk.Frame:
+    def _init_checkbutton_frame(self):
         """
         Initialise checkbutton for user to indicate whether comment entry window should be cleared after adding to data
         """
@@ -507,9 +458,7 @@ class Gui:
         # Return the frame
         return frame
 
-    def _add_comment_button_command(
-            self, text: tk.StringVar, entry: tk.Entry
-    ):
+    def _add_comment_button_command(self, text, entry):
         """
         Updates timestamp parameter in all polar threads to currently entered timestamp
         """
@@ -521,9 +470,7 @@ class Gui:
         if self.clear_comment_entry_window.get() is True:
             entry.delete(0, 'end')
 
-    def _start_button_command(
-            self, button
-    ):
+    def _start_button_command(self, button):
         """
         Tells all connected PolThreads to start recording data
         """
@@ -539,9 +486,7 @@ class Gui:
             for polar in self.polthreads:
                 polar.start_polar(record_start)
 
-    def log_text(
-            self, text: str
-    ) -> None:
+    def log_text(self, text):
         """
         Logging function passes to connected PolThreads to add text to GUI
         """
@@ -554,9 +499,7 @@ class Gui:
         # Disable logging window
         self.logging_window.config(state='disabled')
 
-    def quit(
-            self
-    ) -> None:
+    def quit(self):
         """
         Called when GUI is quit to pass exit function to connected PolThreads
         """
@@ -568,8 +511,9 @@ if __name__ == '__main__':
     # UPDATE THIS LIST!!! Add new Polar devices as separate tuples in the form:
     # ('Mac address', 'user-created ID', [any from 'ppg', 'hr', 'ppi'])
     polars = [
+        ('A0:9E:1A:B2:2B:B6', 'CMS_2', ['ppi'])
         # ('A0:9E:1A:B2:2B:5B', 'CMS_1', ['ppg']),    # CMS 1 on armband
-        ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
+        # ('A0:9E:1A:B2:2A:08', 'CMS_3', ['ppi']),   # CMS 3 on armband
     ]
     gui = Gui(pol_details=polars)
     gui.root.mainloop()
