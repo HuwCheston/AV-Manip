@@ -321,13 +321,13 @@ class Gui:
     """
     def __init__(self, pol_details, **kwargs):
         # Boolean used to store whether we're currently recording data
-        self.is_recording: bool = False
+        self.is_recording = False
         # Folder to store output in, can be set as keyword argument when initialising GUI or via a button in the GUI
-        self.output_folder: str = kwargs.get('output_folder', os.getcwd())
+        self.output_folder = kwargs.get('output_folder', os.getcwd())
         # Whether we should clear the timestamp entry window after adding in a timestamp
         self.clear_comment_entry_window = kwargs.get('clear_window', False)
         # String to store the timestamp
-        self.timestamp: None | str = None
+        self.timestamp = None
         # List of polar threads
         self.polthreads = self._init_polthreads(pol_details)
         # Tkinter GUI variables
